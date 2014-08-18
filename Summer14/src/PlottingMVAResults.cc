@@ -474,12 +474,26 @@ void TMVAGlob::CreateCanvasandFrameROC(const double & minPTbin, const double & m
 
   banner4Plot(false,minPTbin,maxPTbin,puMin,puMax);
 
-  TLatex latex;
-  latex.SetNDC();
-  latex.SetTextAlign(21); // align right                                                                                                                                                  
-  latex.SetTextSize(0.033);
-  latex.DrawLatex(0.547,0.92,Form("CMS Preliminary Simulation, #sqrt{s} = 13 TeV"));
-
+  TLatex *   tex = new TLatex(0.85,0.92," (13 TeV)");
+  tex->SetNDC();
+  tex->SetTextAlign(31);
+  tex->SetTextFont(42);
+  tex->SetTextSize(0.04);
+  tex->SetLineWidth(2);
+  tex->Draw();
+  tex = new TLatex(0.13,0.92,"CMS");
+  tex->SetNDC();
+  tex->SetTextFont(61);
+  tex->SetTextSize(0.04);
+  tex->SetLineWidth(2);
+  tex->Draw();
+  tex = new TLatex(0.2324,0.92,"Preliminary Simulation");
+  tex->SetNDC();
+  tex->SetTextFont(52);
+  tex->SetTextSize(0.0304);
+  tex->SetLineWidth(2);
+  tex->Draw();
+  
   cROCLog_ = new TCanvas((std::string("cROCLog")+std::string(inputFiles_.at(0)->GetName())).c_str(),"cROC",180,52,550,550);
 
   cROCLog_->cd();
@@ -514,11 +528,26 @@ void TMVAGlob::CreateCanvasandFrameROC(const double & minPTbin, const double & m
 
   banner4Plot(false,minPTbin,maxPTbin,puMin,puMax);
 
-  latex.SetNDC();
-  latex.SetTextAlign(21); // align right                                                                                                                                                  
-  latex.SetTextSize(0.033);
-  latex.DrawLatex(0.547,0.92,Form("CMS Preliminary Simulation, #sqrt{s} = 13 TeV"));
-
+  tex = new TLatex(0.85,0.92," (13 TeV)");
+  tex->SetNDC();
+  tex->SetTextAlign(31);
+  tex->SetTextFont(42);
+  tex->SetTextSize(0.04);
+  tex->SetLineWidth(2);
+  tex->Draw();
+  tex = new TLatex(0.13,0.92,"CMS");
+  tex->SetNDC();
+  tex->SetTextFont(61);
+  tex->SetTextSize(0.04);
+  tex->SetLineWidth(2);
+  tex->Draw();
+  tex = new TLatex(0.2324,0.92,"Preliminary Simulation");
+  tex->SetNDC();
+  tex->SetTextFont(52);
+  tex->SetTextSize(0.0304);
+  tex->SetLineWidth(2);
+  tex->Draw();
+  
   legROC_ = new TLegend(0.17,0.43,0.56,0.87,NULL,"brNDC");
 
   legROC_->SetBorderSize(0);
@@ -1121,12 +1150,26 @@ void TMVAGlob::plotMVAs(TFile* inputFile,  const std::string & inputName, HistTy
       t->SetTextAngle( 90 );
       t->AppendPad();
 
-      // update canvas                                                                                                                                                                  
-      TLatex latex;
-      latex.SetNDC();
-      latex.SetTextAlign(21); // align right                                                                                                                                 
-      latex.SetTextSize(0.033);
-      latex.DrawLatex(0.547,0.92,Form("CMS Preliminary Simulation, #sqrt{s} = 13 TeV"));
+
+      TLatex *   tex = new TLatex(0.85,0.92," (13 TeV)");
+      tex->SetNDC();
+      tex->SetTextAlign(31);
+      tex->SetTextFont(42);
+      tex->SetTextSize(0.04);
+      tex->SetLineWidth(2);
+      tex->Draw();
+      tex = new TLatex(0.13,0.92,"CMS");
+      tex->SetNDC();
+      tex->SetTextFont(61);
+      tex->SetTextSize(0.04);
+      tex->SetLineWidth(2);
+      tex->Draw();
+      tex = new TLatex(0.2324,0.92,"Preliminary Simulation");
+      tex->SetNDC();
+      tex->SetTextFont(52);
+      tex->SetTextSize(0.0304);
+      tex->SetLineWidth(2);
+      tex->Draw();
       cMVAs_->Update();
 
       methodTitle.ReplaceAll(" ","_");
@@ -1470,14 +1513,28 @@ void TMVAGlob::plotSignificance (TFile* inputFile, const std::string & inputName
 
     cSignificance_->Update();
 
-    TLatex latex;
-    latex.SetNDC();
-    latex.SetTextAlign(21); // align right                                                                                                                                                
-    latex.SetTextSize(0.033);
-    latex.DrawLatex(0.547,0.92,Form("CMS Preliminary Simulation, #sqrt{s} = 13 TeV"));
-    latex.Delete();
 
     // print comments                                                                                                                                                                    
+    TLatex *   tex = new TLatex(0.85,0.92," (13 TeV)");
+    tex->SetNDC();
+    tex->SetTextAlign(31);
+    tex->SetTextFont(42);
+    tex->SetTextSize(0.04);
+    tex->SetLineWidth(2);
+    tex->Draw();
+    tex = new TLatex(0.13,0.92,"CMS");
+    tex->SetNDC();
+    tex->SetTextFont(61);
+    tex->SetTextSize(0.04);
+    tex->SetLineWidth(2);
+    tex->Draw();
+    tex = new TLatex(0.2324,0.92,"Preliminary Simulation");
+    tex->SetNDC();
+    tex->SetTextFont(52);
+    tex->SetTextSize(0.0304);
+    tex->SetLineWidth(2);
+    tex->Draw();
+
     TString name = Form("For %.4g signal and %.4g background",numberSignalEvents,numberBackgroundEvents);
     TPaveText* line1 = new TPaveText(0.22,0.21,0.5,0.26,"NDC");
     line1->SetBorderSize(0);

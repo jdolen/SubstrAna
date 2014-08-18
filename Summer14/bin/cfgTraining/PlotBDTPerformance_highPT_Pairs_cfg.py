@@ -8,8 +8,8 @@ process.Options = cms.PSet(
 
    InputLowPUFiles = cms.VPSet( 
      # first column
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mpruned_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{pruned}"), variableNameY = cms.string("M_{pruned}")),
-     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mpruned_mclean_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{pruned}"), variableNameY = cms.string("M_{clean}")),
+     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mpruned_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{pruned}"), variableNameY = cms.string("M_{pruned}")),
+#     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mpruned_mclean_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{pruned}"), variableNameY = cms.string("M_{clean}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mpruned_mconst_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{pruned}"), variableNameY = cms.string("M_{const}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mpruned_mtrim_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{pruned}"), variableNameY = cms.string("M_{trim}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mpruned_msoftbeta10_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{pruned}"), variableNameY = cms.string("M_{soft}(#beta=1)")),
@@ -26,24 +26,24 @@ process.Options = cms.PSet(
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mpruned_QGLikelihood_comb_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{pruned}"), variableNameY = cms.string("Q/G comb")),
 
      # second column
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mclean_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("M_{clean}")),
-     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mclean_mconst_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("M_{const}")),
-     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mclean_mtrim_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("M_{trim}")),
-     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mclean_msoftbeta10_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("M_{soft}(#beta=1)")),
-     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mclean_msoftbeta00_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("M_{soft}(#beta=0)")),
-     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mclean_tau1_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("#tau_{1}")),
-     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mclean_tau2_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("#tau_{2}")),
-     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mclean_tau2tau1_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("#tau_{2}/#tau_{1}")),
-     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mclean_Qjet_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("#Gamma_{Qjets}")),
-     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mclean_ECFbeta15_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("C_{2}(#beta=1.5)")),
-     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mclean_ECFbeta10_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("C_{2}(#beta=1)")),
-     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mclean_QGLikelihood_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("Q/G")),
-     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mclean_QGLikelihood_sub1_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("Q/G sub 1")),
-     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mclean_QGLikelihood_sub2_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("Q/G sub 2")),
-     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mclean_QGLikelihood_combo_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("Q/G comb")),
+#     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mclean_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("M_{clean}")),
+#     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mclean_mconst_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("M_{const}")),
+#     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mclean_mtrim_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("M_{trim}")),
+#     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mclean_msoftbeta10_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("M_{soft}(#beta=1)")),
+#     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mclean_msoftbeta00_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("M_{soft}(#beta=0)")),
+#     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mclean_tau1_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("#tau_{1}")),
+#     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mclean_tau2_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("#tau_{2}")),
+#     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mclean_tau2tau1_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("#tau_{2}/#tau_{1}")),
+#     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mclean_Qjet_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("#Gamma_{Qjets}")),
+#     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mclean_ECFbeta15_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("C_{2}(#beta=1.5)")),
+#     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mclean_ECFbeta10_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("C_{2}(#beta=1)")),
+#     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mclean_QGLikelihood_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("Q/G")),
+#     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mclean_QGLikelihood_sub1_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("Q/G sub 1")),
+#     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mclean_QGLikelihood_sub2_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("Q/G sub 2")),
+#     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mclean_QGLikelihood_combo_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("Q/G comb")),
 
      # third column
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mconst_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{const}"), variableNameY = cms.string("M_{const}")),
+     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mconst_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{const}"), variableNameY = cms.string("M_{const}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mconst_mtrim_PTBin_475_600_PU_0_39.root"), variableNameX = cms.string("M_{const}"), variableNameY = cms.string("M_{trim}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mconst_msoftbeta10_PTBin_475_600_PU_0_39.root"), variableNameX = cms.string("M_{const}"), variableNameY = cms.string("M_{soft}(#beta=1)")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mconst_msoftbeta00_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{const}"), variableNameY = cms.string("M_{soft}(#beta=0)")),
@@ -59,7 +59,7 @@ process.Options = cms.PSet(
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mconst_QGLikelihood_comb_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{const}"), variableNameY = cms.string("Q/G comb")),
 
      # fourth column
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mtrim_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{trim}"), variableNameY = cms.string("M_{trim}")),
+     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mtrim_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{trim}"), variableNameY = cms.string("M_{trim}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mtrim_msoftbeta10_PTBin_475_600_PU_0_39.root"), variableNameX = cms.string("M_{trim}"), variableNameY = cms.string("M_{soft}(#beta=1)")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mtrim_msoftbeta00_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{trim}"), variableNameY = cms.string("M_{soft}(#beta=0)")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mtrim_tau1_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{trim}"), variableNameY = cms.string("#tau_{1}")),
@@ -74,7 +74,7 @@ process.Options = cms.PSet(
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_mtrim_QGLikelihood_comb_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{trim}"), variableNameY = cms.string("Q/G comb")),
 
      # fourth column
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU/outputTMVATraining_highPT_lowPU/TMVATrainingResult_msoftbeta10_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{soft}(#beta=1)"), variableNameY = cms.string("M_{soft}(#beta=1)")),
+     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_msoftbeta10_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{soft}(#beta=1)"), variableNameY = cms.string("M_{soft}(#beta=1)")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_msoftbeta10_msoftbeta00_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{soft}(#beta=1)"), variableNameY = cms.string("M_{soft}(#beta=0)")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_msoftbeta10_tau1_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{soft}(#beta=1)"), variableNameY = cms.string("#tau_{1}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_msoftbeta10_tau2_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{soft}(#beta=1)"), variableNameY = cms.string("#tau_{2}")),
@@ -88,7 +88,7 @@ process.Options = cms.PSet(
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_msoftbeta10_QGLikelihood_comb_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{soft}(#beta=1)"), variableNameY = cms.string("Q/G comb")),
 
      # fifth column
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU/outputTMVATraining_highPT_lowPU/TMVATrainingResult_msoftbeta00_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{soft}(#beta=0)"), variableNameY = cms.string("M_{soft}(#beta=0)")),
+     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_msoftbeta00_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{soft}(#beta=0)"), variableNameY = cms.string("M_{soft}(#beta=0)")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_msoftbeta00_tau1_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{soft}(#beta=0)"), variableNameY = cms.string("#tau_{1}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_msoftbeta00_tau2_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{soft}(#beta=0)"), variableNameY = cms.string("#tau_{2}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_msoftbeta00_tau2tau1_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{soft}(#beta=0)"), variableNameY = cms.string("#tau_{2}/#tau_{1}")),
@@ -101,7 +101,7 @@ process.Options = cms.PSet(
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_msoftbeta00_QGLikelihood_comb_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("M_{soft}(#beta=0)"), variableNameY = cms.string("Q/G comb")),
 
      # sixth column
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU/outputTMVATraining_highPT_lowPU/TMVATrainingResult_tau1_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("#tau_{1}"), variableNameY = cms.string("#tau_{1}")),
+     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_tau1_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("#tau_{1}"), variableNameY = cms.string("#tau_{1}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_tau1_tau2_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("#tau_{1}"), variableNameY = cms.string("#tau_{2}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_tau1_tau2tau1_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("#tau_{1}"), variableNameY = cms.string("#tau_{2}/#tau_{1}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_tau1_Qjets_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("#tau_{1}"), variableNameY = cms.string("#Gamma_{Qjets}")),
@@ -113,8 +113,8 @@ process.Options = cms.PSet(
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_tau1_QGLikelihood_comb_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("#tau_{1}"), variableNameY = cms.string("Q/G comb")),
 
      # seventh column
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU/outputTMVATraining_highPT_lowPU/TMVATrainingResult_tau2_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("#tau_{2}"), variableNameY = cms.string("#tau_{2}")),
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU/outputTMVATraining_highPT_lowPU/TMVATrainingResult_tau2_tau1_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("#tau_{2}"), variableNameY = cms.string("#tau_{2}/#tau_{1}")),
+     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_tau2_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("#tau_{2}"), variableNameY = cms.string("#tau_{2}")),
+     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_tau2_tau1_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("#tau_{2}"), variableNameY = cms.string("#tau_{2}/#tau_{1}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_tau2_Qjets_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("#tau_{2}"), variableNameY = cms.string("#Gamma_{Qjets}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_tau2_ECFbeta15_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("#tau_{2}"), variableNameY = cms.string("C_{2}(#beta=1.5)")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_tau2_ECFbeta10_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("#tau_{2}"), variableNameY = cms.string("C_{2}(#beta=1)")),
@@ -125,7 +125,7 @@ process.Options = cms.PSet(
      
      
      # eight column
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU/outputTMVATraining_highPT_lowPU/TMVATrainingResult_tau2_tau1_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("#tau_{2}/#tau_{1}"), variableNameY = cms.string("#tau_{2}/#tau_{1}")),
+     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_tau2_tau1_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("#tau_{2}/#tau_{1}"), variableNameY = cms.string("#tau_{2}/#tau_{1}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_tau2tau1_Qjets_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("#tau_{2}/#tau_{1}"), variableNameY = cms.string("#Gamma_{Qjets}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_tau2tau1_ECFbeta15_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("#tau_{2}/#tau_{1}"), variableNameY = cms.string("C_{2}(#beta=1.5)")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_tau2tau1_ECFbeta10_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("#tau_{2}/#tau_{1}"), variableNameY = cms.string("C_{2}(#beta=1)")),
@@ -135,7 +135,7 @@ process.Options = cms.PSet(
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_tau2tau1_QGLikelihood_comb_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("#tau_{2}/#tau_{1}"), variableNameY = cms.string("Q/G comb")),
 
      # ninth column
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU/outputTMVATraining_highPT_lowPU/TMVATrainingResult_Qjets_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("#Gamma_{Qjets}"), variableNameY = cms.string("#Gamma_{Qjets}")),
+     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_Qjets_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("#Gamma_{Qjets}"), variableNameY = cms.string("#Gamma_{Qjets}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_Qjets_ECFbeta15_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("#Gamma_{Qjets}"), variableNameY = cms.string("C_{2}(#beta=1.5)")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_Qjets_ECFbeta10_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("#Gamma_{Qjets}"), variableNameY = cms.string("C_{2}(#beta=1)")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_Qjets_QGLikelihood_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("#Gamma_{Qjets}"), variableNameY = cms.string("Q/G")),
@@ -144,7 +144,7 @@ process.Options = cms.PSet(
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_Qjets_QGLikelihood_comb_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("#Gamma_{Qjets}"), variableNameY = cms.string("Q/G comb")),
 
      # ninth column
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU/outputTMVATraining_highPT_lowPU/TMVATrainingResult_ECFbeta15_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("C_{2}(#beta=1.5)"), variableNameY = cms.string("C_{2}(#beta=1.5)")),
+     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_ECFbeta15_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("C_{2}(#beta=1.5)"), variableNameY = cms.string("C_{2}(#beta=1.5)")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_ECFbeta15_ECFbeta10_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("C_{2}(#beta=1.5)"), variableNameY = cms.string("C_{2}(#beta=1)")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_ECFbeta15_QGLikelihood_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("C_{2}(#beta=1.5)"), variableNameY = cms.string("Q/G")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_ECFbeta15_QGLikelihood_sub1_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("C_{2}(#beta=1.5)"), variableNameY = cms.string("Q/G sub 1")),
@@ -152,29 +152,29 @@ process.Options = cms.PSet(
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_ECFbeta15_QGLikelihood_comb_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("C_{2}(#beta=1.5)"), variableNameY = cms.string("Q/G comb")),
 
      # tenth column
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU/outputTMVATraining_highPT_lowPU/TMVATrainingResult_ECFbeta10_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("C_{2}(#beta=1)"), variableNameY = cms.string("C_{2}(#beta=1)")),
+     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_ECFbeta10_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("C_{2}(#beta=1)"), variableNameY = cms.string("C_{2}(#beta=1)")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_ECFbeta10_QGLikelihood_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("C_{2}(#beta=1)"), variableNameY = cms.string("Q/G")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_ECFbeta10_QGLikelihood_sub1_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("C_{2}(#beta=1)"), variableNameY = cms.string("Q/G sub 1")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_ECFbeta10_QGLikelihood_sub2_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("C_{2}(#beta=1)"), variableNameY = cms.string("Q/G sub 2")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_ECFbeta10_QGLikelihood_comb_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("C_{2}(#beta=1)"), variableNameY = cms.string("Q/G comb")),
 
      # tenth column
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU/outputTMVATraining_highPT_lowPU/TMVATrainingResult_QGLikelihood_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("Q/G"), variableNameY = cms.string("Q/G")),
+     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_QGLikelihood_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("Q/G"), variableNameY = cms.string("Q/G")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_QGLikelihood_QGLikelihood_sub1_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("Q/G"), variableNameY = cms.string("Q/G sub 1")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_QGLikelihood_QGLikelihood_sub2_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("Q/G"), variableNameY = cms.string("Q/G sub 2")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_QGLikelihood_QGLikelihood_comb_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("Q/G"), variableNameY = cms.string("Q/G comb")),
 
      # tenth column
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU/outputTMVATraining_highPT_lowPU/TMVATrainingResult_QGLikelihood_sub1_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("Q/G sub 1"), variableNameY = cms.string("Q/G sub 1")),
+     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_QGLikelihood_sub1_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("Q/G sub 1"), variableNameY = cms.string("Q/G sub 1")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_QGLikelihood_sub1_QGLikelihood_sub2_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("Q/G sub 1"), variableNameY = cms.string("Q/G sub 2")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_QGLikelihood_sub1_QGLikelihood_comb_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("Q/G sub 1"), variableNameY = cms.string("Q/G comb")),
 
      # tenth column
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU/outputTMVATraining_highPT_lowPU/TMVATrainingResult_QGLikelihood_sub2_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("Q/G sub 2"), variableNameY = cms.string("Q/G sub 2")),
+     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_QGLikelihood_sub2_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("Q/G sub 2"), variableNameY = cms.string("Q/G sub 2")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_QGLikelihood_sub2_QGLikelihood_comb_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("Q/G sub 2"), variableNameY = cms.string("Q/G comb")),
 
      # tenth column
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU/outputTMVATraining_highPT_lowPU/TMVATrainingResult_QGLikelihood_comb_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("Q/G comb"), variableNameY = cms.string("Q/G comb")),
+     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_QGLikelihood_comb_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("Q/G comb"), variableNameY = cms.string("Q/G comb")),
 
      cms.PSet(fileName = cms.string("AllVariablesTraining_highPT_lowPU_BDTG/outputTMVATraining_highPT_lowPU/TMVATrainingResult_allvariables_PTBin_475_600_PU_0_39.root"), variableNameX =  cms.string("all"), variableNameY = cms.string("all")),
 
@@ -184,8 +184,8 @@ process.Options = cms.PSet(
 
    InputHighPUFiles = cms.VPSet( 
      # first column
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU/outputTMVATraining_highPT_highPU/TMVATrainingResult_mpruned_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{pruned}"), variableNameY = cms.string("M_{pruned}")),
-     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mpruned_mclean_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{pruned}"), variableNameY = cms.string("M_{clean}")),
+     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mpruned_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{pruned}"), variableNameY = cms.string("M_{pruned}")),
+#     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mpruned_mclean_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{pruned}"), variableNameY = cms.string("M_{clean}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mpruned_mconst_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{pruned}"), variableNameY = cms.string("M_{const}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mpruned_mtrim_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{pruned}"), variableNameY = cms.string("M_{trim}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mpruned_msoftbeta10_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{pruned}"), variableNameY = cms.string("M_{soft}(#beta=1)")),
@@ -202,24 +202,24 @@ process.Options = cms.PSet(
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mpruned_QGLikelihood_comb_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{pruned}"), variableNameY = cms.string("Q/G comb")),
 
      # second column
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU/outputTMVATraining_highPT_highPU/TMVATrainingResult_mclean_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("M_{clean}")),
-     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mclean_mconst_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("M_{const}")),
-     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mclean_mtrim_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("M_{trim}")),
-     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mclean_msoftbeta10_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("M_{soft}(#beta=1)")),
-     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mclean_msoftbeta00_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("M_{soft}(#beta=0)")),
-     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mclean_tau1_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("#tau_{1}")),
-     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mclean_tau2_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("#tau_{2}")),
-     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mclean_tau2tau1_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("#tau_{2}/#tau_{1}")),
-     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mclean_Qjet_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("#Gamma_{Qjets}")),
-     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mclean_ECFbeta15_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("C_{2}(#beta=1.5)")),
-     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mclean_ECFbeta10_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("C_{2}(#beta=1)")),
-     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mclean_QGLikelihood_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("Q/G")),
-     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mclean_QGLikelihood_sub1_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("Q/G sub 1")),
-     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mclean_QGLikelihood_sub2_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("Q/G sub 2")),
-     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mclean_QGLikelihood_combo_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("Q/G comb")),
+#     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mclean_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("M_{clean}")),
+#     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mclean_mconst_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("M_{const}")),
+#     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mclean_mtrim_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("M_{trim}")),
+#     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mclean_msoftbeta10_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("M_{soft}(#beta=1)")),
+#     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mclean_msoftbeta00_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("M_{soft}(#beta=0)")),
+#     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mclean_tau1_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("#tau_{1}")),
+#     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mclean_tau2_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("#tau_{2}")),
+#     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mclean_tau2tau1_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("#tau_{2}/#tau_{1}")),
+#     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mclean_Qjet_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("#Gamma_{Qjets}")),
+#     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mclean_ECFbeta15_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("C_{2}(#beta=1.5)")),
+#     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mclean_ECFbeta10_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("C_{2}(#beta=1)")),
+#     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mclean_QGLikelihood_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("Q/G")),
+#     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mclean_QGLikelihood_sub1_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("Q/G sub 1")),
+#     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mclean_QGLikelihood_sub2_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("Q/G sub 2")),
+#     cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mclean_QGLikelihood_combo_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{clean}"), variableNameY = cms.string("Q/G comb")),
 
      # third column
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU/outputTMVATraining_highPT_highPU/TMVATrainingResult_mconst_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{const}"), variableNameY = cms.string("M_{const}")),
+     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mconst_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{const}"), variableNameY = cms.string("M_{const}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mconst_mtrim_PTBin_475_600_PU_39_100.root"), variableNameX = cms.string("M_{const}"), variableNameY = cms.string("M_{trim}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mconst_msoftbeta10_PTBin_475_600_PU_39_100.root"), variableNameX = cms.string("M_{const}"), variableNameY = cms.string("M_{soft}(#beta=1)")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mconst_msoftbeta00_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{const}"), variableNameY = cms.string("M_{soft}(#beta=0)")),
@@ -235,7 +235,7 @@ process.Options = cms.PSet(
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mconst_QGLikelihood_comb_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{const}"), variableNameY = cms.string("Q/G comb")),
 
      # fourth column
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU/outputTMVATraining_highPT_highPU/TMVATrainingResult_mtrim_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{trim}"), variableNameY = cms.string("M_{trim}")),
+     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mtrim_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{trim}"), variableNameY = cms.string("M_{trim}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mtrim_msoftbeta10_PTBin_475_600_PU_39_100.root"), variableNameX = cms.string("M_{trim}"), variableNameY = cms.string("M_{soft}(#beta=1)")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mtrim_msoftbeta00_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{trim}"), variableNameY = cms.string("M_{soft}(#beta=0)")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mtrim_tau1_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{trim}"), variableNameY = cms.string("#tau_{1}")),
@@ -250,7 +250,7 @@ process.Options = cms.PSet(
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_mtrim_QGLikelihood_comb_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{trim}"), variableNameY = cms.string("Q/G comb")),
 
      # fourth column
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU/outputTMVATraining_highPT_highPU/TMVATrainingResult_msoftbeta10_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{soft}(#beta=1)"), variableNameY = cms.string("M_{soft}(#beta=1)")),
+     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_msoftbeta10_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{soft}(#beta=1)"), variableNameY = cms.string("M_{soft}(#beta=1)")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_msoftbeta10_msoftbeta00_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{soft}(#beta=1)"), variableNameY = cms.string("M_{soft}(#beta=0)")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_msoftbeta10_tau1_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{soft}(#beta=1)"), variableNameY = cms.string("#tau_{1}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_msoftbeta10_tau2_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{soft}(#beta=1)"), variableNameY = cms.string("#tau_{2}")),
@@ -264,7 +264,7 @@ process.Options = cms.PSet(
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_msoftbeta10_QGLikelihood_comb_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{soft}(#beta=1)"), variableNameY = cms.string("Q/G comb")),
 
      # fifth column
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU/outputTMVATraining_highPT_highPU/TMVATrainingResult_msoftbeta00_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{soft}(#beta=0)"), variableNameY = cms.string("M_{soft}(#beta=0)")),
+     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_msoftbeta00_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{soft}(#beta=0)"), variableNameY = cms.string("M_{soft}(#beta=0)")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_msoftbeta00_tau1_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{soft}(#beta=0)"), variableNameY = cms.string("#tau_{1}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_msoftbeta00_tau2_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{soft}(#beta=0)"), variableNameY = cms.string("#tau_{2}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_msoftbeta00_tau2tau1_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{soft}(#beta=0)"), variableNameY = cms.string("#tau_{2}/#tau_{1}")),
@@ -277,7 +277,7 @@ process.Options = cms.PSet(
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_msoftbeta00_QGLikelihood_comb_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("M_{soft}(#beta=0)"), variableNameY = cms.string("Q/G comb")),
 
      # sixth column
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU/outputTMVATraining_highPT_highPU/TMVATrainingResult_tau1_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("#tau_{1}"), variableNameY = cms.string("#tau_{1}")),
+     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_tau1_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("#tau_{1}"), variableNameY = cms.string("#tau_{1}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_tau1_tau2_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("#tau_{1}"), variableNameY = cms.string("#tau_{2}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_tau1_tau2tau1_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("#tau_{1}"), variableNameY = cms.string("#tau_{2}/#tau_{1}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_tau1_Qjets_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("#tau_{1}"), variableNameY = cms.string("#Gamma_{Qjets}")),
@@ -289,8 +289,8 @@ process.Options = cms.PSet(
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_tau1_QGLikelihood_comb_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("#tau_{1}"), variableNameY = cms.string("Q/G comb")),
 
      # seventh column
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU/outputTMVATraining_highPT_highPU/TMVATrainingResult_tau2_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("#tau_{2}"), variableNameY = cms.string("#tau_{2}")),
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU/outputTMVATraining_highPT_highPU/TMVATrainingResult_tau2_tau1_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("#tau_{2}"), variableNameY = cms.string("#tau_{2}/#tau_{1}")),
+     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_tau2_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("#tau_{2}"), variableNameY = cms.string("#tau_{2}")),
+     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_tau2_tau1_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("#tau_{2}"), variableNameY = cms.string("#tau_{2}/#tau_{1}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_tau2_Qjets_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("#tau_{2}"), variableNameY = cms.string("#Gamma_{Qjets}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_tau2_ECFbeta15_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("#tau_{2}"), variableNameY = cms.string("C_{2}(#beta=1.5)")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_tau2_ECFbeta10_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("#tau_{2}"), variableNameY = cms.string("C_{2}(#beta=1)")),
@@ -301,7 +301,7 @@ process.Options = cms.PSet(
      
      
      # eight column
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU/outputTMVATraining_highPT_highPU/TMVATrainingResult_tau2_tau1_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("#tau_{2}/#tau_{1}"), variableNameY = cms.string("#tau_{2}/#tau_{1}")),
+     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_tau2_tau1_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("#tau_{2}/#tau_{1}"), variableNameY = cms.string("#tau_{2}/#tau_{1}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_tau2tau1_Qjets_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("#tau_{2}/#tau_{1}"), variableNameY = cms.string("#Gamma_{Qjets}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_tau2tau1_ECFbeta15_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("#tau_{2}/#tau_{1}"), variableNameY = cms.string("C_{2}(#beta=1.5)")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_tau2tau1_ECFbeta10_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("#tau_{2}/#tau_{1}"), variableNameY = cms.string("C_{2}(#beta=1)")),
@@ -311,7 +311,7 @@ process.Options = cms.PSet(
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_tau2tau1_QGLikelihood_comb_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("#tau_{2}/#tau_{1}"), variableNameY = cms.string("Q/G comb")),
 
      # ninth column
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU/outputTMVATraining_highPT_highPU/TMVATrainingResult_Qjets_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("#Gamma_{Qjets}"), variableNameY = cms.string("#Gamma_{Qjets}")),
+     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_Qjets_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("#Gamma_{Qjets}"), variableNameY = cms.string("#Gamma_{Qjets}")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_Qjets_ECFbeta15_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("#Gamma_{Qjets}"), variableNameY = cms.string("C_{2}(#beta=1.5)")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_Qjets_ECFbeta10_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("#Gamma_{Qjets}"), variableNameY = cms.string("C_{2}(#beta=1)")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_Qjets_QGLikelihood_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("#Gamma_{Qjets}"), variableNameY = cms.string("Q/G")),
@@ -320,7 +320,7 @@ process.Options = cms.PSet(
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_Qjets_QGLikelihood_comb_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("#Gamma_{Qjets}"), variableNameY = cms.string("Q/G comb")),
 
      # ninth column
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU/outputTMVATraining_highPT_highPU/TMVATrainingResult_ECFbeta15_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("C_{2}(#beta=1.5)"), variableNameY = cms.string("C_{2}(#beta=1.5)")),
+     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_ECFbeta15_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("C_{2}(#beta=1.5)"), variableNameY = cms.string("C_{2}(#beta=1.5)")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_ECFbeta15_ECFbeta10_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("C_{2}(#beta=1.5)"), variableNameY = cms.string("C_{2}(#beta=1)")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_ECFbeta15_QGLikelihood_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("C_{2}(#beta=1.5)"), variableNameY = cms.string("Q/G")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_ECFbeta15_QGLikelihood_sub1_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("C_{2}(#beta=1.5)"), variableNameY = cms.string("Q/G sub 1")),
@@ -328,29 +328,29 @@ process.Options = cms.PSet(
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_ECFbeta15_QGLikelihood_comb_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("C_{2}(#beta=1.5)"), variableNameY = cms.string("Q/G comb")),
 
      # tenth column
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU/outputTMVATraining_highPT_highPU/TMVATrainingResult_ECFbeta10_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("C_{2}(#beta=1)"), variableNameY = cms.string("C_{2}(#beta=1)")),
+     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_ECFbeta10_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("C_{2}(#beta=1)"), variableNameY = cms.string("C_{2}(#beta=1)")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_ECFbeta10_QGLikelihood_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("C_{2}(#beta=1)"), variableNameY = cms.string("Q/G")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_ECFbeta10_QGLikelihood_sub1_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("C_{2}(#beta=1)"), variableNameY = cms.string("Q/G sub 1")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_ECFbeta10_QGLikelihood_sub2_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("C_{2}(#beta=1)"), variableNameY = cms.string("Q/G sub 2")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_ECFbeta10_QGLikelihood_comb_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("C_{2}(#beta=1)"), variableNameY = cms.string("Q/G comb")),
 
      # tenth column
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU/outputTMVATraining_highPT_highPU/TMVATrainingResult_QGLikelihood_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("Q/G"), variableNameY = cms.string("Q/G")),
+     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_QGLikelihood_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("Q/G"), variableNameY = cms.string("Q/G")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_QGLikelihood_QGLikelihood_sub1_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("Q/G"), variableNameY = cms.string("Q/G sub 1")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_QGLikelihood_QGLikelihood_sub2_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("Q/G"), variableNameY = cms.string("Q/G sub 2")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_QGLikelihood_QGLikelihood_comb_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("Q/G"), variableNameY = cms.string("Q/G comb")),
 
      # tenth column
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU/outputTMVATraining_highPT_highPU/TMVATrainingResult_QGLikelihood_sub1_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("Q/G sub 1"), variableNameY = cms.string("Q/G sub 1")),
+     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_QGLikelihood_sub1_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("Q/G sub 1"), variableNameY = cms.string("Q/G sub 1")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_QGLikelihood_sub1_QGLikelihood_sub2_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("Q/G sub 1"), variableNameY = cms.string("Q/G sub 2")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_QGLikelihood_sub1_QGLikelihood_comb_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("Q/G sub 1"), variableNameY = cms.string("Q/G comb")),
 
      # tenth column
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU/outputTMVATraining_highPT_highPU/TMVATrainingResult_QGLikelihood_sub2_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("Q/G sub 2"), variableNameY = cms.string("Q/G sub 2")),
+     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_QGLikelihood_sub2_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("Q/G sub 2"), variableNameY = cms.string("Q/G sub 2")),
      cms.PSet(fileName = cms.string("PairVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_QGLikelihood_sub2_QGLikelihood_comb_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("Q/G sub 2"), variableNameY = cms.string("Q/G comb")),
 
      # tenth column
-     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU/outputTMVATraining_highPT_highPU/TMVATrainingResult_QGLikelihood_comb_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("Q/G comb"), variableNameY = cms.string("Q/G comb")),
+     cms.PSet(fileName = cms.string("SingleVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_QGLikelihood_comb_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("Q/G comb"), variableNameY = cms.string("Q/G comb")),
 
      cms.PSet(fileName = cms.string("AllVariablesTraining_highPT_highPU_BDTG/outputTMVATraining_highPT_highPU/TMVATrainingResult_allvariables_PTBin_475_600_PU_39_100.root"), variableNameX =  cms.string("all"), variableNameY = cms.string("all")),
 
