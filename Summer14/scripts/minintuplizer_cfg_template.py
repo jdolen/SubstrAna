@@ -15,7 +15,8 @@ process.Options = cms.PSet(
 
     puppiConfig     = cms.string("PUPPICONFIG"), # puppi configuration to run
 
-    jetPtTresholdForGroomers   = cms.double(100.),
+    jetPtTresholdForGroomers      = cms.double(100.),
+    genjetPtTresholdForGroomers   = cms.double(50.),
     jetPtTresholdForTopTagging = cms.double(300.),
     genJetPtTresholdForTopTagging = cms.double(250.),
 
@@ -72,11 +73,41 @@ process.Options = cms.PSet(
     #charge
     jetcharge = cms.vdouble(0.5,0.7,1.0),
 
-    #energy correlator
+    #energy correlator                                                                                                                                                            
     energyCorrelator = cms.VPSet(
-     cms.PSet( ecfAlgo = cms.string('antikt_algorithm'), Rparam = cms.double(2.0), nPoint = cms.int32(2), beta = cms.double(0.5)),
-     cms.PSet( ecfAlgo = cms.string('antikt_algorithm'), Rparam = cms.double(2.0), nPoint = cms.int32(2), beta = cms.double(1.0)),
-     cms.PSet( ecfAlgo = cms.string('antikt_algorithm'), Rparam = cms.double(2.0), nPoint = cms.int32(2), beta = cms.double(1.5)),
-     cms.PSet( ecfAlgo = cms.string('antikt_algorithm'), Rparam = cms.double(2.0), nPoint = cms.int32(2), beta = cms.double(2.0)),
-    )
+     cms.PSet( ecfAlgo = cms.string('antikt_algorithm'), Rparam = cms.double(2.0), nPoint = cms.int32(2), beta = cms.double(0.5), type = cms.int32(0)),
+     cms.PSet( ecfAlgo = cms.string('antikt_algorithm'), Rparam = cms.double(2.0), nPoint = cms.int32(2), beta = cms.double(1.0), type = cms.int32(0)),
+     cms.PSet( ecfAlgo = cms.string('antikt_algorithm'), Rparam = cms.double(2.0), nPoint = cms.int32(2), beta = cms.double(1.5), type = cms.int32(0)),
+     cms.PSet( ecfAlgo = cms.string('antikt_algorithm'), Rparam = cms.double(2.0), nPoint = cms.int32(2), beta = cms.double(2.0), type = cms.int32(0)),
+     cms.PSet( ecfAlgo = cms.string('antikt_algorithm'), Rparam = cms.double(2.0), nPoint = cms.int32(2), beta = cms.double(2.5), type = cms.int32(0)),
+     cms.PSet( ecfAlgo = cms.string('antikt_algorithm'), Rparam = cms.double(2.0), nPoint = cms.int32(2), beta = cms.double(3.0), type = cms.int32(0)),
+
+     cms.PSet( ecfAlgo = cms.string('antikt_algorithm'), Rparam = cms.double(2.0), nPoint = cms.int32(3), beta = cms.double(0.5), type = cms.int32(0)),
+     cms.PSet( ecfAlgo = cms.string('antikt_algorithm'), Rparam = cms.double(2.0), nPoint = cms.int32(3), beta = cms.double(1.0), type = cms.int32(0)),
+     cms.PSet( ecfAlgo = cms.string('antikt_algorithm'), Rparam = cms.double(2.0), nPoint = cms.int32(3), beta = cms.double(1.5), type = cms.int32(0)),
+     cms.PSet( ecfAlgo = cms.string('antikt_algorithm'), Rparam = cms.double(2.0), nPoint = cms.int32(3), beta = cms.double(2.0), type = cms.int32(0)),
+     cms.PSet( ecfAlgo = cms.string('antikt_algorithm'), Rparam = cms.double(2.0), nPoint = cms.int32(3), beta = cms.double(2.5), type = cms.int32(0)),
+     cms.PSet( ecfAlgo = cms.string('antikt_algorithm'), Rparam = cms.double(2.0), nPoint = cms.int32(3), beta = cms.double(3.0), type = cms.int32(0)),
+
+     cms.PSet( ecfAlgo = cms.string('antikt_algorithm'), Rparam = cms.double(2.0), nPoint = cms.int32(4), beta = cms.double(0.5), type = cms.int32(0)),
+     cms.PSet( ecfAlgo = cms.string('antikt_algorithm'), Rparam = cms.double(2.0), nPoint = cms.int32(4), beta = cms.double(1.0), type = cms.int32(0)),
+     cms.PSet( ecfAlgo = cms.string('antikt_algorithm'), Rparam = cms.double(2.0), nPoint = cms.int32(4), beta = cms.double(1.5), type = cms.int32(0)),
+     cms.PSet( ecfAlgo = cms.string('antikt_algorithm'), Rparam = cms.double(2.0), nPoint = cms.int32(4), beta = cms.double(2.0), type = cms.int32(0)),
+     cms.PSet( ecfAlgo = cms.string('antikt_algorithm'), Rparam = cms.double(2.0), nPoint = cms.int32(4), beta = cms.double(2.5), type = cms.int32(0)),
+     cms.PSet( ecfAlgo = cms.string('antikt_algorithm'), Rparam = cms.double(2.0), nPoint = cms.int32(4), beta = cms.double(3.0), type = cms.int32(0)),
+    ),
+
+    Nsubjettiness = cms.VPSet(
+     cms.PSet(beta = cms.double(0.5),  R0 = cms.double(0.8), Rcut = cms.double(0.8)),
+     cms.PSet(beta = cms.double(0.75), R0 = cms.double(0.8), Rcut = cms.double(0.8)),
+     cms.PSet(beta = cms.double(1.0),  R0 = cms.double(0.8), Rcut = cms.double(0.8)),
+     cms.PSet(beta = cms.double(1.25), R0 = cms.double(0.8), Rcut = cms.double(0.8)),
+     cms.PSet(beta = cms.double(1.5),  R0 = cms.double(0.8), Rcut = cms.double(0.8)),
+     cms.PSet(beta = cms.double(2.0),  R0 = cms.double(0.8), Rcut = cms.double(0.8)),
+     cms.PSet(beta = cms.double(2.5),  R0 = cms.double(0.8), Rcut = cms.double(0.8)),
+     cms.PSet(beta = cms.double(3.0),  R0 = cms.double(0.8), Rcut = cms.double(0.8)),
+    ),
+
+
+
 )

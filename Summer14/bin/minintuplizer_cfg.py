@@ -5,7 +5,7 @@ process = cms.Process("MiniNtuplizer")
 process.Options = cms.PSet(
 
     isMC            = cms.bool(True),
-    maxEvents       = cms.int32(5),    # maximum events to  run
+    maxEvents       = cms.int32(-1),    # maximum events to  run
     minEvents       = cms.int32(0),     # maximum events to  run
 
     jetR            = cms.double(0.8),  # basic clustering cone size
