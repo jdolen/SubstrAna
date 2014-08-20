@@ -46,13 +46,24 @@ process.Options = cms.PSet(
     #softkiller
     softKiller = cms.PSet( ymax = cms.double(2.5), cell_size = cms.double(0.4) ),
 
-    #softdrop
+    #softdrop                                                                                                                                                                             
     softDrop = cms.VPSet(
-     cms.PSet( beta = cms.double(2.), symmetry_cut = cms.double(0.1), R0 = cms.double(1.)),
-     cms.PSet( beta = cms.double(0.), symmetry_cut = cms.double(0.1), R0 = cms.double(1.)),
-     cms.PSet( beta = cms.double(1.), symmetry_cut = cms.double(0.1), R0 = cms.double(1.)),
-     cms.PSet( beta = cms.double(-1.), symmetry_cut = cms.double(0.1), R0 = cms.double(1.)) 
+     cms.PSet( beta = cms.double(2.),  symmetry_cut = cms.double(0.1),  R0 = cms.double(1.)),
+     cms.PSet( beta = cms.double(0.),  symmetry_cut = cms.double(0.1),  R0 = cms.double(1.)),
+     cms.PSet( beta = cms.double(1.),  symmetry_cut = cms.double(0.1),  R0 = cms.double(1.)),
+     cms.PSet( beta = cms.double(-1.), symmetry_cut = cms.double(0.1),  R0 = cms.double(1.)),
+
+     cms.PSet( beta = cms.double(2.),  symmetry_cut = cms.double(0.05),  R0 = cms.double(1.)),
+     cms.PSet( beta = cms.double(0.),  symmetry_cut = cms.double(0.05),  R0 = cms.double(1.)),
+     cms.PSet( beta = cms.double(1.),  symmetry_cut = cms.double(0.05),  R0 = cms.double(1.)),
+     cms.PSet( beta = cms.double(-1.), symmetry_cut = cms.double(0.05),  R0 = cms.double(1.)),
+
+     cms.PSet( beta = cms.double(2.),  symmetry_cut = cms.double(0.15),  R0 = cms.double(1.)),
+     cms.PSet( beta = cms.double(0.),  symmetry_cut = cms.double(0.15),  R0 = cms.double(1.)),
+     cms.PSet( beta = cms.double(1.),  symmetry_cut = cms.double(0.15),  R0 = cms.double(1.)),
+     cms.PSet( beta = cms.double(-1.), symmetry_cut = cms.double(0.15),  R0 = cms.double(1.)),
     ),
+
 
     # trimming
     trimming = cms.VPSet( 

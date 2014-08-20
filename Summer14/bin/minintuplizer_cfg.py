@@ -15,8 +15,8 @@ process.Options = cms.PSet(
 
     puppiConfig     = cms.string("Puppi_cff.py"), # puppi configuration to run
 
-    jetPtTresholdForGroomers      = cms.double(200.),    
-    genjetPtTresholdForGroomers   = cms.double(150.),    
+    jetPtTresholdForGroomers      = cms.double(100.),    
+    genjetPtTresholdForGroomers   = cms.double(50.),    
     jetPtTresholdForTopTagging = cms.double(300.),
     genJetPtTresholdForTopTagging = cms.double(250.),
 
