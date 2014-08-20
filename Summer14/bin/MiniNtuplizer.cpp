@@ -73,10 +73,10 @@ std::string QGinputWeightFilePath;
 VTaggingVariables vtagger;
 
 // thresholds 
-double jetPtTresholdForGroomers, jetPtTresholdForTopTagging, genJetPtTresholdForTopTagging;
+double jetPtTresholdForGroomers, jetPtTresholdForTopTagging, genJetPtTresholdForTopTagging, genjetPtTresholdForGroomers;
 
 // parsing groomers parameter from cfg file
-std::vector<edm::ParameterSet> softDropParam, trimmingParam, pruningParam, ecfParam;
+std::vector<edm::ParameterSet> softDropParam, trimmingParam, pruningParam, ecfParam,NsubjettinessParam ;
 edm::ParameterSet softKillerParam ;
 std::vector<double> chargeParam ;
 
@@ -158,29 +158,21 @@ class GenJetInfo {
   vector<float> hepatanm02m01;
 
   // V-tagging base variables
-  vector<float> tau1;
-  vector<float> tau2;
-  vector<float> tau3;
-  vector<float> tau4;
-  vector<float> tau5;
+  vector<vector<float> > tau1;
+  vector<vector<float> > tau2;
+  vector<vector<float> > tau3;
 
   vector<float> tau1_pr;
   vector<float> tau2_pr;
   vector<float> tau3_pr;
-  vector<float> tau4_pr;
-  vector<float> tau5_pr;
 
   vector<float> tau1_softdrop;
   vector<float> tau2_softdrop;
   vector<float> tau3_softdrop;
-  vector<float> tau4_softdrop;
-  vector<float> tau5_softdrop;
 
   vector<float> tau1_const;
   vector<float> tau2_const;
   vector<float> tau3_const;
-  vector<float> tau4_const;
-  vector<float> tau5_const;
 
   vector<float> Qjets;
 
@@ -519,7 +511,7 @@ void setupGenTree(TTree *iTree, GenJetInfo &iJet, std::string iName) {
 
   for( ; itsoftDrop != softDropParam.end() ; ++itsoftDrop){
    TString name;
-   name = Form("_beta%0.1f",(*itsoftDrop).getParameter<double>("beta"));
+   name = Form("zcut%0.1f_beta%0.1f",(*itsoftDrop).getParameter<double>("symmetry_cut"),(*itsoftDrop).getParameter<double>("beta"));
    name.ReplaceAll(".","");
    iTree->Branch((iName+"ptsoftdrop"+std::string(name)     ).c_str(),"vector<float>",&iJet.ptsoftdrop[iPos]);
    iTree->Branch((iName+"msoftdrop"+std::string(name)      ).c_str(),"vector<float>",&iJet.msoftdrop[iPos]);
@@ -541,29 +533,34 @@ void setupGenTree(TTree *iTree, GenJetInfo &iJet, std::string iName) {
   iTree->Branch((iName+"sdnconst" ).c_str(),&iJet.sdnconst );
   iTree->Branch((iName+"mfiltsoftdrop" ).c_str(),&iJet.mfiltsoftdrop );
 
-  iTree->Branch((iName+"tau1"  ).c_str(),&iJet.tau1);
-  iTree->Branch((iName+"tau2"  ).c_str(),&iJet.tau2);
-  iTree->Branch((iName+"tau3"  ).c_str(),&iJet.tau3);
-  iTree->Branch((iName+"tau4"  ).c_str(),&iJet.tau4);
-  iTree->Branch((iName+"tau5"  ).c_str(),&iJet.tau5);
+  std::vector<edm::ParameterSet>::const_iterator itNsubjettiness = NsubjettinessParam.begin();
+  iPos = 0 ;
+  iJet.tau1.resize(NsubjettinessParam.size()) ;  
+  iJet.tau2.resize(NsubjettinessParam.size()) ;  
+  iJet.tau3.resize(NsubjettinessParam.size()) ;  
+
+  for( ; itNsubjettiness != NsubjettinessParam.end() ; ++itNsubjettiness){
+   TString name ;
+   name = Form("_beta_%0.1f",(*itNsubjettiness).getParameter<double>("beta"));
+   name.ReplaceAll(".","");
+   iTree->Branch((iName+"tau1"+std::string(name) ).c_str(),"vector<float>",&iJet.tau1[iPos]);
+   iTree->Branch((iName+"tau2"+std::string(name) ).c_str(),"vector<float>",&iJet.tau2[iPos]);
+   iTree->Branch((iName+"tau3"+std::string(name) ).c_str(),"vector<float>",&iJet.tau3[iPos]);
+   iPos++ ;
+  }
+
 
   iTree->Branch((iName+"tau1_pr"  ).c_str(),&iJet.tau1_pr);
   iTree->Branch((iName+"tau2_pr"  ).c_str(),&iJet.tau2_pr);
   iTree->Branch((iName+"tau3_pr"  ).c_str(),&iJet.tau3_pr);
-  iTree->Branch((iName+"tau4_pr"  ).c_str(),&iJet.tau4_pr);
-  iTree->Branch((iName+"tau5_pr"  ).c_str(),&iJet.tau5_pr);
 
   iTree->Branch((iName+"tau1_softdrop"  ).c_str(),&iJet.tau1_softdrop);
   iTree->Branch((iName+"tau2_softdrop"  ).c_str(),&iJet.tau2_softdrop);
   iTree->Branch((iName+"tau3_softdrop"  ).c_str(),&iJet.tau3_softdrop);
-  iTree->Branch((iName+"tau4_softdrop"  ).c_str(),&iJet.tau4_softdrop);
-  iTree->Branch((iName+"tau5_softdrop"  ).c_str(),&iJet.tau5_softdrop);
 
   iTree->Branch((iName+"tau1_const"  ).c_str(),&iJet.tau1_const);
   iTree->Branch((iName+"tau2_const"  ).c_str(),&iJet.tau2_const);
   iTree->Branch((iName+"tau3_const"  ).c_str(),&iJet.tau3_const);
-  iTree->Branch((iName+"tau4_const"  ).c_str(),&iJet.tau4_const);
-  iTree->Branch((iName+"tau5_const"  ).c_str(),&iJet.tau5_const);
 
   iTree->Branch((iName+"Qjets"  ).c_str(),&iJet.Qjets);
 
@@ -583,7 +580,7 @@ void setupGenTree(TTree *iTree, GenJetInfo &iJet, std::string iName) {
   iJet.ecf.resize(ecfParam.size()) ;  
   for( ; itECF !=ecfParam.end() ; ++itECF){
    TString name;
-   name = Form("_beta_%0.1f",(*itECF).getParameter<double>("beta"));
+   name = Form("_nPoint_%d_beta_%0.1f",(*itECF).getParameter<int>("nPoint"),(*itECF).getParameter<double>("beta"));
    name.ReplaceAll(".","");
    iTree->Branch((iName+"ecf"+std::string(name)).c_str(),"vector<float>",&iJet.ecf[iPos]);
    iPos++;
@@ -689,29 +686,23 @@ void clear(GenJetInfo &iJet) {
   iJet.sdnconst.clear();
   iJet.mfiltsoftdrop.clear();
 
-  iJet.tau1.clear();
-  iJet.tau2.clear();
-  iJet.tau3.clear();
-  iJet.tau4.clear();
-  iJet.tau5.clear();
+  for(unsigned int iNsubjettiness = 0; iNsubjettiness < iJet.tau1.size(); iNsubjettiness++){
+    iJet.tau1.at(iNsubjettiness).clear();
+    iJet.tau2.at(iNsubjettiness).clear();
+    iJet.tau3.at(iNsubjettiness).clear();
+  }
 
   iJet.tau1_pr.clear();
   iJet.tau2_pr.clear();
   iJet.tau3_pr.clear();
-  iJet.tau4_pr.clear();
-  iJet.tau5_pr.clear();
 
   iJet.tau1_softdrop.clear();
   iJet.tau2_softdrop.clear();
   iJet.tau3_softdrop.clear();
-  iJet.tau4_softdrop.clear();
-  iJet.tau5_softdrop.clear();
 
   iJet.tau1_const.clear();
   iJet.tau2_const.clear();
   iJet.tau3_const.clear();
-  iJet.tau4_const.clear();
-  iJet.tau5_const.clear();
 
   iJet.Qjets.clear();
 
@@ -946,7 +937,6 @@ void setRecoJet(PseudoJet &iJet, JetInfo &iJetI, GenJetInfo& iGenJetI, JetMedian
     matched = IsMatchedToGenBoson( eta_Boson, phi_Boson, iJet);
   }
   float lPtPhil = iJet.pt()*lJEC*float(lJECPhil);
-  if(iJet.pt()*lJEC > 50) cout << "===> " << lPtPhil <<" -- " <<  iJet.pt()*lJEC << endl;
   
   // -- Fil Jet Info
   (iJetI.pt        ).push_back(lCorr     .pt());
@@ -1045,18 +1035,19 @@ void setRecoJet(PseudoJet &iJet, JetInfo &iJetI, GenJetInfo& iGenJetI, JetMedian
   if (iJet.pt() > jetPtTresholdForGroomers){
 
     vtagger.setInputJet(iJet); 
-    (iJetI.tau1 ).push_back(vtagger.computeNSubJettines(1,1.,jetR,jetR));
-    (iJetI.tau2 ).push_back(vtagger.computeNSubJettines(2,1.,jetR,jetR));
-    (iJetI.tau3 ).push_back(vtagger.computeNSubJettines(3,1.,jetR,jetR));
-    (iJetI.tau4 ).push_back(vtagger.computeNSubJettines(4,1.,jetR,jetR));
-    (iJetI.tau1 ).push_back(vtagger.computeNSubJettines(5,1.,jetR,jetR));
+    for(unsigned int iNsubjettiness = 0; iNsubjettiness < NsubjettinessParam.size() ; iNsubjettiness++){
+      (iJetI.tau1 ).at(iNsubjettiness).push_back(vtagger.computeNSubJettines(1,NsubjettinessParam.at(iNsubjettiness).getParameter<double>("beta"),NsubjettinessParam.at(iNsubjettiness).getParameter<double>("R0"),NsubjettinessParam.at(iNsubjettiness).getParameter<double>("Rcut")));
+      (iJetI.tau2 ).at(iNsubjettiness).push_back(vtagger.computeNSubJettines(2,NsubjettinessParam.at(iNsubjettiness).getParameter<double>("beta"),NsubjettinessParam.at(iNsubjettiness).getParameter<double>("R0"),NsubjettinessParam.at(iNsubjettiness).getParameter<double>("Rcut")));
+      (iJetI.tau3 ).at(iNsubjettiness).push_back(vtagger.computeNSubJettines(3,NsubjettinessParam.at(iNsubjettiness).getParameter<double>("beta"),NsubjettinessParam.at(iNsubjettiness).getParameter<double>("R0"),NsubjettinessParam.at(iNsubjettiness).getParameter<double>("Rcut")));
+    }
+
     (iJetI.Qjets).push_back(vtagger.computeQjets(100,25,randNumber.Uniform(0,10000),jetR));
+    
     for( unsigned int iECF = 0; iECF < ecfParam.size() ; iECF++)
-      iJetI.ecf.at(iECF).push_back(vtagger.computeECF(get_algo(ecfParam.at(iECF).getParameter<string>("ecfAlgo")),ecfParam.at(iECF).getParameter<double>("Rparam"),ecfParam.at(iECF).getParameter<int>("nPoint"),ecfParam.at(iECF).getParameter<double>("beta")));
+       iJetI.ecf.at(iECF).push_back(vtagger.computeECF(get_algo(ecfParam.at(iECF).getParameter<string>("ecfAlgo")),ecfParam.at(iECF).getParameter<double>("Rparam"),ecfParam.at(iECF).getParameter<int>("nPoint"),ecfParam.at(iECF).getParameter<double>("beta"),ecfParam.at(iECF).getParameter<int>("type")));
 
     for( unsigned int iCharge = 0; iCharge < chargeParam.size() ; iCharge++)
       iJetI.charge.at(iCharge).push_back(vtagger.computeJetChargeReco(chargeParam[iCharge]));
-
     
     vector<PseudoJet> subjets_pruned ;
     for( unsigned int iPrun = 0 ; iPrun < lPruned.size() ; iPrun++){
@@ -1084,15 +1075,11 @@ void setRecoJet(PseudoJet &iJet, JetInfo &iJetI, GenJetInfo& iGenJetI, JetMedian
      (iJetI.tau1_pr ).push_back(vtagger.computeNSubJettines(1,1.,jetR,jetR));
      (iJetI.tau2_pr ).push_back(vtagger.computeNSubJettines(2,1.,jetR,jetR));
      (iJetI.tau3_pr ).push_back(vtagger.computeNSubJettines(3,1.,jetR,jetR));
-     (iJetI.tau4_pr ).push_back(vtagger.computeNSubJettines(4,1.,jetR,jetR));
-     (iJetI.tau5_pr ).push_back(vtagger.computeNSubJettines(5,1.,jetR,jetR));
     }   
     else{
      (iJetI.tau1_pr ).push_back(999);
      (iJetI.tau2_pr ).push_back(999);
      (iJetI.tau3_pr ).push_back(999);
-     (iJetI.tau4_pr ).push_back(999);
-     (iJetI.tau5_pr ).push_back(999);
     }
 
     for( unsigned int iPrun = 0 ; iPrun < lPruned.size() ; iPrun++){
@@ -1134,15 +1121,11 @@ void setRecoJet(PseudoJet &iJet, JetInfo &iJetI, GenJetInfo& iGenJetI, JetMedian
      (iJetI.tau1_softdrop ).push_back(vtagger.computeNSubJettines(1,1.,jetR,jetR));
      (iJetI.tau2_softdrop ).push_back(vtagger.computeNSubJettines(2,1.,jetR,jetR));
      (iJetI.tau3_softdrop ).push_back(vtagger.computeNSubJettines(3,1.,jetR,jetR));
-     (iJetI.tau4_softdrop ).push_back(vtagger.computeNSubJettines(4,1.,jetR,jetR));
-     (iJetI.tau5_softdrop ).push_back(vtagger.computeNSubJettines(5,1.,jetR,jetR));
     }
     else{
      (iJetI.tau1_softdrop ).push_back(999);
      (iJetI.tau2_softdrop ).push_back(999);
      (iJetI.tau3_softdrop ).push_back(999);
-     (iJetI.tau4_softdrop ).push_back(999);
-     (iJetI.tau5_softdrop ).push_back(999);
     }
 
 
@@ -1152,15 +1135,11 @@ void setRecoJet(PseudoJet &iJet, JetInfo &iJetI, GenJetInfo& iGenJetI, JetMedian
       (iJetI.tau1_const ).push_back(vtagger.computeNSubJettines(1,1.,jetR,jetR));
       (iJetI.tau2_const ).push_back(vtagger.computeNSubJettines(2,1.,jetR,jetR));
       (iJetI.tau3_const ).push_back(vtagger.computeNSubJettines(3,1.,jetR,jetR));
-      (iJetI.tau4_const ).push_back(vtagger.computeNSubJettines(4,1.,jetR,jetR));
-      (iJetI.tau5_const ).push_back(vtagger.computeNSubJettines(5,1.,jetR,jetR));
     }
     else{
       (iJetI.tau1_const ).push_back(999);
       (iJetI.tau2_const ).push_back(999);
       (iJetI.tau3_const ).push_back(999);
-      (iJetI.tau4_const ).push_back(999);
-      (iJetI.tau5_const ).push_back(999);
     }
   }
   else{
@@ -1179,30 +1158,24 @@ void setRecoJet(PseudoJet &iJet, JetInfo &iJetI, GenJetInfo& iGenJetI, JetMedian
       iJetI.pullmagnitude.at(iPrun).push_back(999);
     }
 
-    (iJetI.tau1 ).push_back(999.);
-    (iJetI.tau2 ).push_back(999.);
-    (iJetI.tau3 ).push_back(999.);
-    (iJetI.tau4 ).push_back(999.);
-    (iJetI.tau5 ).push_back(999.);
-    (iJetI.Qjets).push_back(999.);
+    for(unsigned int iNsubjettiness = 0; iNsubjettiness < NsubjettinessParam.size() ; iNsubjettiness++){
+      (iJetI.tau1 ).at(iNsubjettiness).push_back(999.);
+      (iJetI.tau2 ).at(iNsubjettiness).push_back(999.);
+      (iJetI.tau3 ).at(iNsubjettiness).push_back(999.);
+    }
 
+    (iJetI.Qjets).push_back(999.);
     (iJetI.tau1_pr ).push_back(999.);
     (iJetI.tau2_pr ).push_back(999.);
     (iJetI.tau3_pr ).push_back(999.);
-    (iJetI.tau4_pr ).push_back(999.);
-    (iJetI.tau5_pr ).push_back(999.);
 
     (iJetI.tau1_softdrop ).push_back(999.);
     (iJetI.tau2_softdrop ).push_back(999.);
     (iJetI.tau3_softdrop ).push_back(999.);
-    (iJetI.tau4_softdrop ).push_back(999.);
-    (iJetI.tau5_softdrop ).push_back(999.);
 
     (iJetI.tau1_const ).push_back(999.);
     (iJetI.tau2_const ).push_back(999.);
     (iJetI.tau3_const ).push_back(999.);
-    (iJetI.tau4_const ).push_back(999.);
-    (iJetI.tau5_const ).push_back(999.);
 
   }
 
@@ -1274,40 +1247,37 @@ void setGenJet(PseudoJet &iJet, GenJetInfo &iJetI,  JetMedianBackgroundEstimator
            (iJetI.mclean    ).push_back(lClean    .m());
 	}
   }
-
-  // -- trimming
+  
+  // -- trimming  
   vector<PseudoJet> lTrim ;
   vector<PseudoJet> lTrimSafe ;
-  std::vector<edm::ParameterSet>::const_iterator itTrim = trimmingParam.begin();
-  for( ; itTrim != trimmingParam.end() ; ++itTrim){
-   fastjet::Filter trimmer( fastjet::Filter(fastjet::JetDefinition(get_algo((*itTrim).getParameter<string>("trimAlgo")),(*itTrim).getParameter<double>("R_trimming")), fastjet::SelectorPtFractionMin((*itTrim).getParameter<double>("PtFraction"))));
-   lTrim.push_back((trimmer)(iJet));
-   trimmer.set_subtractor(area_subtractor);
-   lTrimSafe.push_back((trimmer)(iJet));
+  if(iJet.pt() >= genjetPtTresholdForGroomers){
+   std::vector<edm::ParameterSet>::const_iterator itTrim = trimmingParam.begin();
+   for( ; itTrim != trimmingParam.end() ; ++itTrim){
+    fastjet::Filter trimmer( fastjet::Filter(fastjet::JetDefinition(get_algo((*itTrim).getParameter<string>("trimAlgo")),(*itTrim).getParameter<double>("R_trimming")), fastjet::SelectorPtFractionMin((*itTrim).getParameter<double>("PtFraction"))));
+    lTrim.push_back((trimmer)(iJet));
+    trimmer.set_subtractor(area_subtractor);
+    lTrimSafe.push_back((trimmer)(iJet));
+   }
   }
   
   // -- pruning
   vector<PseudoJet> lPruned ;
   vector<PseudoJet> lPrunedSafe ;
-  std::vector<edm::ParameterSet>::const_iterator itPruned = pruningParam.begin();
-  for( ; itPruned != pruningParam.end() ; ++itPruned){
-   JetDefinition jet_def_Pruning(get_algo((*itPruned).getParameter<string>("pruneAlgo")), (*itPruned).getParameter<double>("R_jet_def_pruning"));
-   Pruner pruner(jet_def_Pruning,(*itPruned).getParameter<double>("z_cut"), (*itPruned).getParameter<double>("R_Cut"));
-   PseudoJet jetTemp = pruner(iJet) ;
-   lPruned.push_back(jetTemp);
-   lPrunedSafe.push_back((*area_subtractor)(jetTemp));
+  if(iJet.pt() >= genjetPtTresholdForGroomers){
+   std::vector<edm::ParameterSet>::const_iterator itPruned = pruningParam.begin();
+   for( ; itPruned != pruningParam.end() ; ++itPruned){
+    JetDefinition jet_def_Pruning(get_algo((*itPruned).getParameter<string>("pruneAlgo")), (*itPruned).getParameter<double>("R_jet_def_pruning"));
+    Pruner pruner(jet_def_Pruning,(*itPruned).getParameter<double>("z_cut"), (*itPruned).getParameter<double>("R_Cut"));
+    PseudoJet jetTemp = pruner(iJet) ;
+    lPruned.push_back(jetTemp);
+    lPrunedSafe.push_back((*area_subtractor)(jetTemp));
+   }
   }
   
   // -- softdrop
   vector<PseudoJet> lSoftDropped ;
   vector<PseudoJet> lSoftDroppedSafe ;
-  std::vector<edm::ParameterSet>::const_iterator itSoft = softDropParam.begin();
-  for( ; itSoft != softDropParam.end() ; ++itSoft){
-   contrib::SoftDrop softdrop((*itSoft).getParameter<double>("beta"),(*itSoft).getParameter<double>("symmetry_cut"), (*itSoft).getParameter<double>("R0"));
-   lSoftDropped.push_back(softdrop(iJet));   
-   softdrop.set_subtractor(area_subtractor);
-   lSoftDroppedSafe.push_back(softdrop(iJet));
-  }  
 
   double  SoftDropedSymmetry   = -1.0;
   double  SoftDropedDR         = -1.0;
@@ -1316,8 +1286,18 @@ void setGenJet(PseudoJet &iJet, GenJetInfo &iJetI,  JetMedianBackgroundEstimator
   double  SoftDropedArea       = -1.0;
   double  SoftDropedNconst     = -1.0;
   PseudoJet filtered_softdropped_jet; 
+   
 
-  if (lSoftDroppedSafe.at(0)!=0 and lSoftDroppedSafe.at(0).m()>0.0){
+  if(iJet.pt() >= genjetPtTresholdForGroomers){
+   std::vector<edm::ParameterSet>::const_iterator itSoft = softDropParam.begin();
+   for( ; itSoft != softDropParam.end() ; ++itSoft){
+    contrib::SoftDrop softdrop((*itSoft).getParameter<double>("beta"),(*itSoft).getParameter<double>("symmetry_cut"), (*itSoft).getParameter<double>("R0"));
+    lSoftDropped.push_back(softdrop(iJet));   
+    softdrop.set_subtractor(area_subtractor);
+    lSoftDroppedSafe.push_back(softdrop(iJet));
+   } 
+
+   if (lSoftDroppedSafe.at(0)!=0 and lSoftDroppedSafe.at(0).m()>0.0){
     SoftDropedSymmetry   = lSoftDroppedSafe.at(0).structure_of<contrib::SoftDrop>().symmetry(); 
     SoftDropedDR         = lSoftDroppedSafe.at(0).structure_of<contrib::SoftDrop>().delta_R();  
     SoftDropedMassDrop   = lSoftDroppedSafe.at(0).structure_of<contrib::SoftDrop>().mu();       
@@ -1330,6 +1310,7 @@ void setGenJet(PseudoJet &iJet, GenJetInfo &iJetI,  JetMedianBackgroundEstimator
     int    dyn_nfilt = 3;
     Filter filtersoft(dyn_Rfilt, SelectorNHardest(dyn_nfilt));
     filtered_softdropped_jet = filtersoft(lSoftDroppedSafe.at(0));
+   }
   }
 
   // -- Top Tag
@@ -1424,26 +1405,28 @@ void setGenJet(PseudoJet &iJet, GenJetInfo &iJetI,  JetMedianBackgroundEstimator
   (iJetI.mconst    ).push_back(lConstit  .m());
 
   if(computeJetFlavour) (iJetI.jetflavour).push_back(computeGenJetFlavour(iJet));
-    
-  for( unsigned int iTrim = 0 ; iTrim < lTrim.size() ; iTrim++){
+   
+  if(iJet.pt() >  genjetPtTresholdForGroomers){
+   for( unsigned int iTrim = 0 ; iTrim < lTrim.size() ; iTrim++){
     iJetI.pttrim.at(iTrim).push_back(lTrim.at(iTrim).pt());
     iJetI.mtrim.at(iTrim).push_back(lTrim.at(iTrim).m());
     iJetI.pttrimsafe.at(iTrim).push_back(lTrimSafe.at(iTrim).pt());
     iJetI.mtrimsafe.at(iTrim).push_back(lTrimSafe.at(iTrim).m());
-  }
+   }
 
-  for( unsigned int iPrun = 0 ; iPrun < lPruned.size() ; iPrun++){
+   for( unsigned int iPrun = 0 ; iPrun < lPruned.size() ; iPrun++){
     iJetI.mpruned.at(iPrun).push_back(lPruned.at(iPrun).m());
     iJetI.ptpruned.at(iPrun).push_back(lPruned.at(iPrun).pt());
     iJetI.mprunedsafe.at(iPrun).push_back(lPrunedSafe.at(iPrun).m());
     iJetI.ptprunedsafe.at(iPrun).push_back(lPrunedSafe.at(iPrun).pt());
-  }
+   }
 
-  for( unsigned int iSoft = 0 ; iSoft < lSoftDropped.size() ; iSoft++){
+   for( unsigned int iSoft = 0 ; iSoft < lSoftDropped.size() ; iSoft++){
     iJetI.msoftdrop.at(iSoft).push_back(lSoftDropped.at(iSoft).m());
     iJetI.ptsoftdrop.at(iSoft).push_back(lSoftDropped.at(iSoft).pt());
     iJetI.msoftdropsafe.at(iSoft).push_back(lSoftDroppedSafe.at(iSoft).m());
     iJetI.ptsoftdropsafe.at(iSoft).push_back(lSoftDroppedSafe.at(iSoft).pt());
+   }
   }
 
   (iJetI.nparticles).push_back((iJet.constituents()).size());
@@ -1471,21 +1454,21 @@ void setGenJet(PseudoJet &iJet, GenJetInfo &iJetI,  JetMedianBackgroundEstimator
   (iJetI.cmshelicity ).push_back(cmsttHelicity );
   (iJetI.cmsnsubjets ).push_back(cmsttNsubjets );
 
-  if(iJet.pt() > 0.){
+  if(iJet.pt() > genjetPtTresholdForGroomers){
 
    vtagger.setInputJet(iJet); 
 
-   (iJetI.tau1 ).push_back(vtagger.computeNSubJettines(1,1.,jetR,jetR));
-   (iJetI.tau2 ).push_back(vtagger.computeNSubJettines(2,1.,jetR,jetR));
-   (iJetI.tau3 ).push_back(vtagger.computeNSubJettines(3,1.,jetR,jetR));
-   (iJetI.tau4 ).push_back(vtagger.computeNSubJettines(4,1.,jetR,jetR));
-   (iJetI.tau5 ).push_back(vtagger.computeNSubJettines(5,1.,jetR,jetR));
+    for(unsigned int iNsubjettiness = 0; iNsubjettiness < NsubjettinessParam.size() ; iNsubjettiness++){
+      (iJetI.tau1 ).at(iNsubjettiness).push_back(vtagger.computeNSubJettines(1,NsubjettinessParam.at(iNsubjettiness).getParameter<double>("beta"),NsubjettinessParam.at(iNsubjettiness).getParameter<double>("R0"),NsubjettinessParam.at(iNsubjettiness).getParameter<double>("Rcut")));
+      (iJetI.tau2 ).at(iNsubjettiness).push_back(vtagger.computeNSubJettines(2,NsubjettinessParam.at(iNsubjettiness).getParameter<double>("beta"),NsubjettinessParam.at(iNsubjettiness).getParameter<double>("R0"),NsubjettinessParam.at(iNsubjettiness).getParameter<double>("Rcut")));
+      (iJetI.tau3 ).at(iNsubjettiness).push_back(vtagger.computeNSubJettines(3,NsubjettinessParam.at(iNsubjettiness).getParameter<double>("beta"),NsubjettinessParam.at(iNsubjettiness).getParameter<double>("R0"),NsubjettinessParam.at(iNsubjettiness).getParameter<double>("Rcut")));
+    }
 
    (iJetI.Qjets).push_back(vtagger.computeQjets(100,25,randNumber.Uniform(0.,10000),jetR));
-
-   for( unsigned int iECF = 0; iECF < ecfParam.size() ; iECF++)
-    iJetI.ecf.at(iECF).push_back(vtagger.computeECF(get_algo(ecfParam.at(iECF).getParameter<string>("ecfAlgo")),ecfParam.at(iECF).getParameter<double>("Rparam"),ecfParam.at(iECF).getParameter<int>("nPoint"),ecfParam.at(iECF).getParameter<double>("beta")));
-
+   
+   for( unsigned int iECF = 0; iECF < ecfParam.size() ; iECF++){
+      iJetI.ecf.at(iECF).push_back(vtagger.computeECF(get_algo(ecfParam.at(iECF).getParameter<string>("ecfAlgo")),ecfParam.at(iECF).getParameter<double>("Rparam"),ecfParam.at(iECF).getParameter<int>("nPoint"),ecfParam.at(iECF).getParameter<double>("beta"),ecfParam.at(iECF).getParameter<int>("type")));
+   }
    for( unsigned int iCharge = 0; iCharge < chargeParam.size() ; iCharge++)
     iJetI.charge.at(iCharge).push_back(vtagger.computeJetChargeReco(chargeParam[iCharge]));
 
@@ -1513,15 +1496,11 @@ void setGenJet(PseudoJet &iJet, GenJetInfo &iJetI,  JetMedianBackgroundEstimator
      (iJetI.tau1_pr ).push_back(vtagger.computeNSubJettines(1,1.,jetR,jetR));
      (iJetI.tau2_pr ).push_back(vtagger.computeNSubJettines(2,1.,jetR,jetR));
      (iJetI.tau3_pr ).push_back(vtagger.computeNSubJettines(3,1.,jetR,jetR));
-     (iJetI.tau4_pr ).push_back(vtagger.computeNSubJettines(4,1.,jetR,jetR));
-     (iJetI.tau5_pr ).push_back(vtagger.computeNSubJettines(5,1.,jetR,jetR));
    }   
    else{
      (iJetI.tau1_pr ).push_back(999);
      (iJetI.tau2_pr ).push_back(999);
      (iJetI.tau3_pr ).push_back(999);
-     (iJetI.tau4_pr ).push_back(999);
-     (iJetI.tau5_pr ).push_back(999);
    }
 
    for( unsigned int iPrun = 0 ; iPrun < lPruned.size() ; iPrun++){
@@ -1557,15 +1536,11 @@ void setGenJet(PseudoJet &iJet, GenJetInfo &iJetI,  JetMedianBackgroundEstimator
      (iJetI.tau1_softdrop ).push_back(vtagger.computeNSubJettines(1,1.,jetR,jetR));
      (iJetI.tau2_softdrop ).push_back(vtagger.computeNSubJettines(2,1.,jetR,jetR));
      (iJetI.tau3_softdrop ).push_back(vtagger.computeNSubJettines(3,1.,jetR,jetR));
-     (iJetI.tau4_softdrop ).push_back(vtagger.computeNSubJettines(4,1.,jetR,jetR));
-     (iJetI.tau5_softdrop ).push_back(vtagger.computeNSubJettines(5,1.,jetR,jetR));
     }
     else{
      (iJetI.tau1_softdrop ).push_back(999);
      (iJetI.tau2_softdrop ).push_back(999);
      (iJetI.tau3_softdrop ).push_back(999);
-     (iJetI.tau4_softdrop ).push_back(999);
-     (iJetI.tau5_softdrop ).push_back(999);
    }
 
 
@@ -1574,15 +1549,11 @@ void setGenJet(PseudoJet &iJet, GenJetInfo &iJetI,  JetMedianBackgroundEstimator
      (iJetI.tau1_const ).push_back(vtagger.computeNSubJettines(1,1.,jetR,jetR));
      (iJetI.tau2_const ).push_back(vtagger.computeNSubJettines(2,1.,jetR,jetR));
      (iJetI.tau3_const ).push_back(vtagger.computeNSubJettines(3,1.,jetR,jetR));
-     (iJetI.tau4_const ).push_back(vtagger.computeNSubJettines(4,1.,jetR,jetR));
-     (iJetI.tau5_const ).push_back(vtagger.computeNSubJettines(5,1.,jetR,jetR));
    }
    else{
      (iJetI.tau1_const ).push_back(999);
      (iJetI.tau2_const ).push_back(999);
      (iJetI.tau3_const ).push_back(999);
-     (iJetI.tau4_const ).push_back(999);
-     (iJetI.tau5_const ).push_back(999);
    }
   }
   else {
@@ -1601,33 +1572,27 @@ void setGenJet(PseudoJet &iJet, GenJetInfo &iJetI,  JetMedianBackgroundEstimator
       iJetI.pullmagnitude.at(iPrun).push_back(999.);       
     }
 
-    (iJetI.tau1 ).push_back(999.);
-    (iJetI.tau2 ).push_back(999.);
-    (iJetI.tau3 ).push_back(999.);
-    (iJetI.tau4 ).push_back(999.);
-    (iJetI.tau5 ).push_back(999.);
+    for(unsigned int iNsubjettiness = 0; iNsubjettiness < NsubjettinessParam.size() ; iNsubjettiness++){
+      (iJetI.tau1 ).at(iNsubjettiness).push_back(999.);
+      (iJetI.tau2 ).at(iNsubjettiness).push_back(999.);
+      (iJetI.tau3 ).at(iNsubjettiness).push_back(999.);
+    }
+
     (iJetI.Qjets).push_back(999.);
 
     (iJetI.tau1_pr ).push_back(999.);
     (iJetI.tau2_pr ).push_back(999.);
     (iJetI.tau3_pr ).push_back(999.);
-    (iJetI.tau4_pr ).push_back(999.);
-    (iJetI.tau5_pr ).push_back(999.);
 
     (iJetI.tau1_softdrop ).push_back(999.);
     (iJetI.tau2_softdrop ).push_back(999.);
     (iJetI.tau3_softdrop ).push_back(999.);
-    (iJetI.tau4_softdrop ).push_back(999.);
-    (iJetI.tau5_softdrop ).push_back(999.);
 
     (iJetI.tau1_const ).push_back(999.);
     (iJetI.tau2_const ).push_back(999.);
     (iJetI.tau3_const ).push_back(999.);
-    (iJetI.tau4_const ).push_back(999.);
-    (iJetI.tau5_const ).push_back(999.);
-
   }
-
+  
 }
   
 
@@ -1644,13 +1609,7 @@ void fillGenJetsInfo(vector<PseudoJet> &iJets, vector<PseudoJet> &iParticles, Ge
   JetMedianBackgroundEstimator  bge_rhom(rho_range, clust_seq_rho); // get mediam background estimator
   BackgroundJetPtMDensity m_density;
   bge_rhom.set_jet_density_class(&m_density);
-  
-  //// use GridMedianBackgroundEstimator (faster), however doesn't work with SafeAreaSubtraction
-  //GridMedianBackgroundEstimator bge_rho(5.0,0.8);
-  //bge_rho.set_particles(iParticles);
-  //GridMedianBackgroundEstimator bge_rhom(5.0,0.8);
-  //bge_rhom.set_particles(iParticles);
-  
+    
   // -- Background estimator for constituents subtractor
   JetMedianBackgroundEstimator bge_rhoC(rho_range,jet_def_for_rho, area_def);
   BackgroundJetScalarPtDensity *scalarPtDensity = new BackgroundJetScalarPtDensity();
@@ -1664,11 +1623,10 @@ void fillGenJetsInfo(vector<PseudoJet> &iJets, vector<PseudoJet> &iParticles, Ge
 
   // -- Loop over jets in the event and set jets variables                                                                                                           
   for (unsigned int j = 0; j < iJets.size(); j++){
-	  if(j==0) 
-	    setGenJet( iJets[j], iJetInfo,  bge_rho, bge_rhom, bge_rhoC, cleanser_vect, 1, rho); // give the original clustered jets, the background estimations and cleansing
-	  else 
-	    setGenJet( iJets[j], iJetInfo,  bge_rho, bge_rhom, bge_rhoC, cleanser_vect, 0, rho); // give the original clustered jets, the background estimations and cleansing
-    //cout << iTree.GetName() << "  " << (iJetInfo.pt)[j] << "  "<< (iJetInfo.ptcorr)[j] <<endl;                                                                               
+     if(j==0) 
+       setGenJet( iJets[j], iJetInfo,  bge_rho, bge_rhom, bge_rhoC, cleanser_vect, 1, rho); // give the original clustered jets, the background estimations and cleansing
+     else 
+       setGenJet( iJets[j], iJetInfo,  bge_rho, bge_rhom, bge_rhoC, cleanser_vect, 0, rho); // give the original clustered jets, the background estimations and cleansing
   }
 
 }
@@ -1685,12 +1643,6 @@ void fillRecoJetsInfo(vector<PseudoJet> &iJets,  vector<PseudoJet> &iParticles, 
   JetMedianBackgroundEstimator bge_rhom(rho_range, clust_seq_rho);
   BackgroundJetPtMDensity m_density;
   bge_rhom.set_jet_density_class(&m_density);
-  
-  //// use GridMedianBackgroundEstimator (faster), however doesn't work with SafeAreaSubtraction
-  //GridMedianBackgroundEstimator bge_rho(5.0,0.8);
-  //bge_rho.set_particles(iParticles);
-  //GridMedianBackgroundEstimator bge_rhom(5.0,0.8);
-  //bge_rhom.set_particles(iParticles);
   
   // -- Background estimator for constituents subtractor
   JetMedianBackgroundEstimator bge_rhoC(rho_range,jet_def_for_rho, area_def);
@@ -1900,6 +1852,7 @@ int main (int argc, char ** argv) {
 
   // thresholds for Top and groomed jets 
   jetPtTresholdForGroomers      = Options.getParameter<double>("jetPtTresholdForGroomers"); 
+  genjetPtTresholdForGroomers   = Options.getParameter<double>("genjetPtTresholdForGroomers");
   jetPtTresholdForTopTagging    = Options.getParameter<double>("jetPtTresholdForTopTagging");
   genJetPtTresholdForTopTagging = Options.getParameter<double>("genJetPtTresholdForTopTagging");
 
@@ -1939,7 +1892,8 @@ int main (int argc, char ** argv) {
   chargeParam   = Options.getParameter<std::vector<double>>("jetcharge");
   //ECF param
   ecfParam      = Options.getParameter<std::vector<edm::ParameterSet>>("energyCorrelator");
-
+  //Nsubjettines param
+  NsubjettinessParam = Options.getParameter<std::vector<edm::ParameterSet>>("Nsubjettiness");
 
   //jet flavour for GenJets
   computeJetFlavour =  Options.getParameter<bool>("computeJetFlavour");
@@ -2043,9 +1997,7 @@ int main (int argc, char ** argv) {
     int nPU = eventInfo->nPU;
     int nPV = PV->GetEntries();
     double rho = eventInfo->rhoJet;
-    //cout << "nPU = " << nPU << endl;
-    //cout << "nPV = " << nPV <<endl;
-    
+
     // -- gen info (only if running on MC)
     vector<PseudoJet> genJets;
     vector<PseudoJet> gen_event;
@@ -2054,13 +2006,13 @@ int main (int argc, char ** argv) {
     PseudoJet leptonVector(0.,0.,0.,0.);
 
     if (isMC) { 
-      fGen   ->load(localEntry); // load gen information  
-      if (fGen->leptonicBosonFilter(leptonVector) < 0) continue; // filter events With W->lnu
+      fGen->load(localEntry); // load gen information  
+      if(fGen->leptonicBosonFilter(leptonVector) < 0) continue; // filter events With W->lnu
 
       gen_event       = fGen   ->genFetch();  //gen particles: only status 1 (ME) and user_index set 2
-      fGenParticles = fGen->GetGenParticleArray(); // take the vector of GenParticles, all the status
-      ClusterSequenceArea pGen    (gen_event    , jet_def, area_def);
-      genJets     = sorted_by_pt(pGen    .inclusive_jets(10.));
+      fGenParticles   = fGen->GetGenParticleArray(); // take the vector of GenParticles, all the status
+      ClusterSequenceArea pGen (gen_event,jet_def, area_def);
+      genJets     = sorted_by_pt(pGen.inclusive_jets(10.));
      
       if (DoMatchingToBoson){
 	fGen -> selectBoson(pdgIdBoson);
@@ -2069,34 +2021,33 @@ int main (int argc, char ** argv) {
       }
 
       if(leptonVector.pt() > 0){  
-	vector<PseudoJet>::iterator itJet = genJets.begin() ;                                                                                                                                                
-	for( ; itJet != genJets.end() ; ++itJet){                                                                                                                                             
-	  if( matchingIndex((*itJet),leptonVector,true) == false) genJetsCleaned.push_back((*itJet));                                                                                             
+	vector<PseudoJet>::iterator itJet = genJets.begin() ;                                                                                                                        
+        for( ; itJet != genJets.end() ; ++itJet){                                                                                                                             
+	  if( matchingIndex((*itJet),leptonVector,true) == false) genJetsCleaned.push_back((*itJet));                                                                   
 	}  	
       }
-      else{
-	genJetsCleaned = genJets;
-      }
+      else genJetsCleaned = genJets;
+      
       fillGenJetsInfo(genJetsCleaned, gen_event, JGenInfo, cleanser_vect, nPU, nPV, rho);          
     }
-
+    
     vector<PseudoJet> pf_event        = fPFCand->pfFetch();   //return all the particles
     vector<PseudoJet> chs_event       = fPFCand->pfchsFetch(-1); //only chs particles -> user_index set to 1(neutrals) or 2 (chaged from PV)
     vector<PseudoJet> puppi_event     = fPFCand->puppiFetch();   // puppi particles from all pf with puppi weights 
     vector<PseudoJet> soft_event      = soft_killer(pf_event);   //retun the list from soft_killer contructor given all pf and the input parameters
-    
+
     // -- Cluster jets -> make the clustering
-    ClusterSequenceArea pPup    (puppi_event  , jet_def, area_def);
+    ClusterSequenceArea pPup    (puppi_event  , jet_def, area_def);   
     ClusterSequenceArea pPF     (pf_event     , jet_def, area_def);
     ClusterSequenceArea pCHS    (chs_event    , jet_def, area_def);
     ClusterSequenceArea pSoft   (soft_event   , jet_def, area_def);
 
     // -- Order in decreasing pt the final jet collection with an inclusive cut on jets of 25GeV
     vector<PseudoJet> puppiJets   = sorted_by_pt(pPup    .inclusive_jets(jetPtCut));
-    vector<PseudoJet> pfJets      = sorted_by_pt(pPF     .inclusive_jets(jetPtCut));
+    vector<PseudoJet> pfJets      = sorted_by_pt(pPF     .inclusive_jets(jetPtCut));    
     vector<PseudoJet> chsJets     = sorted_by_pt(pCHS    .inclusive_jets(jetPtCut));
     vector<PseudoJet> softJets    = sorted_by_pt(pSoft   .inclusive_jets(jetPtCut));
-
+    
     vector<PseudoJet> puppiJetsCleaned ;
     vector<PseudoJet> pfJetsCleaned ;
     vector<PseudoJet> chsJetsCleaned ;
@@ -2105,49 +2056,44 @@ int main (int argc, char ** argv) {
     // clean jets from gen lepton for semi-leptonic events
     
     if(isMC && leptonVector.pt() > 0){
-      
-      vector<PseudoJet>::iterator       itJet = puppiJets.begin() ;
+      vector<PseudoJet>::iterator itJet = puppiJets.begin() ;
       for( ; itJet != puppiJets.end() ; ++itJet){
         if( matchingIndex((*itJet),leptonVector,true) == false) puppiJetsCleaned.push_back((*itJet));
       }
-
       itJet = pfJets.begin() ;
       for( ; itJet != pfJets.end() ; ++itJet){
         if( matchingIndex((*itJet),leptonVector,true) == false) pfJetsCleaned.push_back((*itJet)); 
       }
-
       itJet = chsJets.begin() ;
       for( ; itJet != chsJets.end() ; ++itJet){
         if( matchingIndex((*itJet),leptonVector,true) == false) chsJetsCleaned.push_back((*itJet));
       }
-
       itJet = softJets.begin() ;
       for( ; itJet != softJets.end() ; ++itJet){
         if( matchingIndex((*itJet),leptonVector,true) == false) softJetsCleaned.push_back((*itJet));
       }
-
     }
     else{
-           puppiJetsCleaned = puppiJets ; pfJetsCleaned = pfJets ; chsJetsCleaned = chsJets ; softJetsCleaned = softJets ;
-
+        puppiJetsCleaned = puppiJets ; 
+        pfJetsCleaned = pfJets ; 
+	chsJetsCleaned = chsJets ; 
+        softJetsCleaned = softJets ;
     }   
     
-
-    
-     
+         
     // save jet info in a tree
-    fillRecoJetsInfo(puppiJetsCleaned, puppi_event, puppi_event, JPuppiInfo       , JGenInfo, false, jetCorr, jetUnc,lCorr, cleanser_vect,nPU, nPV, rho, eta_Boson, phi_Boson, true, isMC);                
-    fillRecoJetsInfo(pfJetsCleaned   , pf_event   , pf_event,    JPFInfo          , JGenInfo, false, jetCorr, jetUnc,lCorr, cleanser_vect,nPU, nPV, rho, eta_Boson, phi_Boson,false, isMC );               
-    fillRecoJetsInfo(chsJetsCleaned  , chs_event  , pf_event,    JCHSInfo         , JGenInfo, true , jetCorr_CHS, jetUnc_CHS,lCorr, cleanser_vect, nPU, nPV, rho, eta_Boson, phi_Boson,false, isMC );      
-    fillRecoJetsInfo(softJetsCleaned , soft_event , soft_event,  JSoftKillerInfo  , JGenInfo, true , jetCorr, jetUnc,lCorr, cleanser_vect, nPU, nPV, rho, eta_Boson, phi_Boson,false, isMC );       
-        
+    fillRecoJetsInfo(puppiJetsCleaned, puppi_event, puppi_event, JPuppiInfo    , JGenInfo, false, jetCorr, jetUnc,lCorr, cleanser_vect,nPU, nPV, rho, eta_Boson, phi_Boson,true,isMC);
+    fillRecoJetsInfo(pfJetsCleaned   , pf_event   , pf_event,    JPFInfo       , JGenInfo, false, jetCorr, jetUnc,lCorr, cleanser_vect,nPU, nPV, rho, eta_Boson, phi_Boson,false,isMC);  
+    fillRecoJetsInfo(chsJetsCleaned  , chs_event  , pf_event,    JCHSInfo      , JGenInfo, true , jetCorr_CHS, jetUnc_CHS,lCorr, cleanser_vect, nPU, nPV, rho, eta_Boson, phi_Boson,false,isMC );      
+    fillRecoJetsInfo(softJetsCleaned , soft_event , soft_event,  JSoftKillerInfo , JGenInfo, true , jetCorr, jetUnc,lCorr, cleanser_vect, nPU, nPV, rho, eta_Boson, phi_Boson,false,isMC);
+     
     if (isMC) genTree->Fill();    
+    
     puppiTree->Fill();
     pfTree->Fill();
     chsTree->Fill();
     softkillerTree->Fill();
-
-
+    
     if (doCMSSWJets)
       readCMSSWJet(ientry, lTree, *cmsswTree, genJets, JCMSSWPFInfo);        
     

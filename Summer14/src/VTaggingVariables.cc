@@ -5,6 +5,7 @@ VTaggingVariables::VTaggingVariables(const PseudoJet & inputJet){
 
   inputJet_ = inputJet ;
   SelectorIsPureGhost().sift(inputJet_.constituents(), ghosts_, particles_);
+
 }
 
 ///////////////////////                                                                                                                                                                  
@@ -62,17 +63,31 @@ double VTaggingVariables::computeNSubJettines(const int & nJettines, const doubl
   
 
 ///////////////////////                                                                                                                                                                  
-double VTaggingVariables::computeECF(JetAlgorithm jetAlgoforECF, const double & Rparameter, const int & nPoint, const double & beta){
+double VTaggingVariables::computeECF(JetAlgorithm jetAlgoforECF, const double & Rparameter, const int & nPoint, const double & beta, const int & type){
 
    double ECFValues = 0 ;
-   fastjet::JetDefinition jet_def_forECF(jetAlgoforECF,Rparameter); // definition for ECF
-   fastjet::ClusterSequence clust_seq_forECF(inputJet_.constituents(),jet_def_forECF);       // cluster sequence for ECF computation
-   std::vector<fastjet::PseudoJet> incluisve_jets_forECF = clust_seq_forECF.inclusive_jets(0);       // take all the set of pseudojets from clustering
-   contrib::EnergyCorrelatorDoubleRatio C2beta(nPoint,beta,contrib::EnergyCorrelator::pt_R); // calculate the ECF
-   ECFValues = C2beta(incluisve_jets_forECF[0]);
-  
-   return ECFValues ;
 
+   if(!jet_def_forECF_) jet_def_forECF_   = new JetDefinition(jetAlgoforECF,Rparameter); // definition for ECF                         
+   if(!clust_seq_forECF_) clust_seq_forECF_ = new ClusterSequence(particles_,*(jet_def_forECF_));         
+   if(incluisve_jets_forECF_.empty()) incluisve_jets_forECF_ = clust_seq_forECF_->inclusive_jets(0);//take all the set of pseudojets from clustering                                
+   
+   if(type == 0){ // compute simple energy correlation function for nPoint
+     contrib::EnergyCorrelator C2beta(nPoint,beta,contrib::EnergyCorrelator::pt_R);
+     ECFValues = C2beta(incluisve_jets_forECF_[0]);  
+     return ECFValues ;
+   }
+   else if(type == 1){
+     contrib::EnergyCorrelatorRatio C2beta(nPoint,beta,contrib::EnergyCorrelator::pt_R); // ECF(N+1,beta)/ECF(N,beta)
+     ECFValues = C2beta(incluisve_jets_forECF_[0]);  
+     return ECFValues ;
+   }
+   else if(type == 2){
+    contrib::EnergyCorrelatorDoubleRatio C2beta(nPoint,beta,contrib::EnergyCorrelator::pt_R); // ECF(N+1,beta)*ECF(N-1,beta)/ECF(N,beta)^2
+    ECFValues = C2beta(incluisve_jets_forECF_[0]);  
+    return ECFValues ;
+   }
+
+   return ECFValues ;
 }
 
 
@@ -157,6 +172,10 @@ void VTaggingVariables::setInputJet(const PseudoJet & inputJet){
 
   inputJet_ = inputJet ;
   SelectorIsPureGhost().sift(inputJet_.constituents(), ghosts_, particles_);
+  jet_def_forECF_   = 0 ;
+  clust_seq_forECF_ = 0 ;
+  incluisve_jets_forECF_.clear() ;
+
 
 }
 
@@ -220,7 +239,6 @@ double VTaggingVariables::computeQGLikelihood(QGLikelihoodCalculator* qgLikeliho
   QCLikelihoodVariables_["mult"] = (nChg_QC + nNeutral_ptCut);
 
   //std::cout<<" axis1 : "<<QCLikelihoodVariables_["axis1"]<<"  "<<QCLikelihoodVariables_["axis2"]<<"  "<<nChg_QC + nNeutral_ptCut<<std::endl;
-
 
   return qgLikelihood->QGvalue(QCLikelihoodVariables_);
  

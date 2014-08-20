@@ -52,7 +52,7 @@ class VTaggingVariables {
   double computeJetCharge(const double & jetChargeKappa = 1.0);
   double computeJetChargeReco(const double & jetChargeKappa = 1.0);
   double computeNSubJettines(const int & nJettines, const double & beta, const double & R0, const double & Rcut);
-  double computeECF(JetAlgorithm jetAlgoforECF, const double & Rparameter, const int & nPoint, const double & beta);
+  double computeECF(JetAlgorithm jetAlgoforECF, const double & Rparameter, const int & nPoint, const double & beta, const int & type = 0);
   double computeQjets(const int & QJetsPreclustering = 35, const int & QJetsN = 25, const int & seed = 1, const double & jetR = 0.8);
 
   double getQjetVolatility(std::vector<PseudoJet> constits, const int & QJetsN, const int & seed);
@@ -70,7 +70,7 @@ class VTaggingVariables {
  private:
 
   PseudoJet inputJet_ ;
-
+  
   std::vector<PseudoJet> particles_;
   std::vector<PseudoJet> ghosts_;
 
@@ -81,6 +81,11 @@ class VTaggingVariables {
   TClonesArray  *fGens_;
 
   TVector2 jetPull_;
+
+  JetDefinition* jet_def_forECF_ ;                                                                                      
+  ClusterSequence* clust_seq_forECF_ ;                                                         
+  std::vector<PseudoJet> incluisve_jets_forECF_ ; 
+
 
 };
 
