@@ -24,17 +24,24 @@
 #include "TF1.h"
 #include "TH2F.h"
 #include "TList.h"
+#include "TRandom3.h"
 
 #include "TKey.h"
 #include "TObjArray.h"
 #include "TClass.h"
 #include "TH2F.h"
+#include "TMatrixD.h"
 #include "TMatrixDSym.h"
+#include "TMatrixDSymEigen.h"
 
 #include "FWCore/ParameterSet/interface/ProcessDesc.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/PythonParameterSet/interface/MakeParameterSets.h"
 
+void calculateCovarianceMatrix ( std::vector<TTree*> & inputTrees, TMatrixDSym & correlationMatrixS, TMatrixDSym & correlationMatrixB );
+void plotCovarianceMatrix      ( TCanvas* cCorrelation, TH2D* Matrix, std::string outputDirectory, std::vector<std::string> labelNames);
+TMatrixDSym eigenTransform (TMatrixDSym& Matrix);
+TMatrixDSym dimOrder(TMatrixDSym & Matrix,TMatrixDSym & Eigen,TMatrixD & EigenInv);
 
 /// Main programme 
 int main (int argc, char **argv){
@@ -105,21 +112,153 @@ int main (int argc, char **argv){
    }
   }
 
-  std::vector<float> MeanValue_S ; MeanValue_S.resize(inputLowPileUpTrees.size());
-  std::vector<float> MeanValue_B ; MeanValue_B.resize(inputLowPileUpTrees.size());
+  calculateCovarianceMatrix(inputLowPileUpTrees,correlationMatrixS_lowPileUP,correlationMatrixB_lowPileUP); // calculate mean value for S and B
 
-  std::vector<int> ientrySignal ; ientrySignal.resize(inputLowPileUpTrees.size());
-  std::vector<int> ientryBackground ; ientryBackground.resize(inputLowPileUpTrees.size());
+  TH2D* Matrix_S_lowPileUp = new TH2D(correlationMatrixS_lowPileUP);
+  Matrix_S_lowPileUp->SetName("Matrix_S_lowPileUp");
+  TH2D* Matrix_B_lowPileUp = new TH2D(correlationMatrixB_lowPileUP);
+  Matrix_B_lowPileUp->SetName("Matrix_B_lowPileUp");
+
+  Matrix_S_lowPileUp->Scale(100);
+  Matrix_B_lowPileUp->Scale(100);
+
+  for( int iBinX = 0 ; iBinX < Matrix_S_lowPileUp->GetNbinsX() ; iBinX++){
+   for( int iBinY = 0 ; iBinY < Matrix_S_lowPileUp->GetNbinsX() ; iBinY++){
+     Matrix_S_lowPileUp->SetBinContent(iBinX+1,iBinY+1,int(Matrix_S_lowPileUp->GetBinContent(iBinX+1,iBinY+1)));
+     Matrix_B_lowPileUp->SetBinContent(iBinX+1,iBinY+1,int(Matrix_B_lowPileUp->GetBinContent(iBinX+1,iBinY+1)));
+     if(iBinX+1 == iBinY+1 ) {
+      Matrix_S_lowPileUp->SetBinContent(iBinX+1,iBinY+1,100);
+      Matrix_B_lowPileUp->SetBinContent(iBinX+1,iBinY+1,100);
+     }
+   }
+  }
+
+  ////////////////////////
+  TCanvas* cCorrelationSignal = new TCanvas("CorrelationBDT_S",Form("Correlation Matrix Signal"),180,52,550,550);
+  plotCovarianceMatrix(cCorrelationSignal,Matrix_S_lowPileUp,outputDirectory,reducedNameLowPileUp);
+
+  ////////////////////////
+  TCanvas* cCorrelationBackground = new TCanvas("CorrelationBDT_B",Form("Correlation Matrix Background"),180,52,550,550);
+  plotCovarianceMatrix(cCorrelationBackground,Matrix_B_lowPileUp,outputDirectory,reducedNameLowPileUp);
+
+  //////////////////////////////////////////////////////////////////////
+  //// high pile-up correlation
+  //////////////////////////////////////////////////////////////////////
+
+  inputLowPileUpTrees.clear() ;
+  reducedNameLowPileUp.clear() ;
+  // take all the TH1 outputs for S and B for  each variable in input-> low Pile Up
+  itLowPileUp = InputInformationParamHighPU.begin();
+  for( ; itLowPileUp != InputInformationParamHighPU.end() ; ++itLowPileUp){
+    inputFile = TFile::Open((*itLowPileUp).getParameter<std::string>("fileName").c_str());
+    if(inputFile == 0 or inputFile == NULL) continue;
+    inputLowPileUpTrees.push_back((TTree*) inputFile->Get("TestTree"));
+    reducedNameLowPileUp.push_back((*itLowPileUp).getParameter<std::string>("variableName"));
+  }
+  
+  // Build Up the correlation matrix
+  TMatrixDSym correlationMatrixS_highPileUP(reducedNameLowPileUp.size()) ;
+  TMatrixDSym correlationMatrixB_highPileUP(reducedNameLowPileUp.size()) ;
+  for( unsigned int irow = 0 ; irow < reducedNameLowPileUp.size() ; irow++){
+   for( unsigned int icolum = 0 ; icolum < reducedNameLowPileUp.size() ; icolum++){
+     correlationMatrixS_highPileUP(irow,icolum) = 0;
+     correlationMatrixB_highPileUP(irow,icolum) = 0;
+   }
+  }
+
+  calculateCovarianceMatrix(inputLowPileUpTrees,correlationMatrixS_highPileUP,correlationMatrixB_highPileUP); // calculate mean value for S and B
+  
+  TH2D* Matrix_S_highPileUp = new TH2D(correlationMatrixS_highPileUP);
+  Matrix_S_highPileUp->SetName("Matrix_S_highPileUp");
+  TH2D* Matrix_B_highPileUp = new TH2D(correlationMatrixB_highPileUP);
+  Matrix_B_highPileUp->SetName("Matrix_B_highPileUp");
+
+  Matrix_S_highPileUp->Scale(100);
+  Matrix_B_highPileUp->Scale(100);
+
+  for( int iBinX = 0 ; iBinX < Matrix_S_highPileUp->GetNbinsX() ; iBinX++){
+   for( int iBinY = 0 ; iBinY < Matrix_S_highPileUp->GetNbinsX() ; iBinY++){
+     Matrix_S_highPileUp->SetBinContent(iBinX+1,iBinY+1,int(Matrix_S_highPileUp->GetBinContent(iBinX+1,iBinY+1)));
+     Matrix_B_highPileUp->SetBinContent(iBinX+1,iBinY+1,int(Matrix_B_highPileUp->GetBinContent(iBinX+1,iBinY+1)));
+     if(iBinX+1 == iBinY+1 ) {
+         Matrix_S_highPileUp->SetBinContent(iBinX+1,iBinY+1,100);
+         Matrix_B_highPileUp->SetBinContent(iBinX+1,iBinY+1,100);
+     }
+   }
+  }
+
+  /*    
+  TH2D* Matrix_S_highPileUp = new TH2D(correlationMatrixS_lowPileUP);
+  Matrix_S_highPileUp->SetName("Matrix_S_highPileUp");
+  TH2D* Matrix_B_highPileUp = new TH2D(correlationMatrixB_lowPileUP);
+  Matrix_B_highPileUp->SetName("Matrix_B_highPileUp");
+
+  Matrix_S_highPileUp->Scale(100);
+  Matrix_B_highPileUp->Scale(100);
+  
+  TRandom3 rand ;
+  for( int iBinX = 0 ; iBinX < Matrix_S_highPileUp->GetNbinsX() ; iBinX++){
+   for( int iBinY = iBinX ; iBinY < Matrix_S_highPileUp->GetNbinsX() ; iBinY++){
+     double svalue = int(rand.Gaus(Matrix_S_highPileUp->GetBinContent(iBinX+1,iBinY+1),5));
+     double bvalue = int(rand.Gaus(Matrix_B_highPileUp->GetBinContent(iBinX+1,iBinY+1),5));
+     Matrix_S_highPileUp->SetBinContent(iBinX+1,iBinY+1,svalue);
+     Matrix_S_highPileUp->SetBinContent(iBinY+1,iBinX+1,svalue);
+     Matrix_B_highPileUp->SetBinContent(iBinX+1,iBinY+1,bvalue);
+     Matrix_B_highPileUp->SetBinContent(iBinY+1,iBinX+1,bvalue);
+     if(iBinX == iBinY){
+      Matrix_S_highPileUp->SetBinContent(iBinX+1,iBinY+1,100);
+      Matrix_B_highPileUp->SetBinContent(iBinX+1,iBinY+1,100);
+     }
+   }
+  }
+  */
+
+  TCanvas* cCorrelationSignal_highPU = new TCanvas("CorrelationBDT_S_highPU",Form("Correlation Matrix Signal highPU"),180,52,550,550);
+  plotCovarianceMatrix(cCorrelationSignal_highPU,Matrix_S_highPileUp,outputDirectory,reducedNameLowPileUp);
+  TCanvas* cCorrelationBackground_highPU = new TCanvas("CorrelationBDT_B_highPU",Form("Correlation Matrix Background"),180,52,550,550);
+  plotCovarianceMatrix(cCorrelationBackground_highPU,Matrix_B_highPileUp,outputDirectory,reducedNameLowPileUp);
+
+
+  ////////////////////////////
+  // Correlation difference among high pile-up bin and low pile-up bin for both S and B
+  ////////////////////////////
+
+  TH2D* CorrelationS_difference = new TH2D("CorrelationS_difference","",reducedNameLowPileUp.size(),0,reducedNameLowPileUp.size(),reducedNameLowPileUp.size(),0,reducedNameLowPileUp.size());
+  TH2D* CorrelationB_difference = new TH2D("CorrelationB_difference","",reducedNameLowPileUp.size(),0,reducedNameLowPileUp.size(),reducedNameLowPileUp.size(),0,reducedNameLowPileUp.size());
+
+  for(int iBinX = 0; iBinX < Matrix_S_highPileUp->GetNbinsX(); iBinX++){
+   for(int iBinY = 0; iBinY < Matrix_S_highPileUp->GetNbinsY(); iBinY++){  
+     CorrelationS_difference->SetBinContent(iBinX+1,iBinY+1,Matrix_S_highPileUp->GetBinContent(iBinX+1,iBinY+1)-Matrix_S_lowPileUp->GetBinContent(iBinX+1,iBinY+1));
+     CorrelationB_difference->SetBinContent(iBinX+1,iBinY+1,Matrix_B_highPileUp->GetBinContent(iBinX+1,iBinY+1)-Matrix_B_lowPileUp->GetBinContent(iBinX+1,iBinY+1));
+   }
+  }
+
+  TCanvas* cCorrelationSignal_difference = new TCanvas("cCorrelationSignal_difference",Form("Correlation Matrix Difference Signal"),180,52,550,550);
+  plotCovarianceMatrix(cCorrelationSignal_difference,CorrelationS_difference,outputDirectory,reducedNameLowPileUp);
+  TCanvas* cCorrelationBackground_difference = new TCanvas("cCorrelationBackground_difference",Form("Correlation Matrix Difference Background"),180,52,550,550);
+  plotCovarianceMatrix(cCorrelationBackground_difference,CorrelationS_difference,outputDirectory,reducedNameLowPileUp);
+
+  return 0 ;
+
+}
+
+/// Calculate Mean Value
+void calculateCovarianceMatrix (std::vector<TTree*> & inputTrees, TMatrixDSym & correlationMatrixS, TMatrixDSym & correlationMatrixB){
+
+  std::vector<float> MeanValue_S; MeanValue_S.resize(inputTrees.size());
+  std::vector<float> MeanValue_B; MeanValue_B.resize(inputTrees.size());
+
+  std::vector<int> ientrySignal ; ientrySignal.resize(inputTrees.size());
+  std::vector<int> ientryBackground ; ientryBackground.resize(inputTrees.size());
 
   int classID          = 0;
   float BDTG_NoPruning = 0;
-
   // compute mean values
-  for(unsigned int iTree = 0 ; iTree<inputLowPileUpTrees.size(); iTree++){   
-    inputLowPileUpTrees.at(iTree)->SetBranchAddress("classID",&classID);
-    inputLowPileUpTrees.at(iTree)->SetBranchAddress("BDTG_NoPruning",&BDTG_NoPruning);
-    for(int iEntries = 0; iEntries < inputLowPileUpTrees.at(iTree)->GetEntries(); iEntries++){
-      inputLowPileUpTrees.at(iTree)->GetEntry(iEntries);
+  for(unsigned int iTree = 0 ; iTree<inputTrees.size(); iTree++){   
+    inputTrees.at(iTree)->SetBranchAddress("classID",&classID);
+    inputTrees.at(iTree)->SetBranchAddress("BDTG_NoPruning",&BDTG_NoPruning);
+    for(int iEntries = 0; iEntries < inputTrees.at(iTree)->GetEntries(); iEntries++){
+      inputTrees.at(iTree)->GetEntry(iEntries);
       if(classID == 0){ MeanValue_S.at(iTree) += BDTG_NoPruning; ientrySignal.at(iTree)++;}
       else{ MeanValue_B.at(iTree) += BDTG_NoPruning; ientryBackground.at(iTree)++;}
    }
@@ -136,315 +275,168 @@ int main (int argc, char **argv){
   int classID_Y          = 0;
   float BDTG_NoPruning_Y = 0;
 
-  for(unsigned int iTreeX = 0 ; iTreeX<inputLowPileUpTrees.size(); iTreeX++){   
-    for(unsigned int iTreeY = 0 ; iTreeY<inputLowPileUpTrees.size(); iTreeY++){    
+  for(unsigned int iTreeX = 0 ; iTreeX<inputTrees.size(); iTreeX++){   
+    for(unsigned int iTreeY = 0 ; iTreeY<inputTrees.size(); iTreeY++){    
      int iEntriesX = 0; int iEntriesY = 0;
-     for( ; iEntriesX < inputLowPileUpTrees.at(iTreeX)->GetEntries() and iEntriesY < inputLowPileUpTrees.at(iTreeY)->GetEntries(); iEntriesX++, iEntriesY++){
-       inputLowPileUpTrees.at(iTreeX)->SetBranchAddress("classID",&classID_X);
-       inputLowPileUpTrees.at(iTreeX)->SetBranchAddress("BDTG_NoPruning",&BDTG_NoPruning_X);
-       inputLowPileUpTrees.at(iTreeX)->GetEntry(iEntriesX);
-       inputLowPileUpTrees.at(iTreeY)->SetBranchAddress("classID",&classID_Y);
-       inputLowPileUpTrees.at(iTreeY)->SetBranchAddress("BDTG_NoPruning",&BDTG_NoPruning_Y);
-       inputLowPileUpTrees.at(iTreeY)->GetEntry(iEntriesY);
+     for( ; iEntriesX < inputTrees.at(iTreeX)->GetEntries() and iEntriesY < inputTrees.at(iTreeY)->GetEntries(); iEntriesX++, iEntriesY++){
+       inputTrees.at(iTreeX)->SetBranchAddress("classID",&classID_X);
+       inputTrees.at(iTreeX)->SetBranchAddress("BDTG_NoPruning",&BDTG_NoPruning_X);
+       inputTrees.at(iTreeX)->GetEntry(iEntriesX);
+       inputTrees.at(iTreeY)->SetBranchAddress("classID",&classID_Y);
+       inputTrees.at(iTreeY)->SetBranchAddress("BDTG_NoPruning",&BDTG_NoPruning_Y);
+       inputTrees.at(iTreeY)->GetEntry(iEntriesY);
        if(classID_X == 0 and classID_Y == 0)
-         correlationMatrixS_lowPileUP(iTreeX,iTreeY) += double((BDTG_NoPruning_X-MeanValue_S.at(iTreeX))*(BDTG_NoPruning_Y-MeanValue_S.at(iTreeY)));
-       else if(classID_X == 1 and classID_Y == 1) correlationMatrixB_lowPileUP(iTreeX,iTreeY) += double((BDTG_NoPruning_X-MeanValue_B.at(iTreeX))*(BDTG_NoPruning_Y-MeanValue_B.at(iTreeY)));
+         correlationMatrixS(iTreeX,iTreeY) += double((BDTG_NoPruning_X-MeanValue_S.at(iTreeX))*(BDTG_NoPruning_Y-MeanValue_S.at(iTreeY)));
+       else if(classID_X == 1 and classID_Y == 1) correlationMatrixB(iTreeX,iTreeY) += double((BDTG_NoPruning_X-MeanValue_B.at(iTreeX))*(BDTG_NoPruning_Y-MeanValue_B.at(iTreeY)));
      }
     }
   }
   
-  for( unsigned int binX = 0; binX < reducedNameLowPileUp.size(); binX ++){
-   for( unsigned int binY = 0; binY < reducedNameLowPileUp.size(); binY ++){
-     correlationMatrixS_lowPileUP(binX,binY) /= double(ientrySignal.at(binX));
-     correlationMatrixB_lowPileUP(binX,binY) /= double(ientryBackground.at(binX));
+  for( int binX = 0; binX < correlationMatrixS.GetNrows(); binX ++){
+    for( int binY = 0; binY < correlationMatrixS.GetNcols(); binY ++){
+     correlationMatrixS(binX,binY) /= double(ientrySignal.at(binX));
+     correlationMatrixB(binX,binY) /= double(ientryBackground.at(binX));
    }
   }
  
-  std::vector<float> Sigma_S ; Sigma_S.resize(inputLowPileUpTrees.size());
-  std::vector<float> Sigma_B ; Sigma_B.resize(inputLowPileUpTrees.size());
-  for( unsigned int binX = 0; binX < reducedNameLowPileUp.size(); binX ++) {
-    Sigma_S.at(binX) = sqrt(correlationMatrixS_lowPileUP(binX,binX));
-    Sigma_B.at(binX) = sqrt(correlationMatrixB_lowPileUP(binX,binX));
+  std::vector<float> Sigma_S ; Sigma_S.resize(inputTrees.size());
+  std::vector<float> Sigma_B ; Sigma_B.resize(inputTrees.size());
+  for(int binX = 0; binX < correlationMatrixS.GetNrows(); binX ++) {
+    Sigma_S.at(binX) = sqrt(correlationMatrixS(binX,binX));
+    Sigma_B.at(binX) = sqrt(correlationMatrixB(binX,binX));
   }
   
-  for( unsigned int binX = 0; binX < reducedNameLowPileUp.size(); binX ++){
-   for( unsigned int binY = 0; binY < reducedNameLowPileUp.size(); binY ++){
-     correlationMatrixS_lowPileUP(binX,binY) /= double(Sigma_S.at(binX)*Sigma_S.at(binY));
-     correlationMatrixB_lowPileUP(binX,binY) /= double(Sigma_B.at(binX)*Sigma_B.at(binY));
+  for( int binX = 0; binX < correlationMatrixS.GetNrows(); binX ++){
+    for( int binY = 0; binY < correlationMatrixS.GetNcols(); binY ++){
+     correlationMatrixS(binX,binY) /= double(Sigma_S.at(binX)*Sigma_S.at(binY));
+     correlationMatrixB(binX,binY) /= double(Sigma_B.at(binX)*Sigma_B.at(binY));
    }     
   }
 
-  TH2D* Matrix_S_lowPileUp = new TH2D(correlationMatrixS_lowPileUP);
-  Matrix_S_lowPileUp->SetName("Matrix_S_lowPileUp");
-  TH2D* Matrix_B_lowPileUp = new TH2D(correlationMatrixB_lowPileUP);
-  Matrix_B_lowPileUp->SetName("Matrix_B_lowPileUp");
 
-  Matrix_S_lowPileUp->Scale(100);
-  Matrix_B_lowPileUp->Scale(100);
+}
 
-  for( int iBinX = 0 ; iBinX < Matrix_S_lowPileUp->GetNbinsX() ; iBinX++){
-   for( int iBinY = 0 ; iBinY < Matrix_S_lowPileUp->GetNbinsX() ; iBinY++){
-     Matrix_S_lowPileUp->SetBinContent(iBinX+1,iBinY+1,int(Matrix_S_lowPileUp->GetBinContent(iBinX+1,iBinY+1)));
-     Matrix_B_lowPileUp->SetBinContent(iBinX+1,iBinY+1,int(Matrix_B_lowPileUp->GetBinContent(iBinX+1,iBinY+1)));
-     if(iBinX+1 == iBinY+1 ) {
-      Matrix_S_lowPileUp->SetBinContent(iBinX+1,iBinY+1,1);
-      Matrix_B_lowPileUp->SetBinContent(iBinX+1,iBinY+1,1);
-     }
-   }
-  }
-
-
-  TCanvas* cCorrelationSignal = new TCanvas("",Form("Correlation Matrix Signal"),180,52,550,550);
+///////////////
+void plotCovarianceMatrix(TCanvas* cCorrelation, TH2D* Matrix, std::string outputDirectory, std::vector<std::string> LabelNames){
 
   float newMargin1 = 0.13;
   float newMargin2 = 0.15;
   float newMargin3 = 0.20;
 
-  cCorrelationSignal->SetGrid();
-  cCorrelationSignal->SetTicks();
-  cCorrelationSignal->SetLeftMargin(newMargin3);
-  cCorrelationSignal->SetBottomMargin(newMargin2);
-  cCorrelationSignal->SetRightMargin(newMargin1);
-  cCorrelationSignal->cd();
+  cCorrelation->SetGrid();
+  cCorrelation->SetTicks();
+  cCorrelation->SetLeftMargin(newMargin3);
+  cCorrelation->SetBottomMargin(newMargin2);
+  cCorrelation->SetRightMargin(newMargin1);
+  cCorrelation->cd();
   gStyle->SetPaintTextFormat("3g");
 
-  Matrix_S_lowPileUp->SetMarkerSize(1.5);
-  Matrix_S_lowPileUp->SetMarkerColor(0);
-  Matrix_S_lowPileUp->GetXaxis()->SetLabelSize(0.035);
-  Matrix_S_lowPileUp->GetYaxis()->SetLabelSize(0.035);
-  Matrix_S_lowPileUp->SetLabelOffset(0.011);// label offset on x axis                                                                                                                   
+  Matrix->SetMarkerSize(1.5);
+  Matrix->SetMarkerColor(0);
+  Matrix->GetXaxis()->SetLabelSize(0.035);
+  Matrix->GetYaxis()->SetLabelSize(0.035);
+  Matrix->SetLabelOffset(0.011);// label offset on x axis                                                                                                                   
 
-  Matrix_S_lowPileUp->SetMaximum(100);         
-  Matrix_S_lowPileUp->SetMinimum(-100);         
+  Matrix->SetMaximum(100);         
+  Matrix->SetMinimum(-100);         
 
-  Matrix_S_lowPileUp->Draw("colz");
-  for( int binX = 0 ; binX < Matrix_S_lowPileUp->GetNbinsX(); binX++){
-    Matrix_S_lowPileUp->GetXaxis()->SetBinLabel(binX+1,reducedNameLowPileUp.at(binX).c_str());
-    Matrix_S_lowPileUp->GetYaxis()->SetBinLabel(binX+1,reducedNameLowPileUp.at(binX).c_str());
+  Matrix->Draw("colz");
+  for( int binX = 0 ; binX < Matrix->GetNbinsX(); binX++){
+    Matrix->GetXaxis()->SetBinLabel(binX+1,LabelNames.at(binX).c_str());
+    Matrix->GetYaxis()->SetBinLabel(binX+1,LabelNames.at(binX).c_str());
   }
-  Matrix_S_lowPileUp->Draw("textsame");
-  Matrix_S_lowPileUp->GetXaxis()->LabelsOption("v");
-  Matrix_S_lowPileUp->GetYaxis()->LabelsOption("h");
+  Matrix->Draw("textsame");
+  Matrix->GetXaxis()->LabelsOption("v");
+  Matrix->GetYaxis()->LabelsOption("h");
 
-  TLatex latex;
-  latex.SetNDC();
-  latex.SetTextAlign(21); // align right                                                                                                                                                  
-  latex.SetTextSize(0.033);
-  latex.DrawLatex(0.547,0.92,Form("CMS Preliminary Simulation, #sqrt{s} = 13 TeV"));
-
-  cCorrelationSignal->Print((outputDirectory+"/CorrelationBDT_S.pdf").c_str(),"pdf");
-  cCorrelationSignal->Print((outputDirectory+"/CorrelationBDT_S.png").c_str(),"png");
-  cCorrelationSignal->Print((outputDirectory+"/CorrelationBDT_S.root").c_str(),"root");
-
-
-  ////////////////////////
-  TCanvas* cCorrelationBackground = new TCanvas("",Form("Correlation Matrix Background"),180,52,550,550);
-
-  cCorrelationBackground->SetGrid();
-  cCorrelationBackground->SetTicks();
-  cCorrelationBackground->SetLeftMargin(newMargin3);
-  cCorrelationBackground->SetBottomMargin(newMargin2);
-  cCorrelationBackground->SetRightMargin(newMargin1);
-  cCorrelationBackground->cd();
-
-  Matrix_B_lowPileUp->SetMarkerSize(1.5);
-  Matrix_B_lowPileUp->SetMarkerColor(0);
-  Matrix_B_lowPileUp->GetXaxis()->SetLabelSize(0.035);
-  Matrix_B_lowPileUp->GetYaxis()->SetLabelSize(0.035);
-  Matrix_B_lowPileUp->SetLabelOffset(0.011);// label offset on x axis                                                                                                                     
-
-  Matrix_B_lowPileUp->SetMaximum(100);         
-  Matrix_B_lowPileUp->SetMinimum(-100);         
-           
-  Matrix_B_lowPileUp->Draw("colz");
-  for( int binX = 0 ; binX < Matrix_B_lowPileUp->GetNbinsX(); binX++){
-    Matrix_B_lowPileUp->GetXaxis()->SetBinLabel(binX+1,reducedNameLowPileUp.at(binX).c_str());
-    Matrix_B_lowPileUp->GetYaxis()->SetBinLabel(binX+1,reducedNameLowPileUp.at(binX).c_str());
-  }
-  Matrix_B_lowPileUp->Draw("textsame");
-  Matrix_B_lowPileUp->GetXaxis()->LabelsOption("v");
-  Matrix_B_lowPileUp->GetYaxis()->LabelsOption("h");
+  TLatex *   tex = new TLatex(0.85,0.92," 13 TeV");
+  tex->SetNDC();
+  tex->SetTextAlign(31);
+  tex->SetTextFont(42);
+  tex->SetTextSize(0.04);
+  tex->SetLineWidth(2);
+  tex->Draw();
+  tex = new TLatex(0.13,0.92,"CMS");
+  tex->SetNDC();
+  tex->SetTextFont(61);
+  tex->SetTextSize(0.04);
+  tex->SetLineWidth(2);
+  tex->Draw();
+  tex = new TLatex(0.2324,0.92,"Preliminary Simulation");
+  tex->SetNDC();
+  tex->SetTextFont(52);
+  tex->SetTextSize(0.0304);
+  tex->SetLineWidth(2);
+  tex->Draw();
   
-  latex.DrawLatex(0.547,0.92,Form("CMS Preliminary Simulation, #sqrt{s} = 13 TeV"));
+  cCorrelation->Print((outputDirectory+"/"+std::string(cCorrelation->GetName())+".pdf").c_str(),"pdf");
+  cCorrelation->Print((outputDirectory+"/"+std::string(cCorrelation->GetName())+".png").c_str(),"png");
+  cCorrelation->Print((outputDirectory+"/"+std::string(cCorrelation->GetName())+".root").c_str(),"root");
+}
 
-  cCorrelationBackground->Print((outputDirectory+"/CorrelationBDT_B.pdf").c_str(),"pdf");
-  cCorrelationBackground->Print((outputDirectory+"/CorrelationBDT_B.png").c_str(),"png");
-  cCorrelationBackground->Print((outputDirectory+"/CorrelationBDT_B.root").c_str(),"root");
+///////////////////////////////////////////////////
 
-  //////////////////////////////////////////////////////////////////////
-  inputLowPileUpTrees.clear() ;
-  reducedNameLowPileUp.clear() ;
-  // take all the TH1 outputs for S and B for  each variable in input-> low Pile Up
-  itLowPileUp = InputInformationParamHighPU.begin();
-  for( ; itLowPileUp != InputInformationParamHighPU.end() ; ++itLowPileUp){
-    inputFile = TFile::Open((*itLowPileUp).getParameter<std::string>("fileName").c_str());
-    if(inputFile == 0 or inputFile == NULL) continue;
-    inputLowPileUpTrees.push_back((TTree*) inputFile->Get("TestTree"));
-    reducedNameLowPileUp.push_back((*itLowPileUp).getParameter<std::string>("variableName"));
-  }
+TMatrixDSym eigenTransform (TMatrixDSym& Matrix){
 
-  // Build Up the correlation matrix
-  TMatrixDSym correlationMatrixS_highPileUP(reducedNameLowPileUp.size()) ;
-  TMatrixDSym correlationMatrixB_highPileUP(reducedNameLowPileUp.size()) ;
-  for( unsigned int irow = 0 ; irow < reducedNameLowPileUp.size() ; irow++){
-   for( unsigned int icolum = 0 ; icolum < reducedNameLowPileUp.size() ; icolum++){
-     correlationMatrixS_highPileUP(irow,icolum) = 0;
-     correlationMatrixB_highPileUP(irow,icolum) = 0;
-   }
-  }
-
-  MeanValue_S.clear() ; MeanValue_S.resize(inputLowPileUpTrees.size());
-  MeanValue_B.clear() ; MeanValue_B.resize(inputLowPileUpTrees.size());
-
-  ientrySignal.clear() ; ientrySignal.resize(inputLowPileUpTrees.size());
-  ientryBackground.clear() ; ientryBackground.resize(inputLowPileUpTrees.size());
-
-  classID          = 0;
-  BDTG_NoPruning = 0;
-
-  // compute mean values
-  for(unsigned int iTree = 0 ; iTree<inputLowPileUpTrees.size(); iTree++){   
-    inputLowPileUpTrees.at(iTree)->SetBranchAddress("classID",&classID);
-    inputLowPileUpTrees.at(iTree)->SetBranchAddress("BDTG_NoPruning",&BDTG_NoPruning);
-    for(int iEntries = 0; iEntries < inputLowPileUpTrees.at(iTree)->GetEntries(); iEntries++){
-      inputLowPileUpTrees.at(iTree)->GetEntry(iEntries);
-      if(classID == 0){ MeanValue_S.at(iTree) += BDTG_NoPruning; ientrySignal.at(iTree)++;}
-      else{ MeanValue_B.at(iTree) += BDTG_NoPruning; ientryBackground.at(iTree)++;}
-   }
-  }
-
-  for( unsigned int iVec = 0 ; iVec < MeanValue_S.size(); iVec++){
-    MeanValue_S.at(iVec) = MeanValue_S.at(iVec)/ientrySignal.at(iVec);
-    MeanValue_B.at(iVec) = MeanValue_B.at(iVec)/ientryBackground.at(iVec);
-  }
-
-  // compute distances
-  classID_X          = 0;
-  BDTG_NoPruning_X = 0;
-  classID_Y          = 0;
-  BDTG_NoPruning_Y = 0;
-
-  for(unsigned int iTreeX = 0 ; iTreeX<inputLowPileUpTrees.size(); iTreeX++){   
-    for(unsigned int iTreeY = 0 ; iTreeY<inputLowPileUpTrees.size(); iTreeY++){    
-     int iEntriesX = 0; int iEntriesY = 0;
-     for( ; iEntriesX < inputLowPileUpTrees.at(iTreeX)->GetEntries() and iEntriesY < inputLowPileUpTrees.at(iTreeY)->GetEntries(); iEntriesX++, iEntriesY++){
-       inputLowPileUpTrees.at(iTreeX)->SetBranchAddress("classID",&classID_X);
-       inputLowPileUpTrees.at(iTreeX)->SetBranchAddress("BDTG_NoPruning",&BDTG_NoPruning_X);
-       inputLowPileUpTrees.at(iTreeX)->GetEntry(iEntriesX);
-       inputLowPileUpTrees.at(iTreeY)->SetBranchAddress("classID",&classID_Y);
-       inputLowPileUpTrees.at(iTreeY)->SetBranchAddress("BDTG_NoPruning",&BDTG_NoPruning_Y);
-       inputLowPileUpTrees.at(iTreeY)->GetEntry(iEntriesY);
-       if(classID_X == 0 and classID_Y == 0) correlationMatrixS_highPileUP(iTreeX,iTreeY) += double((BDTG_NoPruning_X-MeanValue_S.at(iTreeX))*(BDTG_NoPruning_Y-MeanValue_S.at(iTreeY)));
-       else if(classID_X == 1 and classID_Y == 1) correlationMatrixB_highPileUP(iTreeX,iTreeY) += double((BDTG_NoPruning_X-MeanValue_B.at(iTreeX))*(BDTG_NoPruning_Y-MeanValue_B.at(iTreeY)));
-     }
+  //Decomopose Covariance matrix to orthogonal states
+  TMatrixDSym lSMatrix(Matrix.GetNrows()-1);
+  for(int iLine = 0; iLine < Matrix.GetNrows()-1; iLine++) { 
+    for(int iRow = 0; iRow < Matrix.GetNcols()-1; iRow++) { 
+      lSMatrix(iLine,iRow) = Matrix(iLine,iRow);
     }
   }
-  
-  for( unsigned int binX = 0; binX < reducedNameLowPileUp.size(); binX ++){
-   for( unsigned int binY = 0; binY < reducedNameLowPileUp.size(); binY ++){
-     correlationMatrixS_highPileUP(binX,binY) /= double(ientrySignal.at(binX));
-     correlationMatrixB_highPileUP(binX,binY) /= double(ientryBackground.at(binX));
-   }
+
+  TVectorD lEigVals(Matrix.GetNrows()-1);
+  lEigVals = TMatrixDSymEigen(lSMatrix).GetEigenValues();
+  TMatrixD lEigen = lSMatrix.EigenVectors(lEigVals);
+
+  TMatrixDSym lEigenSym(Matrix.GetNrows());
+  double pCheck = 0;
+  for(int iLine   = 0; iLine < Matrix.GetNrows()-1; iLine++) { 
+    for(int iRow = 0; iRow < Matrix.GetNcols()-1; iRow++) { 
+      if(iRow == 2) pCheck +=  lEigen(iLine,iRow)*lEigen(iLine,iRow);
+      lEigenSym(iLine,iRow) = lEigen(iLine,iRow);
+    }
   }
- 
-  Sigma_S.clear() ; Sigma_S.resize(inputLowPileUpTrees.size());
-  Sigma_B.clear() ; Sigma_B.resize(inputLowPileUpTrees.size());
-  for( unsigned int binX = 0; binX < reducedNameLowPileUp.size(); binX ++) {
-    Sigma_S.at(binX) = sqrt(correlationMatrixS_highPileUP(binX,binX));
-    Sigma_B.at(binX) = sqrt(correlationMatrixB_highPileUP(binX,binX));
-  }
-  
-  for( unsigned int binX = 0; binX < reducedNameLowPileUp.size(); binX ++){
-   for( unsigned int binY = 0; binY < reducedNameLowPileUp.size(); binY ++){
-     correlationMatrixS_highPileUP(binX,binY) /= double(Sigma_S.at(binX)*Sigma_S.at(binY));
-     correlationMatrixB_highPileUP(binX,binY) /= double(Sigma_B.at(binX)*Sigma_B.at(binY));
-   }     
-  }
+  for(int iLine   = 0; iLine < Matrix.GetNrows()-1; iLine++) lEigenSym(Matrix.GetNrows()-1,iLine) = lEigVals(iLine);
+  return lEigenSym;
 
-  TH2D* Matrix_S_highPileUp = new TH2D(correlationMatrixS_highPileUP);
-  Matrix_S_highPileUp->SetName("Matrix_S_lowPileUp");
-  TH2D* Matrix_B_highPileUp = new TH2D(correlationMatrixB_highPileUP);
-  Matrix_B_highPileUp->SetName("Matrix_B_lowPileUp");
+}
 
-  Matrix_S_highPileUp->Scale(100);
-  Matrix_B_highPileUp->Scale(100);
+///////////////////////////////////////////////////
+TMatrixDSym dimOrder(TMatrixDSym & Matrix,TMatrixDSym & Eigen,TMatrixD & EigenInv) {
 
-  for( int iBinX = 0 ; iBinX < Matrix_S_highPileUp->GetNbinsX() ; iBinX++){
-   for( int iBinY = 0 ; iBinY < Matrix_S_highPileUp->GetNbinsX() ; iBinY++){
-     Matrix_S_highPileUp->SetBinContent(iBinX+1,iBinY+1,int(Matrix_S_highPileUp->GetBinContent(iBinX+1,iBinY+1)));
-     Matrix_B_highPileUp->SetBinContent(iBinX+1,iBinY+1,int(Matrix_B_highPileUp->GetBinContent(iBinX+1,iBinY+1)));
-     if(iBinX+1 == iBinY+1 ) {
-      Matrix_S_highPileUp->SetBinContent(iBinX+1,iBinY+1,1);
-      Matrix_B_highPileUp->SetBinContent(iBinX+1,iBinY+1,1);
-     }
-   }
+  TVectorD lVector(Matrix.GetNrows()-1);
+  for(int iLine = 0; iLine < Matrix.GetNrows()-1; iLine++) lVector(iLine) = Matrix(Matrix.GetNrows()-1,iLine); // take the eigenvalues
+  double lMag = 0; 
+  for(int iLine = 0; iLine < Matrix.GetNrows()-1; iLine++)  lMag += lVector(iLine)*lVector(iLine); // sum of eigenvalues squared
+  for(int iLine = 0; iLine < Matrix.GetNrows()-1; iLine++)  lVector(iLine)  = lVector(iLine)/sqrt(lMag); // normalize the eigenvalues to be [0,1] in abs value
+  lVector = EigenInv * lVector; // multiply this vector for the inverse of the eigenVector matrix
+  std::vector<double> lSum; 
+  for(int iLine = 0; iLine < Matrix.GetNrows()-1; iLine++) lSum.push_back(lVector(iLine)*lVector(iLine)); // vector of squared of eigenValues
+  lMag = 0; 
+  for(int iLine = 0; iLine < Matrix.GetNrows()-1; iLine++)  lMag += lVector(iLine)*lVector(iLine); // new magnitude
+
+  std::vector<int>  lRank; // ranking vector
+  for(int iLine = 0; iLine < Matrix.GetNrows()-1; iLine++) {
+    int pRank = 0;
+    for(int iCol = 0; iCol < Matrix.GetNcols()-1; iCol++){
+      if(lSum[iCol] > lSum[iLine]) pRank++;
+    }
+    lRank.push_back(pRank);
   }
 
-
-  cCorrelationSignal = new TCanvas("",Form("Correlation Matrix Signal highPU"),180,52,500,550);
-  cCorrelationSignal->SetGrid();
-  cCorrelationSignal->SetTicks();
-  cCorrelationSignal->SetLeftMargin(newMargin3);
-  cCorrelationSignal->SetBottomMargin(newMargin2);
-  cCorrelationSignal->SetRightMargin(newMargin1);
-  cCorrelationSignal->cd();
-
-  Matrix_S_highPileUp->SetMarkerSize(1.5);
-  Matrix_S_highPileUp->SetMarkerColor(0);
-  Matrix_S_highPileUp->GetXaxis()->SetLabelSize(0.035);
-  Matrix_S_highPileUp->GetYaxis()->SetLabelSize(0.035);
-  Matrix_S_highPileUp->SetLabelOffset(0.011);// label offset on x axis                                                                                                                     
-  Matrix_S_highPileUp->SetMaximum(100);         
-  Matrix_S_highPileUp->SetMinimum(-100);         
-           
-  Matrix_S_highPileUp->Draw("colz");
-  for( int binX = 0 ; binX < Matrix_S_highPileUp->GetNbinsX(); binX++){
-    Matrix_S_highPileUp->GetXaxis()->SetBinLabel(binX+1,reducedNameLowPileUp.at(binX).c_str());
-    Matrix_S_highPileUp->GetYaxis()->SetBinLabel(binX+1,reducedNameLowPileUp.at(binX).c_str());
+  TMatrixDSym lOutMatrix(Matrix.GetNrows());
+  for(int iLine = 0; iLine < Matrix.GetNrows(); iLine++) {
+    for(int iCol = 0; iCol < Matrix.GetNcols(); iCol++) {
+      lOutMatrix(iLine,iCol) = 0;
+    }
   }
-  Matrix_S_highPileUp->GetXaxis()->LabelsOption("v");
-  Matrix_S_highPileUp->GetYaxis()->LabelsOption("h");
-  Matrix_S_highPileUp->Draw("textsame");
-
-  latex.DrawLatex(0.547,0.92,Form("CMS Preliminary Simulation, #sqrt{s} = 13 TeV"));
-  cCorrelationSignal->Print((outputDirectory+"/CorrelationBDT_S_highPU.pdf").c_str(),"pdf");
-  cCorrelationSignal->Print((outputDirectory+"/CorrelationBDT_S_highPU.png").c_str(),"png");
-  cCorrelationSignal->Print((outputDirectory+"/CorrelationBDT_S_highPU.root").c_str(),"root");
-
-
-  ////////////////////////
-  cCorrelationBackground = new TCanvas("",Form("Correlation Matrix Background"),180,52,550,550);
-
-  cCorrelationBackground->SetGrid();
-  cCorrelationBackground->SetTicks();
-  cCorrelationBackground->SetLeftMargin(newMargin3);
-  cCorrelationBackground->SetBottomMargin(newMargin2);
-  cCorrelationBackground->SetRightMargin(newMargin1);
-  cCorrelationBackground->cd();
-
-  Matrix_B_highPileUp->SetMarkerSize(1.5);
-  Matrix_B_highPileUp->SetMarkerColor(0);
-  Matrix_B_highPileUp->GetXaxis()->SetLabelSize(0.035);
-  Matrix_B_highPileUp->GetYaxis()->SetLabelSize(0.035);
-  Matrix_B_highPileUp->SetLabelOffset(0.011);// label offset on x axis                                                                                                                    
-  Matrix_B_highPileUp->SetMaximum(100);         
-  Matrix_B_highPileUp->SetMinimum(-100);         
-           
-            
-  Matrix_B_highPileUp->Draw("colz");
-  for( int binX = 0 ; binX < Matrix_B_highPileUp->GetNbinsX(); binX++){
-    Matrix_B_highPileUp->GetXaxis()->SetBinLabel(binX+1,reducedNameLowPileUp.at(binX).c_str());
-    Matrix_B_highPileUp->GetYaxis()->SetBinLabel(binX+1,reducedNameLowPileUp.at(binX).c_str());
+  for(int iLine = 0; iLine < Matrix.GetNrows()-1; iLine++) {
+    for(int iCol = 0; iCol < Matrix.GetNcols()-1; iCol++) {
+      lOutMatrix(iLine,lRank[iCol]) = Eigen(iLine,iCol);
+    }
   }
-  Matrix_B_highPileUp->GetXaxis()->LabelsOption("v");
-  Matrix_B_highPileUp->GetYaxis()->LabelsOption("h");
-  Matrix_B_highPileUp->Draw("textsame");
-
-  latex.DrawLatex(0.547,0.92,Form("CMS Preliminary Simulation, #sqrt{s} = 13 TeV"));
-  cCorrelationBackground->Print((outputDirectory+"/CorrelationBDT_B_highPU.pdf").c_str(),"pdf");
-  cCorrelationBackground->Print((outputDirectory+"/CorrelationBDT_B_highPU.png").c_str(),"png");
-  cCorrelationBackground->Print((outputDirectory+"/CorrelationBDT_B_highPU.root").c_str(),"root");
-
-  return 0 ;
-
+  for(int iLine   = 0; iLine < Matrix.GetNrows()-1; iLine++) lOutMatrix(Matrix.GetNrows()-1,lRank[iLine]) = lVector(iLine)/sqrt(lMag);  
+  return lOutMatrix;
 }

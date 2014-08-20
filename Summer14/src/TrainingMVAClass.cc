@@ -485,7 +485,7 @@ void TrainingMVAClass::BookandTrainBDTF ( const int & NTrees, const bool & optim
 void TrainingMVAClass::SetSignalTree (const std::vector<TFile*> & signalFileList, const std::string & TreeName){
 
   if(TreeName!="") TreeName_ = TreeName ;
-  else TreeName_ = "WJet" ;
+  else TreeName_ = "chs" ;
 
   for(size_t iFile = 0 ; iFile < signalFileList.size() ; iFile ++){
    if(signalFileList.at(iFile)!=0) 
@@ -510,7 +510,7 @@ void TrainingMVAClass::SetSignalTree (const std::vector<TTree*> & signalTreeList
 void TrainingMVAClass::SetBackgroundTree (const std::vector<TFile*> & backgroundFileList, const std::string & TreeName){
 
   if(TreeName!="") TreeName_ = TreeName ;
-  else TreeName_ = "WJet" ;
+  else TreeName_ = "chs" ;
      
   for(size_t iFile = 0 ; iFile < backgroundFileList.size() ; iFile ++){
    if(backgroundFileList.at(iFile)!=0) 
@@ -560,7 +560,7 @@ void TrainingMVAClass::SetLabel (const std::string & Label ){
 void TrainingMVAClass::SetTreeName (const std::string & TreeName ){
 
   if(TreeName!="") TreeName_ = TreeName ;
-  else TreeName_ = "WJet" ;
+  else TreeName_ = "chs" ;
 
   return ;
 }

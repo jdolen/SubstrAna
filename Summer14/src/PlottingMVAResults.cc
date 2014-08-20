@@ -474,7 +474,7 @@ void TMVAGlob::CreateCanvasandFrameROC(const double & minPTbin, const double & m
 
   banner4Plot(false,minPTbin,maxPTbin,puMin,puMax);
 
-  TLatex *   tex = new TLatex(0.85,0.92," (13 TeV)");
+  TLatex *   tex = new TLatex(0.85,0.92," 13 TeV");
   tex->SetNDC();
   tex->SetTextAlign(31);
   tex->SetTextFont(42);
@@ -528,7 +528,7 @@ void TMVAGlob::CreateCanvasandFrameROC(const double & minPTbin, const double & m
 
   banner4Plot(false,minPTbin,maxPTbin,puMin,puMax);
 
-  tex = new TLatex(0.85,0.92," (13 TeV)");
+  tex = new TLatex(0.85,0.92," 13 TeV");
   tex->SetNDC();
   tex->SetTextAlign(31);
   tex->SetTextFont(42);
@@ -1151,7 +1151,7 @@ void TMVAGlob::plotMVAs(TFile* inputFile,  const std::string & inputName, HistTy
       t->AppendPad();
 
 
-      TLatex *   tex = new TLatex(0.85,0.92," (13 TeV)");
+      TLatex *   tex = new TLatex(0.85,0.92," 13 TeV");
       tex->SetNDC();
       tex->SetTextAlign(31);
       tex->SetTextFont(42);
@@ -1515,7 +1515,7 @@ void TMVAGlob::plotSignificance (TFile* inputFile, const std::string & inputName
 
 
     // print comments                                                                                                                                                                    
-    TLatex *   tex = new TLatex(0.85,0.92," (13 TeV)");
+    TLatex *   tex = new TLatex(0.85,0.92," 13 TeV");
     tex->SetNDC();
     tex->SetTextAlign(31);
     tex->SetTextFont(42);

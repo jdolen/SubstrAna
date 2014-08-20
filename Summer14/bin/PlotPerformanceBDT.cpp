@@ -248,7 +248,7 @@ int main (int argc, char **argv){
   performanceBDT_lowPileUP->GetYaxis()->LabelsOption("h");
 
 
-  TLatex *   tex = new TLatex(0.85,0.92," (13 TeV)");
+  TLatex *   tex = new TLatex(0.85,0.92," 13 TeV");
   tex->SetNDC();
   tex->SetTextAlign(31);
   tex->SetTextFont(42);
