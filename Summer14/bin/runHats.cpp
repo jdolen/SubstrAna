@@ -879,11 +879,10 @@ int main( int argc, char *argv[] ){
   double beta = 1.0; // power for angular dependence, e.g. beta = 1 --> linear k-means, beta = 2 --> quadratic/classic k-means
   //double R0 = 0.8; // Characteristic jet radius for normalization
   double Rcut = 10000.0; // maximum R particles can be from axis to be included in jet (large value for no cutoff)   
-  NsubParameters paraNsub(beta, R, Rcut);
 
-  Njettiness nSubKT(Njettiness::kt_axes,paraNsub);
-  Njettiness nSubMin(Njettiness::min_axes,paraNsub);
-  Njettiness nSubOnePass(Njettiness::onepass_kt_axes,paraNsub);
+  Njettiness nSubKT(Njettiness::kt_axes,Njettiness::unnormalized_measure,3,beta,R,Rcut);
+  Njettiness nSubMin(Njettiness::min_axes,Njettiness::unnormalized_measure,3,beta,R,Rcut);
+  Njettiness nSubOnePass(Njettiness::onepass_kt_axes,Njettiness::unnormalized_measure,3,beta,R,Rcut);
 
   /////////////////////////////////////////////////////////////////////
   //-------------------------------------------------------------------
