@@ -2,7 +2,7 @@
 
 // constructor from files
 TMVAReadingClass::TMVAReadingClass(const std::vector<TFile*> & SampleFileList, const std::string & TreeName,
-                                         const std::string & inputFilePath , const std::string & Label ){
+                                         const std::string & inputFileWeight , const std::string & Label ){
 
   SetInputTree (SampleFileList, TreeName) ;
 
@@ -10,15 +10,15 @@ TMVAReadingClass::TMVAReadingClass(const std::vector<TFile*> & SampleFileList, c
 
   SetLabel (Label);
 
-  SetInputFilePath (inputFilePath) ;
-  
+  SetInputFileWeight (inputFileWeight) ;
+
   reader_ = new TMVA::Reader( TreeName_+"_"+Label_);
 
 }
 
 // constructor from trees
 TMVAReadingClass::TMVAReadingClass(const std::vector<TTree*> & SampleTreeList, const std::string & TreeName,
-		                         const std::string & inputFilePath , const std::string & Label ){
+		                         const std::string & inputFileWeight , const std::string & Label ){
 
 
   SetTreeName (TreeName) ;
@@ -29,7 +29,7 @@ TMVAReadingClass::TMVAReadingClass(const std::vector<TTree*> & SampleTreeList, c
 
   SetLabel (Label);
 
-  SetInputFilePath (inputFilePath) ;
+  SetInputFileWeight (inputFileWeight) ;
 
   reader_ = new TMVA::Reader( TreeName_+"_"+Label_);
 
@@ -100,11 +100,10 @@ void TMVAReadingClass::AddPrepareReader (const std::string & LeptonType, const s
 
 
 // Book the MVA method
-void TMVAReadingClass::BookMVAWeight (const std::string & methodName, const std::string & weightFile, const std::string & nameBranch) {
+void TMVAReadingClass::BookMVAWeight (const std::string & methodName, const std::string & nameBranch) {
 
   methodName_ = methodName ;
-  weightFile_ = weightFile ;  // destination of weight file
-  reader_->BookMVA(methodName_.c_str(),(inputFilePath_+"/"+weightFile_).c_str()) ; // book the MVA reader method
+  reader_->BookMVA(methodName_.c_str(),inputFileWeight_.c_str()) ; // book the MVA reader method
   nameBranch_ = nameBranch ;  // name of the new branch of the MVA output
 
   return ;
@@ -211,9 +210,9 @@ void TMVAReadingClass::SetSpectatorVariables (const std::vector<std::string> & m
 }
 
 // Set input path
-void TMVAReadingClass::SetInputFilePath ( const std::string & InputFilePath){
+void TMVAReadingClass::SetInputFileWeight ( const std::string & InputFileWeight){
 
-  if(!InputFilePath.empty()) inputFilePath_ = InputFilePath ;
+  if(!InputFileWeight.empty()) inputFileWeight_ = InputFileWeight ;
 
   return;
 }

@@ -33,11 +33,11 @@ class TMVAReadingClass {
   
   // constructor giving input files
   TMVAReadingClass(const std::vector<TFile*> & SampleFileList, const std::string & TreeName,
-                      const std::string & InputFilePath , const std::string & Label );
+                      const std::string & InputFileWeight , const std::string & Label );
 
   // constructor giving input trees
   TMVAReadingClass(const std::vector<TTree*> & SampleTreeList, const std::string & TreeName,
-                      const std::string & InputFilePath , const std::string & Label);
+                      const std::string & InputFileWeight , const std::string & Label);
 
   // default de-constructor
   ~TMVAReadingClass();
@@ -49,7 +49,7 @@ class TMVAReadingClass {
   void AddPrepareReader (const std::string & LeptonType, const std::string & preselectionCutType, std::vector<double> * JetPtBinOfTraining = NULL , const int & pTBin = 0, std::vector<double>* PileUpBinOfTraining = NULL, const int & puBin = 0);
 
   // Book MVA method used in the training + weight file for input TMVA weights and the branch og the name where to store the info
-  void BookMVAWeight (const std::string & methodName, const std::string & weightFile, const std::string & nameBranch) ;
+  void BookMVAWeight (const std::string & methodName, const std::string & nameBranch) ;
 
   // Fill the MVA weight value
   void FillMVAWeight (const int & iJetToRead = 0, const bool & optionCut = true) ;
@@ -67,7 +67,7 @@ class TMVAReadingClass {
   void SetSpectatorVariables (const std::vector<std::string> & mapSpectatorVariables);
 
   // Set input file path
-  void SetInputFilePath ( const std::string & InputFilePath);
+  void SetInputFileWeight ( const std::string & InputFileWeight);
 
   // Set tree name
   void SetTreeName ( const std::string & TreeName );
@@ -110,7 +110,7 @@ class TMVAReadingClass {
   std::string Label_ ;
 
   // input file path
-  std::string inputFilePath_ ;
+  std::string inputFileWeight_ ;
 
   // method Name, weight file and name of the output branch
   std::string methodName_ ;
