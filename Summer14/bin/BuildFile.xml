@@ -13,3 +13,4 @@
 <bin   file="PlotROCandSignificance.cpp" name="PlotROCandSignificance"> </bin>
 <bin   file="PlotCorrelationBDT.cpp" name="PlotCorrelationBDT"> </bin>
 <bin   file="PlotPerformanceBDT.cpp" name="PlotPerformanceBDT"> </bin>
+<bin   file="TMVAApplyWeights.cpp" name="TMVAApplyWeights"> </bin>
