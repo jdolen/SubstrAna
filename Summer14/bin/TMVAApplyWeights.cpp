@@ -47,19 +47,6 @@ int main (int argc, char** argv){
      InputFileName = Options.getParameter<std::vector<std::string>>("InputFileName");
   else{ std::cout<<" No input directory found for weight TMVA xml file --> exit from the program "<<std::endl; return -1; }
 
-  std::vector<std::string> InputVariableList;
-  if(Options.existsAs<std::vector<std::string>>("InputVariableList"))
-    InputVariableList = Options.getParameter<std::vector<std::string>>("InputVariableList");
-  else{ std::cout<<" Exit from code, no input variable file list found "<<std::endl; return -1; }
-
-  std::cout << std::endl;
-  std::cout << " >>>>> Option::InputVariableList size = " << InputVariableList.size() << std::endl;
-
-  for (unsigned int iVar = 0; iVar < InputVariableList.size(); iVar++){
-    std::cout << " " << InputVariableList.at(iVar) << ", ";
-  }
-  std::cout << std::endl;
-
   std::vector<std::string> InputSpectatorList;
   if(Options.existsAs<std::vector<std::string>>("InputSpectatorList"))
     InputSpectatorList = Options.getParameter<std::vector<std::string>>("InputSpectatorList");
@@ -205,19 +192,20 @@ int main (int argc, char** argv){
      // Loop on the input weight file ... the name should contain some %s for the pTbin and pileUp bin value to be sobstituted
      for( size_t iWeightFile = 0 ; iWeightFile < InputWeightFileParam.size() ; iWeightFile++){ 
 
-       TString fileName = Form("%s",(InputWeightFileParam.at(iWeightFile).getParameter<std::string>("inputWeightFile")).c_str());
-
-       if(fileName.Contains("PTBin_%d_%d")) 
+      TString fileName = Form("%s",(InputWeightFileParam.at(iWeightFile).getParameter<std::string>("inputWeightFile")).c_str());
+      if(fileName.Contains("PTBin_%d_%d")) 
 	 fileName.ReplaceAll("PTBin_%d_%d",Form("PTBin_%d_%d",int(JetPtBinOfTraining.at(pTBin)),int(JetPtBinOfTraining.at(pTBin+1))));
-       if(fileName.Contains("PU_%d_%d")) 
+      if(fileName.Contains("PU_%d_%d")) 
 	 fileName.ReplaceAll("PU_%d_%d",Form("PU_%d_%d",int(PileUpBinOfTraining.at(puBin)),int(PileUpBinOfTraining.at(puBin+1))));
-
+      if(fileName.Contains("%d_%d"))
+	 fileName.ReplaceAll("%d_%d",Form("%d_%d",int(PileUpBinOfTraining.at(pTBin)),int(PileUpBinOfTraining.at(pTBin+1))));
+  
       std::cout<<" Weight File Name " <<fileName<<std::endl;
       std::cout<<std::endl;
      
       TMVAReaderVector.push_back(new TMVAReadingClass(SampleTreeList,TreeName,std::string(fileName),Label));
             
-      TMVAReaderVector.back()->AddTrainingVariables(InputVariableList,InputSpectatorList);
+      TMVAReaderVector.back()->AddTrainingVariables(InputWeightFileParam.at(iWeightFile).getParameter<std::vector<std::string> >("inputVariableList"),InputSpectatorList);
       
       TMVAReaderVector.back()->AddPrepareReader(LeptonType,PreselectionCutType,&JetPtBinOfTraining,pTBin,&PileUpBinOfTraining,puBin);
 

@@ -571,10 +571,23 @@ std::vector<ROOT::Math::XYZVector>* treeReader::Get3V(const std::string &name){
   else return new std::vector<ROOT::Math::XYZVector>;
 }
 
+bool treeReader::is3V(const std::string &name){
+  std::map<std::string,std::vector<ROOT::Math::XYZVector> * >::const_iterator    it_3V  = m_3Vvectors.find(name);
+  if (it_3V  != m_3Vvectors.end()  ) return true;
+  else return false;
+}
+
+
 ROOT::Math::XYZVector* treeReader::get3V(const std::string &name){
   std::map<std::string,ROOT::Math::XYZVector * >::const_iterator    it_3V  = k_3Vvectors.find(name);
   if (it_3V  != k_3Vvectors.end()  ) return k_3Vvectors[name];
   else return new ROOT::Math::XYZVector;
+}
+
+bool treeReader::is_3V(const std::string &name){
+  std::map<std::string,ROOT::Math::XYZVector * >::const_iterator    it_3V  = k_3Vvectors.find(name);
+  if (it_3V  != k_3Vvectors.end()  ) return true;
+  else return false;
 }
 
 std::vector<ROOT::Math::XYZTVector>* treeReader::Get4V(const std::string &name){
@@ -583,10 +596,22 @@ std::vector<ROOT::Math::XYZTVector>* treeReader::Get4V(const std::string &name){
   else return new std::vector<ROOT::Math::XYZTVector>;
 }
 
+bool treeReader::is4V(const std::string &name){
+  std::map<std::string,std::vector<ROOT::Math::XYZTVector> * >::const_iterator   it_4V  = m_4Vvectors.find(name);
+  if (it_4V  != m_4Vvectors.end()  ) return true;
+  else return false;
+}
+
 ROOT::Math::XYZTVector* treeReader::get4V(const std::string &name){
   std::map<std::string,ROOT::Math::XYZTVector * >::const_iterator   it_4V  = k_4Vvectors.find(name);
   if (it_4V  != k_4Vvectors.end()  ) return k_4Vvectors[name];
   else return new ROOT::Math::XYZTVector;
+}
+
+bool treeReader::is_4V(const std::string &name){
+  std::map<std::string,ROOT::Math::XYZTVector * >::const_iterator   it_4V  = k_4Vvectors.find(name);
+  if (it_4V  != k_4Vvectors.end()  ) return true;
+  else return false;
 }
 
 std::vector<double>* treeReader::GetDouble(const std::string &name){
@@ -595,10 +620,22 @@ std::vector<double>* treeReader::GetDouble(const std::string &name){
   else return new std::vector<double>;
 }
 
+bool treeReader::isDouble(const std::string &name){
+  std::map<std::string,std::vector<double> * >::const_iterator  it_D  = m_Dvectors.find(name);
+  if (it_D  != m_Dvectors.end()  ) return true;
+  else return false;
+}
+
 double* treeReader::getDouble(const std::string &name){
   std::map<std::string,double * >::const_iterator   it_D  = k_Dvectors.find(name);
   if (it_D  != k_Dvectors.end()  ) return k_Dvectors[name];
   else return new double;
+}
+
+bool treeReader::is_Double(const std::string &name){
+  std::map<std::string,double * >::const_iterator   it_D  = k_Dvectors.find(name);
+  if (it_D  != k_Dvectors.end()  ) return true;
+  else return false;
 }
 
 std::vector<float>* treeReader::GetFloat(const std::string &name){
@@ -607,10 +644,22 @@ std::vector<float>* treeReader::GetFloat(const std::string &name){
   else return new std::vector<float>;
 }
 
+bool treeReader::isFloat(const std::string &name){
+  std::map<std::string,std::vector<float> * >::const_iterator it_F  = m_Fvectors.find(name);
+  if (it_F  != m_Fvectors.end()  ) return true;
+  else return false;
+}
+
 float* treeReader::getFloat(const std::string &name){
   std::map<std::string,float * >::const_iterator  it_F  = k_Fvectors.find(name);
   if (it_F  != k_Fvectors.end()  ) return k_Fvectors[name];
   else return new float;
+}
+
+bool treeReader::is_Float(const std::string &name){
+  std::map<std::string,float * >::const_iterator  it_F  = k_Fvectors.find(name);
+  if (it_F  != k_Fvectors.end()  ) return true;
+  else return false;
 }
 
 std::vector<int>* treeReader::GetInt(const std::string &name){
@@ -619,10 +668,23 @@ std::vector<int>* treeReader::GetInt(const std::string &name){
   else return new std::vector<int>;
 }
 
+
+bool treeReader::isInt(const std::string &name){
+  std::map<std::string,std::vector<int> * >::const_iterator it_I  = m_Ivectors.find(name);
+  if (it_I  != m_Ivectors.end()  ) return true;
+  else return false;
+}
+
 int* treeReader::getInt(const std::string &name){
   std::map<std::string,int * >::const_iterator  it_I  = k_Ivectors.find(name);
   if (it_I  != k_Ivectors.end()  ) return k_Ivectors[name];
   else return new int;
+}
+
+bool treeReader::is_Int(const std::string &name){
+  std::map<std::string,int * >::const_iterator  it_I  = k_Ivectors.find(name);
+  if (it_I  != k_Ivectors.end()  ) return true;
+  else return false;
 }
 
 
@@ -632,10 +694,22 @@ std::vector<bool>* treeReader::GetBool(const std::string &name){
   else return new std::vector<bool>;
 }
 
+bool treeReader::isBool(const std::string &name){
+  std::map<std::string,std::vector<bool> * >::const_iterator it_I  = m_Bvectors.find(name);
+  if (it_I  != m_Bvectors.end()  ) return true;
+  else return false;
+}
+
 bool* treeReader::getBool(const std::string &name){
   std::map<std::string,bool * >::const_iterator  it_I  = k_Bvectors.find(name);
   if (it_I  != k_Bvectors.end()  ) return k_Bvectors[name];
   else return new bool;
+}
+
+bool treeReader::is_Bool(const std::string &name){
+  std::map<std::string,bool * >::const_iterator  it_I  = k_Bvectors.find(name);
+  if (it_I  != k_Bvectors.end()  ) return true;
+  else return false;
 }
 
 std::vector<std::string>* treeReader::GetString(const std::string &name){
@@ -644,8 +718,20 @@ std::vector<std::string>* treeReader::GetString(const std::string &name){
   else return new std::vector<std::string>;
 }
 
+bool treeReader::isString(const std::string &name){
+  std::map<std::string,std::vector<std::string> * >::const_iterator it_S  = m_Svectors.find(name);
+  if (it_S  != m_Svectors.end()  ) return true;
+  else return false;
+}
+
 std::string* treeReader::getString(const std::string &name){
   std::map<std::string,std::string * >::const_iterator  it_S  = k_Svectors.find(name);
   if (it_S  != k_Svectors.end()  ) return k_Svectors[name];
   else return new std::string;
+}
+
+bool treeReader::is_String(const std::string &name){
+  std::map<std::string,std::string * >::const_iterator  it_S  = k_Svectors.find(name);
+  if (it_S  != k_Svectors.end()  ) return true;
+  else return false;
 }

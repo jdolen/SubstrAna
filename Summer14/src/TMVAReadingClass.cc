@@ -119,49 +119,79 @@ void TMVAReadingClass::FillMVAWeight (const int & iJetToRead, const bool & optio
       newBranch_  = SampleTreeList_.at(iTree)->Branch(nameBranch_.c_str(),&weight_,(nameBranch_+"/F").c_str()); // create the new branch as a float
 
       for( int iEntry = 0; iEntry < SampleTreeList_.at(iTree)->GetEntries(); iEntry++){ // Loop on tree entries
-
        if(iEntry%10000 == 0 ) std::cout<<" Entry = "<<iEntry<<std::endl;      
        SampleTreeList_.at(iTree)->GetEntry(iEntry);  
        weight_ = 0 ;
-
+       
        // fill the value of the training and spectator variable for each event
-       for( size_t iVar = 0 ; iVar < mapTrainingVariables_.size() ; iVar ++ ) 
-         setTrainingVariables_->at(iVar) = treeReader_.at(iTree)->GetFloat(mapTrainingVariables_.at(iVar).c_str())->at(iJetToRead) ; // used treeReader class to fill the value of each input variable  in the vector
+       for( size_t iVar = 0 ; iVar < mapTrainingVariables_.size() ; iVar ++ ) {
+	 TString variableName = Form("%s",mapTrainingVariables_.at(iVar).c_str());
+         TString position     = Form("[%d]",iJetToRead);
+         if(variableName.Contains(position)) variableName.ReplaceAll(position.Data(),"");
+         if(treeReader_.at(iTree)->isFloat(variableName.Data())) 
+           setTrainingVariables_->at(iVar) = treeReader_.at(iTree)->GetFloat(variableName.Data())->at(iJetToRead) ; // used treeReader class to fill the value of each input variable  in the vector	 
+         else if(treeReader_.at(iTree)->isDouble(variableName.Data()))
+	   setTrainingVariables_->at(iVar) = float(treeReader_.at(iTree)->GetDouble(variableName.Data())->at(iJetToRead)) ;        
+         else if(treeReader_.at(iTree)->isInt(variableName.Data()))
+	   setTrainingVariables_->at(iVar) = float(treeReader_.at(iTree)->GetInt(variableName.Data())->at(iJetToRead)) ;        
+         else if(treeReader_.at(iTree)->is_Float(variableName.Data())) 
+           setTrainingVariables_->at(iVar) = treeReader_.at(iTree)->getFloat(variableName.Data())[iJetToRead] ; 
+         else if(treeReader_.at(iTree)->is_Double(variableName.Data()))
+	   setTrainingVariables_->at(iVar) = float(treeReader_.at(iTree)->getDouble(variableName.Data())[iJetToRead]) ;        
+         else if(treeReader_.at(iTree)->is_Int(variableName.Data()))
+	   setTrainingVariables_->at(iVar) = float(treeReader_.at(iTree)->getInt(variableName.Data())[iJetToRead]) ;        
+         else { std::cerr<<" not found branch for this input variable --> "<<variableName.Data()<<" --> stop the program pleas check "<<std::endl; break ;}
+       }      
 
-      for( size_t iVar = 0 ; iVar < mapSpectatorVariables_.size() ; iVar ++ ) 
-	setSpectatorVariables_->at(iVar) = treeReader_.at(iTree)->GetFloat(mapSpectatorVariables_.at(iVar).c_str())->at(iJetToRead) ;
+       for( size_t iVar = 0 ; iVar < mapSpectatorVariables_.size() ; iVar ++ ){
+	 TString variableName = Form("%s",mapSpectatorVariables_.at(iVar).c_str());
+         TString position     = Form("[%d]",iJetToRead);
+         if(variableName.Contains(position)) variableName.ReplaceAll(position.Data(),"");
+         if(treeReader_.at(iTree)->isFloat(variableName.Data())) 
+           setSpectatorVariables_->at(iVar) = treeReader_.at(iTree)->GetFloat(variableName.Data())->at(iJetToRead) ; 
+         else if(treeReader_.at(iTree)->isDouble(variableName.Data()))
+	   setSpectatorVariables_->at(iVar) = float(treeReader_.at(iTree)->GetDouble(variableName.Data())->at(iJetToRead)) ;        
+         else if(treeReader_.at(iTree)->isInt(variableName.Data()))
+	   setSpectatorVariables_->at(iVar) = float(treeReader_.at(iTree)->GetInt(variableName.Data())->at(iJetToRead)) ;        
+         else if(treeReader_.at(iTree)->is_Float(variableName.Data())) 
+           setSpectatorVariables_->at(iVar) = treeReader_.at(iTree)->getFloat(variableName.Data())[iJetToRead] ; 
+         else if(treeReader_.at(iTree)->is_Double(variableName.Data()))
+	   setSpectatorVariables_->at(iVar) = float(treeReader_.at(iTree)->getDouble(variableName.Data())[iJetToRead]) ;        
+         else if(treeReader_.at(iTree)->is_Int(variableName.Data()))
+	   setSpectatorVariables_->at(iVar) = float(treeReader_.at(iTree)->getInt(variableName.Data())[iJetToRead]) ;       
+         else { std::cerr<<" not found branch for this spectator variable --> "<<variableName.Data()<<" --> stop the program pleas check "<<std::endl; break ;}
+       }
 
       // preselection type definition --> only the basic cut SB+SR since we want to skip only the events that are never used in the analysis
-      bool isGoodEvent = false ;
-      
-      if(optionCut == true){
-	
+      bool isGoodEvent = false ;      
+      if(optionCut == true){	
 	if( preselectionCutType_ == "basicJetsCutCSA14" && (LeptonType_ == "Jets" || LeptonType_ == "jets") and  TreeName_ !="gen") {
-	  isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(0) > 200 && treeReader_.at(iTree)->GetFloat("imatch")->at(0) >= 0 && (treeReader_.at(iTree)->GetFloat("pt")->at(0) >= pTJetMin_ && treeReader_.at(iTree)->GetFloat("pt")->at(0) <= pTJetMax_) && (treeReader_.at(iTree)->GetFloat("npu")->at(0) >= puMin_ && treeReader_.at(iTree)->GetFloat("npu")->at(0) <= puMax_) && fabs(treeReader_.at(iTree)->GetFloat("eta")->at(0))<2.4; 
+	  isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) > 200 && treeReader_.at(iTree)->GetInt("imatch")->at(iJetToRead) >= 0 && (treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) >= pTJetMin_ && treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) <= pTJetMax_) && (treeReader_.at(iTree)->getInt("npu")[iJetToRead] >= puMin_ && treeReader_.at(iTree)->getInt("npu")[iJetToRead] <= puMax_) && fabs(treeReader_.at(iTree)->GetFloat("eta")->at(iJetToRead))<2.4; 
 	}	
 	else if( preselectionCutType_ == "basicJetsCutCSA14" && (LeptonType_ == "Jets" || LeptonType_ == "jets") and  TreeName_ =="gen") {
-           isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(0) > 200 && treeReader_.at(iTree)->GetFloat("imatch")->at(0) >= 0 && (treeReader_.at(iTree)->GetFloat("pt")->at(0) >= pTJetMin_ && treeReader_.at(iTree)->GetFloat("pt")->at(0) <= pTJetMax_) && (treeReader_.at(iTree)->GetFloat("npu")->at(0) >= puMin_ && treeReader_.at(iTree)->GetFloat("npu")->at(0) <= puMax_) ;
+           isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) > 200 && treeReader_.at(iTree)->GetInt("imatch")->at(iJetToRead) >= 0 && (treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) >= pTJetMin_ && treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) <= pTJetMax_) && (treeReader_.at(iTree)->getInt("npu")[iJetToRead] >= puMin_ && treeReader_.at(iTree)->getInt("npu")[iJetToRead] <= puMax_) ;
 	}
 	else if( preselectionCutType_ == "basicJetsCutCSA14TTbar" && (LeptonType_ == "Jets" || LeptonType_ == "jets") and  TreeName_ !="gen") {
-           isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(0) > 200 && treeReader_.at(iTree)->GetFloat("imatch")->at(0) >= 0 && (treeReader_.at(iTree)->GetFloat("pt")->at(0) >= pTJetMin_ && treeReader_.at(iTree)->GetFloat("pt")->at(0) <= pTJetMax_) && (treeReader_.at(iTree)->GetFloat("npu")->at(0) >= puMin_ && treeReader_.at(iTree)->GetFloat("npu")->at(0) <= puMax_) && fabs(treeReader_.at(iTree)->GetFloat("eta")->at(0))<2.4 && treeReader_.at(iTree)->GetFloat("mprunedsafe_zcut_010_R_cut_050")->at(0) <=120;
+           isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) > 200 && treeReader_.at(iTree)->GetInt("imatch")->at(iJetToRead) >= 0 && (treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) >= pTJetMin_ && treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) <= pTJetMax_) && (treeReader_.at(iTree)->getInt("npu")[iJetToRead] >= puMin_ && treeReader_.at(iTree)->getInt("npu")[iJetToRead] <= puMax_) && fabs(treeReader_.at(iTree)->GetFloat("eta")->at(iJetToRead))<2.4 && treeReader_.at(iTree)->GetFloat("mprunedsafe_zcut_010_R_cut_050")->at(iJetToRead) <=120;
 	}
 	else if( preselectionCutType_ == "basicJetsCutCSA14TTbar" && (LeptonType_ == "Jets" || LeptonType_ == "jets") and  TreeName_ =="gen") {
-           isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(0) > 200 && treeReader_.at(iTree)->GetFloat("imatch")->at(0) >= 0 && (treeReader_.at(iTree)->GetFloat("pt")->at(0) >= pTJetMin_ && treeReader_.at(iTree)->GetFloat("pt")->at(0) <= pTJetMax_) && (treeReader_.at(iTree)->GetFloat("npu")->at(0) >= puMin_ && treeReader_.at(iTree)->GetFloat("npu")->at(0) <= puMax_) && treeReader_.at(iTree)->GetFloat("mprunedsafe_zcut_010_R_cut_050")->at(0) <=120;
+           isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) > 200 && treeReader_.at(iTree)->GetInt("imatch")->at(iJetToRead) >= 0 && (treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) >= pTJetMin_ && treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) <= pTJetMax_) && (treeReader_.at(iTree)->getInt("npu")[iJetToRead] >= puMin_ && treeReader_.at(iTree)->getInt("npu")[iJetToRead] <= puMax_) && treeReader_.at(iTree)->GetFloat("mprunedsafe_zcut_010_R_cut_050")->at(iJetToRead) <=120;
 	}
         else {  
-           isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(0) > 200 && treeReader_.at(iTree)->GetFloat("imatch")->at(0) >= 0 && (treeReader_.at(iTree)->GetFloat("pt")->at(0) >= pTJetMin_ && treeReader_.at(iTree)->GetFloat("pt")->at(0) <= pTJetMax_) && (treeReader_.at(iTree)->GetFloat("npu")->at(0) >= puMin_ && treeReader_.at(iTree)->GetFloat("npu")->at(0) <= puMax_) ;
+           isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) > 200 && treeReader_.at(iTree)->GetInt("imatch")->at(iJetToRead) >= 0 && (treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) >= pTJetMin_ && treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) <= pTJetMax_) && (treeReader_.at(iTree)->getInt("npu")[iJetToRead] >= puMin_ && treeReader_.at(iTree)->getInt("npu")[iJetToRead] <= puMax_) ;
 	   }	     	
      }
      else isGoodEvent = true ;      
+
      // if is a good event -> fill the branch with the value of the output      
       if(isGoodEvent) { weight_ = reader_->EvaluateMVA(methodName_.c_str());  // read the weight if the event is good -> re-applying the cut here
  	                newBranch_->Fill() ; // fill the branch
      }
      else { weight_ = -100. ; 
             newBranch_->Fill() ; // fill a default value
-     } 
+     }        
     }       
-    SampleTreeList_.at(iTree)->Write("", TObject::kOverwrite); // rewrite the tree
+   SampleTreeList_.at(iTree)->Write("", TObject::kOverwrite); // rewrite the tree
   }
   return ;
 
@@ -240,6 +270,6 @@ void TMVAReadingClass::SetReaderTree(){
 void TMVAReadingClass::SetReaderTree(const std::vector<TTree*> & SampleTreeList){
 
   for(size_t iTree = 0; iTree<SampleTreeList.size() ; iTree++)
-    treeReader_.push_back(new treeReader((TTree*) SampleTreeList.at(iTree), false));
+    treeReader_.push_back(new treeReader((TTree*) SampleTreeList.at(iTree),true));
   return ;
 }

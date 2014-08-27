@@ -12,12 +12,13 @@ process.Options = cms.PSet(
     jetPtCut        = cms.double(25.0), # pt cut on pf and Gen jets  
     jetAlgo         = cms.string('antikt_algorithm'), # ex: antikt_algorithm, ak, AK, cambridge_algorithm, ca, CA
     doCMSSWJets     = cms.bool(False),  # analyze also basic cmssw reconstructed jets 
+    doSoftKillerJets = cms.bool(False),  # produce soft killer jets                                                                                                                        
 
     puppiConfig     = cms.string("PUPPICONFIG"), # puppi configuration to run
 
     jetPtTresholdForGroomers      = cms.double(100.),
     genjetPtTresholdForGroomers   = cms.double(50.),
-    jetPtTresholdForTopTagging = cms.double(300.),
+    jetPtTresholdForTopTagging    = cms.double(300.),
     genJetPtTresholdForTopTagging = cms.double(250.),
 
     L1FastJetJEC    = cms.string("/afs/cern.ch/user/b/bmahakud/public/JEC/POSTLS170_V6_L1FastJet_AK7PF.txt"),
@@ -67,18 +68,18 @@ process.Options = cms.PSet(
 
     # trimming
     trimming = cms.VPSet( 
-     cms.PSet( R_trimming = cms.double(0.2), PtFraction = cms.double(0.05), trimAlgo = cms.string('kt_algorithm')),
+     #cms.PSet( R_trimming = cms.double(0.2), PtFraction = cms.double(0.05), trimAlgo = cms.string('kt_algorithm')),
      cms.PSet( R_trimming = cms.double(0.1), PtFraction = cms.double(0.03), trimAlgo = cms.string('kt_algorithm')),
-     cms.PSet( R_trimming = cms.double(0.2), PtFraction = cms.double(0.03), trimAlgo = cms.string('kt_algorithm')),
-     cms.PSet( R_trimming = cms.double(0.3), PtFraction = cms.double(0.03), trimAlgo = cms.string('kt_algorithm'))
+     #cms.PSet( R_trimming = cms.double(0.2), PtFraction = cms.double(0.03), trimAlgo = cms.string('kt_algorithm')),
+     #cms.PSet( R_trimming = cms.double(0.3), PtFraction = cms.double(0.03), trimAlgo = cms.string('kt_algorithm'))
    ),
 
     #pruning
     pruning =  cms.VPSet(
      cms.PSet( z_cut = cms.double(0.1),  R_Cut = cms.double(0.5),  R_jet_def_pruning = cms.double(0.8), pruneAlgo = cms.string('cambridge_algorithm')),
-     cms.PSet( z_cut = cms.double(0.05), R_Cut = cms.double(0.5),  R_jet_def_pruning = cms.double(0.8), pruneAlgo = cms.string('cambridge_algorithm')),
-     cms.PSet( z_cut = cms.double(0.05), R_Cut = cms.double(0.75), R_jet_def_pruning = cms.double(0.8), pruneAlgo = cms.string('cambridge_algorithm')),
-     cms.PSet( z_cut = cms.double(0.1),  R_Cut = cms.double(0.75), R_jet_def_pruning = cms.double(0.8), pruneAlgo = cms.string('cambridge_algorithm'))
+     #cms.PSet( z_cut = cms.double(0.05), R_Cut = cms.double(0.5),  R_jet_def_pruning = cms.double(0.8), pruneAlgo = cms.string('cambridge_algorithm')),
+     #cms.PSet( z_cut = cms.double(0.05), R_Cut = cms.double(0.75), R_jet_def_pruning = cms.double(0.8), pruneAlgo = cms.string('cambridge_algorithm')),
+     #cms.PSet( z_cut = cms.double(0.1),  R_Cut = cms.double(0.75), R_jet_def_pruning = cms.double(0.8), pruneAlgo = cms.string('cambridge_algorithm'))
     ),
 
     #charge

@@ -39,8 +39,25 @@ class treeReader{
     double*                 getDouble(const std::string &name);
     float*                  getFloat (const std::string &name);
     int*                    getInt   (const std::string &name);
-    bool*                    getBool  (const std::string &name);
+    bool*                   getBool  (const std::string &name);
     std::string*            getString(const std::string &name);
+
+
+    bool is3V     (const std::string &name);
+    bool is4V     (const std::string &name);
+    bool isDouble (const std::string &name);
+    bool isFloat  (const std::string &name);
+    bool isInt    (const std::string &name);
+    bool isBool   (const std::string &name);
+    bool isString (const std::string &name);
+
+    bool is_3V     (const std::string &name);
+    bool is_4V     (const std::string &name);
+    bool is_Double (const std::string &name);
+    bool is_Float  (const std::string &name);
+    bool is_Int    (const std::string &name);
+    bool is_Bool   (const std::string &name);
+    bool is_String (const std::string &name);
     
   private:
 

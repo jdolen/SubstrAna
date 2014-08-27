@@ -82,11 +82,6 @@ class VTaggingVariables {
 
   TVector2 jetPull_;
 
-  JetDefinition* jet_def_forECF_ ;                                                                                      
-  ClusterSequence* clust_seq_forECF_ ;                                                         
-  std::vector<PseudoJet> incluisve_jets_forECF_ ; 
-
-
 };
 
 
