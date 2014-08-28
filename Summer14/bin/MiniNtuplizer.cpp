@@ -606,9 +606,10 @@ void clear(JetInfo &iJet) {
 //set the gen jet info in the output tree
 void setGenJet( PseudoJet &iJet, // current jet 
                 GenJetInfo &iJetI, // output structure
-                JetMedianBackgroundEstimator bge_rho, JetMedianBackgroundEstimator bge_rhom, JetMedianBackgroundEstimator bge_rhoC, // info for safe area or constituent subtraction
+                JetMedianBackgroundEstimator & bge_rho, 
+                JetMedianBackgroundEstimator & bge_rhom, JetMedianBackgroundEstimator & bge_rhoC, // info for safe area or constituent subtraction
                 vector<JetCleanser> &cleanser_vect, // cleanser objects
-                bool is_leadingJet, double rho) {
+                const bool & is_leadingJet, const double & rho) {
 
 
 
@@ -979,14 +980,14 @@ void setGenJet( PseudoJet &iJet, // current jet
 void setRecoJet(PseudoJet &iJet, // input reco Jet 
                 JetInfo &iJetI,  // structure to store reco jet info
                 GenJetInfo& iGenJetI, // structure to store reco jet info 
-                JetMedianBackgroundEstimator bge_rho, JetMedianBackgroundEstimator bge_rhom, JetMedianBackgroundEstimator bge_rhoC, 
+                JetMedianBackgroundEstimator & bge_rho, JetMedianBackgroundEstimator & bge_rhom, JetMedianBackgroundEstimator & bge_rhoC, 
                 bool isCHS, // apply CHS or not
                 FactorizedJetCorrector *iJetCorr, JetCorrectionUncertainty *iJetUnc, // standard JEC and uncertainty
                 std::vector<TGraph*> &iCorr, // Phill corrections
                 vector<JetCleanser> &cleanser_vect, // cleansing
-                bool is_leadingJet, double rho, 
-                vfloat eta_Boson, vfloat phi_Boson, // matched vector boson information
-                const bool & isPuppi = false, bool isMC = true) {
+                const bool & is_leadingJet, const double & rho, 
+                vfloat & eta_Boson, vfloat & phi_Boson, // matched vector boson information
+                const bool & isPuppi = false, const bool & isMC = true) {
 
 
   // -- area-median subtractor  ( safe area subtractor )
@@ -1416,16 +1417,16 @@ void setRecoJet(PseudoJet &iJet, // input reco Jet
     (iJetI.mgen     ).push_back((iGenJetI.m)[imatch]);
     (iJetI.mrawgen  ).push_back((iGenJetI.mraw)[imatch]);
 
-    if(int(iGenJetI.mtrim.at(0).size()) >= imatch) (iJetI.mtrimgen).push_back((iGenJetI.mtrim.at(0))[imatch]);
+    if(int(iGenJetI.mtrim.at(0).size()) > imatch) (iJetI.mtrimgen).push_back((iGenJetI.mtrim.at(0))[imatch]);
     else (iJetI.mtrimgen    ).push_back(-999.);
 
-    if(int(iGenJetI.mtrimsafe.at(0).size())>=imatch) (iJetI.mtrimsafegen).push_back((iGenJetI.mtrimsafe.at(0))[imatch]);
+    if(int(iGenJetI.mtrimsafe.at(0).size()) > imatch) (iJetI.mtrimsafegen).push_back((iGenJetI.mtrimsafe.at(0))[imatch]);
     else (iJetI.mtrimsafegen).push_back(-999.);
 
-    if(int(iGenJetI.msoftdrop.at(0).size()) >= imatch) (iJetI.msoftdropgen).push_back((iGenJetI.msoftdrop.at(0))[imatch]);
+    if(int(iGenJetI.msoftdrop.at(0).size()) > imatch) (iJetI.msoftdropgen).push_back((iGenJetI.msoftdrop.at(0))[imatch]);
     else (iJetI.msoftdropgen).push_back(-999.); 
 
-    if(int(iGenJetI.msoftdropsafe.at(0).size())>= imatch) (iJetI.msoftdropsafegen    ).push_back((iGenJetI.msoftdropsafe.at(0))[imatch]);
+    if(int(iGenJetI.msoftdropsafe.at(0).size()) > imatch) (iJetI.msoftdropsafegen    ).push_back((iGenJetI.msoftdropsafe.at(0))[imatch]);
     else (iJetI.msoftdropsafegen    ).push_back(-999.);
 
     if(computeJetFlavour) (iJetI.flavourgen).push_back((iGenJetI.jetflavour)[imatch]);
