@@ -7,11 +7,8 @@ TrainingMVAClass::TrainingMVAClass(const std::vector<TFile*> & signalFileList, c
 
  
   SetSignalTree (signalFileList,TreeName) ;
-
   SetBackgroundTree (backgroundFileList,TreeName) ;
-
   SetLabel (Label);
-
   SetOutputFile (outputFilePath , outputFileName) ;
 
   factory_ = new TMVA::Factory (TreeName_+"_"+Label_,outputFile_, Form("!V:!Silent:%sColor:DrawProgressBar:AnalysisType=Classification%s",gROOT->IsBatch()?"!":"",transformation.c_str()));
@@ -45,9 +42,7 @@ TrainingMVAClass::~TrainingMVAClass(){
 
   if(preselectionCutSignal_!=0) preselectionCutSignal_->Delete() ;
   if(preselectionCutBackground_!=0) preselectionCutBackground_->Delete() ;
-
   if(outputFile_!=0) outputFile_->Close() ;
- 
   if(factory_!=0) factory_->Delete() ;
 
 }

@@ -59,11 +59,11 @@ class VTaggingVariables {
 
   double computeQGLikelihood(QGLikelihoodCalculator* qgLikelihood, const double & jetCorrection, const double & rho);
 
-  double computePullAngle(const std::vector<PseudoJet> & subjets, const double & jetR);  
+  double computePullAngle(std::vector<PseudoJet> subjets, const double & jetR);  
   TVector2 jetPull(const PseudoJet & jet, const int & type = 0);
 
-  double FindMean(const std::vector< double > & qjetmasses);
-  double FindRMS( const std::vector< double > & qjetmasses);
+  double FindMean(std::vector< double > qjetmasses);
+  double FindRMS(std::vector< double > qjetmasses);
   ///////////////////////
   void   setInputJet(const PseudoJet & inputJet);
 

@@ -2,36 +2,33 @@
 
 // constructor from files
 TMVAReadingClass::TMVAReadingClass(const std::vector<TFile*> & SampleFileList, const std::string & TreeName,
-                                         const std::string & inputFileWeight , const std::string & Label ){
+				   const std::vector<std::string> & inputFileWeight , const std::string & Label ){
 
   SetInputTree (SampleFileList, TreeName) ;
-
   SetReaderTree();
-
   SetLabel (Label);
-
   SetInputFileWeight (inputFileWeight) ;
 
-  reader_ = new TMVA::Reader( TreeName_+"_"+Label_);
-
+  for(size_t iWeight = 0 ; iWeight < inputFileWeight.size(); iWeight++){
+    TString NameReader = Form("%s_%s_weight_%d",TreeName_.c_str(),Label_.c_str(),int(iWeight));
+    reader_.push_back( new TMVA::Reader(NameReader.Data()));
+  }
 }
 
 // constructor from trees
 TMVAReadingClass::TMVAReadingClass(const std::vector<TTree*> & SampleTreeList, const std::string & TreeName,
-		                         const std::string & inputFileWeight , const std::string & Label ){
-
+				   const std::vector<std::string> & inputFileWeight , const std::string & Label ){
 
   SetTreeName (TreeName) ;
-
   SetInputTree (SampleTreeList) ;
-
   SetReaderTree (SampleTreeList) ;
-
   SetLabel (Label);
-
   SetInputFileWeight (inputFileWeight) ;
 
-  reader_ = new TMVA::Reader( TreeName_+"_"+Label_);
+  for(size_t iWeight = 0 ; iWeight < inputFileWeight.size(); iWeight++){
+    TString NameReader = Form("%s_%s_weight_%d",TreeName_.c_str(),Label_.c_str(),int(iWeight));
+    reader_.push_back( new TMVA::Reader(NameReader.Data()));
+  }
 
 }
 
@@ -41,12 +38,17 @@ TMVAReadingClass::~TMVAReadingClass(){
   for(size_t iTree = 0; iTree < SampleTreeList_.size() ; iTree++) { 
    if(SampleTreeList_.at(iTree)!=0)  delete SampleTreeList_.at(iTree) ; 
   }
-  if(reader_!=0) reader_->Delete() ;
 
-  if(setTrainingVariables_ !=0) delete setTrainingVariables_;
+  for(size_t iReader = 0; iReader < reader_.size(); iReader++){
+    if(reader_.at(iReader)!=0) reader_.at(iReader)->Delete() ;
+  }
+
+  if(setTrainingVariables_ !=0)  delete setTrainingVariables_;
   if(setSpectatorVariables_ !=0) delete setSpectatorVariables_;
 
-  for(size_t iTree = 0; iTree < SampleTreeList_.size() ; iTree++) { if(treeReader_.at(iTree)!=0) delete treeReader_.at(iTree) ;}
+  for(size_t iTree = 0; iTree < SampleTreeList_.size() ; iTree++) { 
+     if(treeReader_.at(iTree)!=0) delete treeReader_.at(iTree) ;
+  }
 
 }
 
@@ -59,38 +61,25 @@ void TMVAReadingClass::AddTrainingVariables ( const std::vector<std::string> & m
   setTrainingVariables_  = new std::vector<Float_t> ( mapTrainingVariables_.size()) ; // create a vector of float values in order to read the input variables for the reader
   setSpectatorVariables_ = new std::vector<Float_t> ( mapSpectatorVariables_.size()) ;
 
-  for( size_t iVar = 0 ; iVar < mapTrainingVariables_.size() ; iVar ++ )
-    reader_->AddVariable(mapTrainingVariables_.at(iVar),&setTrainingVariables_->at(iVar)); // add variable to the reader with a right name which should match th input tree
+  for(size_t iWeight = 0; iWeight < reader_.size(); iWeight++){
+
+   for(size_t iVar = 0 ; iVar < mapTrainingVariables_.size() ; iVar ++ )
+     reader_.at(iWeight)->AddVariable(mapTrainingVariables_.at(iVar),&setTrainingVariables_->at(iVar)); // add variable to the reader with a right name which should match th input tree
   
-  for( size_t iVar = 0 ; iVar < mapSpectatorVariables_.size() ; iVar ++ )
-    reader_->AddSpectator(mapSpectatorVariables_.at(iVar),&setSpectatorVariables_->at(iVar));
-  
+   for(size_t iVar = 0 ; iVar < mapSpectatorVariables_.size() ; iVar ++ )
+     reader_.at(iWeight)->AddSpectator(mapSpectatorVariables_.at(iVar),&setSpectatorVariables_->at(iVar));
+  }
+
   return;
 }
 
 // Prepare the tree -> set the preselection cut
 void TMVAReadingClass::AddPrepareReader (const std::string & LeptonType, const std::string & preselectionCutType,
-  					    std::vector<double> * JetPtBinOfTraining, const int & pTBin, 
-                                            std::vector<double> * PileUpBinOfTraining, const int & puBin){
+  					 const std::vector<double> & JetPtBinOfTraining, const std::vector<double> & PileUpBinOfTraining){
 
-  if(JetPtBinOfTraining!=NULL || !JetPtBinOfTraining ){
-    pTJetMin_ = JetPtBinOfTraining->at(pTBin) ;
-    pTJetMax_ = JetPtBinOfTraining->at(pTBin+1) ;
-  }
-  else{
-    pTJetMin_ = 0;
-    pTJetMax_ = 2000 ;
-  }
 
-  if(PileUpBinOfTraining!=NULL || !PileUpBinOfTraining ){
-    puMin_ = PileUpBinOfTraining->at(puBin) ;
-    puMax_ = PileUpBinOfTraining->at(puBin+1) ;
-  }
-  else{
-    puMin_ = 0;
-    puMax_ = 100 ;
-  }
-
+  if(JetPtBinOfTraining.size()!=0)  JetPtBinOfTraining_ = JetPtBinOfTraining ;
+  if(PileUpBinOfTraining.size()!=0) PileUpBinOfTraining_ = PileUpBinOfTraining;
   // store the cut type .. should be a string
   preselectionCutType_ = preselectionCutType ;
   LeptonType_ = LeptonType ;
@@ -103,8 +92,10 @@ void TMVAReadingClass::AddPrepareReader (const std::string & LeptonType, const s
 void TMVAReadingClass::BookMVAWeight (const std::string & methodName, const std::string & nameBranch) {
 
   methodName_ = methodName ;
-  reader_->BookMVA(methodName_.c_str(),inputFileWeight_.c_str()) ; // book the MVA reader method
   nameBranch_ = nameBranch ;  // name of the new branch of the MVA output
+
+  for(size_t iWeight = 0; iWeight < inputFileWeight_.size(); iWeight++) 
+    reader_.at(iWeight)->BookMVA(methodName_.c_str(),inputFileWeight_.at(iWeight).c_str()) ; // book the MVA reader method
 
   return ;
 
@@ -112,24 +103,80 @@ void TMVAReadingClass::BookMVAWeight (const std::string & methodName, const std:
 
 // Fill the MVA weight
 void TMVAReadingClass::FillMVAWeight (const int & iJetToRead, const bool & optionCut) {
-
+  
   // loop on the sample list and create the branch
   for(size_t iTree = 0; iTree < SampleTreeList_.size() ; iTree++){
 
+    if(SampleTreeList_.at(iTree)->FindBranch(nameBranch_.c_str())) // if already exist the branch take it and fill again (when trainings are done in exclusive pT bins you might want just one branch filled alternatively as a function of the events      
+      newBranch_ = SampleTreeList_.at(iTree)->GetBranch(nameBranch_.c_str());
+    else // create a new branch from scratch
       newBranch_  = SampleTreeList_.at(iTree)->Branch(nameBranch_.c_str(),&weight_,(nameBranch_+"/F").c_str()); // create the new branch as a float
 
       for( int iEntry = 0; iEntry < SampleTreeList_.at(iTree)->GetEntries(); iEntry++){ // Loop on tree entries
-       if(iEntry%10000 == 0 ) std::cout<<" Entry = "<<iEntry<<std::endl;      
-       SampleTreeList_.at(iTree)->GetEntry(iEntry);  
-       weight_ = 0 ;
+
+       if(iEntry%100 == 0 ) std::cout<<" Entry = "<<iEntry<<std::endl;      
+       SampleTreeList_.at(iTree)->GetEntry(iEntry);  // load entry information -> treeReader already set all the status to 1
+       weight_ = 0 ; // value to be put in the branch
        
+       // select only events in the correct pt and pu bin 
+       double pTjet = treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) ;
+       double pUjet = treeReader_.at(iTree)->getInt("npu")[iJetToRead] ;
+ 
+       int pTPosition = -1;
+       for(size_t iPT = 0 ; iPT < JetPtBinOfTraining_.size(); iPT = iPT + 2){
+	   if(pTjet > JetPtBinOfTraining_.at(iPT) and pTjet <= JetPtBinOfTraining_.at(iPT+1)) {
+	     pTPosition = iPT ; 
+             continue;
+	   }
+       }
+
+       int pUPosition = -1;
+       for(size_t iPU = 0 ; iPU < PileUpBinOfTraining_.size(); iPU = iPU +2){
+	   if(pUjet > PileUpBinOfTraining_.at(iPU) and pUjet <= PileUpBinOfTraining_.at(iPU+1)) {
+	     pUPosition = iPU ; 
+             continue;
+	   }
+       }
+              
+       bool isGoodEvent = false ;      
+       if(optionCut == true){	
+  	  if( preselectionCutType_ == "basicJetsCutCSA14" && (LeptonType_ == "Jets" || LeptonType_ == "jets") and  TreeName_ !="gen") {
+	    isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) > 200 && treeReader_.at(iTree)->GetInt("imatch")->at(iJetToRead) >= 0 && fabs(treeReader_.at(iTree)->GetFloat("eta")->at(iJetToRead))<2.4; 
+	  }
+	  else if( preselectionCutType_ == "basicJetsCutCSA14" && (LeptonType_ == "Jets" || LeptonType_ == "jets") and  TreeName_ =="gen") {
+           isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) > 200 && treeReader_.at(iTree)->GetInt("imatch")->at(iJetToRead) >= 0  ;
+	  }
+   	  else if( preselectionCutType_ == "basicJetsCutCSA14TTbar" && (LeptonType_ == "Jets" || LeptonType_ == "jets") and  TreeName_ !="gen") {
+           isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) > 200 && treeReader_.at(iTree)->GetInt("imatch")->at(iJetToRead) >= 0 && fabs(treeReader_.at(iTree)->GetFloat("eta")->at(iJetToRead))<2.4 && treeReader_.at(iTree)->GetFloat("mprunedsafe_zcut_010_R_cut_050")->at(iJetToRead) <=120;
+	  }
+  	  else if( preselectionCutType_ == "basicJetsCutCSA14TTbar" && (LeptonType_ == "Jets" || LeptonType_ == "jets") and  TreeName_ =="gen") {
+           isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) > 200 && treeReader_.at(iTree)->GetInt("imatch")->at(iJetToRead) >= 0 && treeReader_.at(iTree)->GetFloat("mprunedsafe_zcut_010_R_cut_050")->at(iJetToRead) <=120;
+	  }
+          else isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) > 200 && treeReader_.at(iTree)->GetInt("imatch")->at(iJetToRead) >= 0 ;
+       }	  	     	       
+       else isGoodEvent = true ;      
+
+       //std::cout<<" pt "<<treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead)<<" puJet "<<pUjet<<" match "<<treeReader_.at(iTree)->GetInt("imatch")->at(iJetToRead)<<" eta "<<fabs(treeReader_.at(iTree)->GetFloat("eta")->at(iJetToRead))<<" isGoodEvent "<<isGoodEvent<<" ptpos "<<pTPosition<<" pile-up "<<pUPosition<<" size "<<JetPtBinOfTraining_.size()<<"  "<<PileUpBinOfTraining_.size()<<std::endl;
+
+       // take the correct weight file to be read for this event --> look for a string  
+       int weightFilePosition = -1 ;
+       if( pTPosition !=-1 and pUPosition !=-1){
+	 TString weightFileSuffix = Form("PTBin_%d_%d_PU_%d_%d",int(JetPtBinOfTraining_.at(pTPosition)),int(JetPtBinOfTraining_.at(pTPosition+1)),int(PileUpBinOfTraining_.at(pUPosition)),int(PileUpBinOfTraining_.at(pUPosition+1)));
+        for(size_t iWeight = 0; iWeight < inputFileWeight_.size(); iWeight++){
+         if(TString(inputFileWeight_.at(iWeight).c_str()).Contains(weightFileSuffix.Data())) weightFilePosition = iWeight;
+	}
+       }
+
+       //if(weightFilePosition!=-1) std::cout<<" weight file "<<weightFilePosition<<" name "<<inputFileWeight_.at(weightFilePosition)<<std::endl;
+											              
        // fill the value of the training and spectator variable for each event
        for( size_t iVar = 0 ; iVar < mapTrainingVariables_.size() ; iVar ++ ) {
 	 TString variableName = Form("%s",mapTrainingVariables_.at(iVar).c_str());
          TString position     = Form("[%d]",iJetToRead);
          if(variableName.Contains(position)) variableName.ReplaceAll(position.Data(),"");
-         if(treeReader_.at(iTree)->isFloat(variableName.Data())) 
+         if(treeReader_.at(iTree)->isFloat(variableName.Data())){ 
            setTrainingVariables_->at(iVar) = treeReader_.at(iTree)->GetFloat(variableName.Data())->at(iJetToRead) ; // used treeReader class to fill the value of each input variable  in the vector	 
+	 } 
          else if(treeReader_.at(iTree)->isDouble(variableName.Data()))
 	   setTrainingVariables_->at(iVar) = float(treeReader_.at(iTree)->GetDouble(variableName.Data())->at(iJetToRead)) ;        
          else if(treeReader_.at(iTree)->isInt(variableName.Data()))
@@ -161,40 +208,21 @@ void TMVAReadingClass::FillMVAWeight (const int & iJetToRead, const bool & optio
 	   setSpectatorVariables_->at(iVar) = float(treeReader_.at(iTree)->getInt(variableName.Data())[iJetToRead]) ;       
          else { std::cerr<<" not found branch for this spectator variable --> "<<variableName.Data()<<" --> stop the program pleas check "<<std::endl; break ;}
        }
-
-      // preselection type definition --> only the basic cut SB+SR since we want to skip only the events that are never used in the analysis
-      bool isGoodEvent = false ;      
-      if(optionCut == true){	
-	if( preselectionCutType_ == "basicJetsCutCSA14" && (LeptonType_ == "Jets" || LeptonType_ == "jets") and  TreeName_ !="gen") {
-	  isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) > 200 && treeReader_.at(iTree)->GetInt("imatch")->at(iJetToRead) >= 0 && (treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) >= pTJetMin_ && treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) <= pTJetMax_) && (treeReader_.at(iTree)->getInt("npu")[iJetToRead] >= puMin_ && treeReader_.at(iTree)->getInt("npu")[iJetToRead] <= puMax_) && fabs(treeReader_.at(iTree)->GetFloat("eta")->at(iJetToRead))<2.4; 
-	}	
-	else if( preselectionCutType_ == "basicJetsCutCSA14" && (LeptonType_ == "Jets" || LeptonType_ == "jets") and  TreeName_ =="gen") {
-           isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) > 200 && treeReader_.at(iTree)->GetInt("imatch")->at(iJetToRead) >= 0 && (treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) >= pTJetMin_ && treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) <= pTJetMax_) && (treeReader_.at(iTree)->getInt("npu")[iJetToRead] >= puMin_ && treeReader_.at(iTree)->getInt("npu")[iJetToRead] <= puMax_) ;
-	}
-	else if( preselectionCutType_ == "basicJetsCutCSA14TTbar" && (LeptonType_ == "Jets" || LeptonType_ == "jets") and  TreeName_ !="gen") {
-           isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) > 200 && treeReader_.at(iTree)->GetInt("imatch")->at(iJetToRead) >= 0 && (treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) >= pTJetMin_ && treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) <= pTJetMax_) && (treeReader_.at(iTree)->getInt("npu")[iJetToRead] >= puMin_ && treeReader_.at(iTree)->getInt("npu")[iJetToRead] <= puMax_) && fabs(treeReader_.at(iTree)->GetFloat("eta")->at(iJetToRead))<2.4 && treeReader_.at(iTree)->GetFloat("mprunedsafe_zcut_010_R_cut_050")->at(iJetToRead) <=120;
-	}
-	else if( preselectionCutType_ == "basicJetsCutCSA14TTbar" && (LeptonType_ == "Jets" || LeptonType_ == "jets") and  TreeName_ =="gen") {
-           isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) > 200 && treeReader_.at(iTree)->GetInt("imatch")->at(iJetToRead) >= 0 && (treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) >= pTJetMin_ && treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) <= pTJetMax_) && (treeReader_.at(iTree)->getInt("npu")[iJetToRead] >= puMin_ && treeReader_.at(iTree)->getInt("npu")[iJetToRead] <= puMax_) && treeReader_.at(iTree)->GetFloat("mprunedsafe_zcut_010_R_cut_050")->at(iJetToRead) <=120;
-	}
-        else {  
-           isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) > 200 && treeReader_.at(iTree)->GetInt("imatch")->at(iJetToRead) >= 0 && (treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) >= pTJetMin_ && treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) <= pTJetMax_) && (treeReader_.at(iTree)->getInt("npu")[iJetToRead] >= puMin_ && treeReader_.at(iTree)->getInt("npu")[iJetToRead] <= puMax_) ;
-	   }	     	
-     }
-     else isGoodEvent = true ;      
-
+       
      // if is a good event -> fill the branch with the value of the output      
-      if(isGoodEvent) { weight_ = reader_->EvaluateMVA(methodName_.c_str());  // read the weight if the event is good -> re-applying the cut here
- 	                newBranch_->Fill() ; // fill the branch
+      if(isGoodEvent and pTPosition !=-1 and pUPosition !=-1 and weightFilePosition !=-1) { 
+  	  weight_ = reader_.at(weightFilePosition)->EvaluateMVA(methodName_.c_str());  // read the weight if the event is good -> re-applying the cut here
+	  newBranch_->Fill() ; // fill the branch
      }
      else { weight_ = -100. ; 
             newBranch_->Fill() ; // fill a default value
      }        
+      //std::cout<<" weight "<<weight_<<std::endl;  
     }       
-   SampleTreeList_.at(iTree)->Write("", TObject::kOverwrite); // rewrite the tree
+    SampleTreeList_.at(iTree)->Write("", TObject::kOverwrite); // rewrite the tree
   }
   return ;
-
+  
 }
 
 
@@ -240,7 +268,7 @@ void TMVAReadingClass::SetSpectatorVariables (const std::vector<std::string> & m
 }
 
 // Set input path
-void TMVAReadingClass::SetInputFileWeight ( const std::string & InputFileWeight){
+void TMVAReadingClass::SetInputFileWeight ( const std::vector<std::string> & InputFileWeight){
 
   if(!InputFileWeight.empty()) inputFileWeight_ = InputFileWeight ;
 
@@ -270,6 +298,6 @@ void TMVAReadingClass::SetReaderTree(){
 void TMVAReadingClass::SetReaderTree(const std::vector<TTree*> & SampleTreeList){
 
   for(size_t iTree = 0; iTree<SampleTreeList.size() ; iTree++)
-    treeReader_.push_back(new treeReader((TTree*) SampleTreeList.at(iTree),true));
+    treeReader_.push_back(new treeReader((TTree*) SampleTreeList.at(iTree),false));
   return ;
 }

@@ -1473,8 +1473,8 @@ void fillGenJetsInfo(vector<PseudoJet> &iJets, // set of GenJets in the event
     
   // -- Background estimator for constituents subtractor
   JetMedianBackgroundEstimator bge_rhoC(rho_range,jet_def_for_rho, area_def);
-  BackgroundJetScalarPtDensity *scalarPtDensity = new BackgroundJetScalarPtDensity();
-  bge_rhoC.set_jet_density_class(scalarPtDensity);
+  BackgroundJetScalarPtDensity scalarPtDensity ;
+  bge_rhoC.set_jet_density_class(&scalarPtDensity);
   bge_rhoC.set_particles(iParticles);
     
   // -- Clear jet info for each event                                                                                                                                     
@@ -1489,6 +1489,7 @@ void fillGenJetsInfo(vector<PseudoJet> &iJets, // set of GenJets in the event
      else 
        setGenJet( iJets[j], iJetInfo,  bge_rho, bge_rhom, bge_rhoC, cleanser_vect, 0, rho); // give the original clustered jets, the background estimations and cleansing
   }
+
 }
 
 
@@ -1518,8 +1519,8 @@ void fillRecoJetsInfo(vector<PseudoJet> &iJets,
   
   // -- Background estimator for constituents subtractor
   JetMedianBackgroundEstimator bge_rhoC(rho_range,jet_def_for_rho, area_def);
-  BackgroundJetScalarPtDensity *scalarPtDensity = new BackgroundJetScalarPtDensity();
-  bge_rhoC.set_jet_density_class(scalarPtDensity);
+  BackgroundJetScalarPtDensity scalarPtDensity;
+  bge_rhoC.set_jet_density_class(&scalarPtDensity);
   bge_rhoC.set_particles(iParticles);
 
   // -- Compute rho, rho_m for SafeAreaSubtraction -> same procedure is used for GenJets
@@ -1533,8 +1534,8 @@ void fillRecoJetsInfo(vector<PseudoJet> &iJets,
   bge_rhom_chs.set_jet_density_class(&m_density_chs);
   // -- Background estimator for constituents subtractor
   JetMedianBackgroundEstimator bge_rhoC_chs(rho_range_chs,jet_def_for_rho_chs, area_def_chs);
-  BackgroundJetScalarPtDensity *scalarPtDensity_chs = new BackgroundJetScalarPtDensity();
-  bge_rhoC_chs.set_jet_density_class(scalarPtDensity_chs);
+  BackgroundJetScalarPtDensity scalarPtDensity_chs; 
+  bge_rhoC_chs.set_jet_density_class(&scalarPtDensity_chs);
   bge_rhoC_chs.set_particles(iParticles);
 
   // -- Clear jet info for each event                                                                                                                                           
@@ -1699,7 +1700,8 @@ int main (int argc, char ** argv) {
   std::string configFileName = argv[1];
   boost::shared_ptr<edm::ParameterSet> parameterSet = edm::readConfig(configFileName);  
   edm::ParameterSet Options  = parameterSet -> getParameter<edm::ParameterSet>("Options");
- 
+  parameterSet.reset();
+
   //Global event information  
   bool isMC                  = Options.getParameter<bool>("isMC");           // MC or data
   int maxEvents              = Options.getParameter<int>("maxEvents");       // max num of events to analyze
@@ -1834,17 +1836,20 @@ int main (int argc, char ** argv) {
   // --- Setup output trees -> one tree for each jet collection type: GenJets, PFJets, PFCHS, Puppi, cmssw and softkiller
   TFile *fout = new TFile(fOut.c_str(),"RECREATE");
   
-  TTree *genTree           = new TTree("gen"  , "gen"  );
+  TTree *genTree = NULL;
+  if(isMC)    genTree  = new TTree("gen"  , "gen"  );
   TTree *pfTree            = new TTree("pf"   , "pf"   );
   TTree *chsTree           = new TTree("chs"  , "chs"  );
   TTree *puppiTree         = new TTree("puppi", "puppi");
-  TTree *softkillerTree    = new TTree("softkiller", "softkiller");
-  TTree *cmsswTree         = new TTree("cmsswpf", "cmsswpf");
+  TTree *softkillerTree = NULL ;
+  if(doSoftKillerJets) softkillerTree   = new TTree("softkiller", "softkiller");
+  TTree *cmsswTree = NULL;
+  if(doCMSSWJets) cmsswTree = new TTree("cmsswpf", "cmsswpf");
   
   GenJetInfo JGenInfo;
   JetInfo JPFInfo, JCHSInfo, JPuppiInfo, JSoftKillerInfo, JCMSSWPFInfo; // declare structures to fill the output tree information + make branches
   
-  setupGenTree(genTree,   JGenInfo    , "" );
+  if(isMC) setupGenTree(genTree,   JGenInfo    , "" );
   setupTree(pfTree,    JPFInfo     , "" );
   setupTree(chsTree,   JCHSInfo    , "" );
   setupTree(puppiTree, JPuppiInfo  , "" );
@@ -1916,7 +1921,6 @@ int main (int argc, char ** argv) {
     vector<PseudoJet> pfJetsCleaned ;
     vector<PseudoJet> chsJetsCleaned ;
 
-    
     // clean jets from gen lepton for semi-leptonic events    
     if(isMC && leptonVector.pt() > 0){
       vector<PseudoJet>::iterator itJet = puppiJets.begin() ;
@@ -1974,18 +1978,23 @@ int main (int argc, char ** argv) {
    }
    
   cout<<"done event loop"<<endl;
-
   // --- Write trees 
   fout->cd();
-
-  if (isMC) genTree ->Write();  
+  if (isMC){ genTree ->Write();  
+  cout<<"Wrote Gen Tree"<<endl;
+  }
   pfTree   ->Write();
+  cout<<"Wrote PF Tree"<<endl;
   chsTree  ->Write();
+  cout<<"Wrote CHS Tree"<<endl;
   puppiTree->Write();
-
-  if (doSoftKillerJets) softkillerTree->Write();
-  if (doCMSSWJets)  cmsswTree->Write();
-
+  cout<<"Wrote Puppi Tree"<<endl;
+  if (doSoftKillerJets){ softkillerTree->Write();
+  cout<<"Wrote SoftKiller Tree"<<endl;
+  }
+  if (doCMSSWJets){  cmsswTree->Write();
+  cout<<"Wrote CMSSW tree"<<endl;
+  }
   fout->Close();
   cout<<"done write trees"<<endl;
 }  

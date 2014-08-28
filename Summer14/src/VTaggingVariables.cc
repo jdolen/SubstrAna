@@ -136,7 +136,7 @@ double VTaggingVariables::getQjetVolatility(std::vector < fastjet::PseudoJet > c
 }
   
 //Q jets stuff                                                                                                                                                                            
-double VTaggingVariables::FindRMS( const std::vector< double > & qjetmasses ){
+double VTaggingVariables::FindRMS(std::vector< double > qjetmasses ){
 
   double total = 0.;
   double ctr = 0.;
@@ -155,7 +155,7 @@ double VTaggingVariables::FindRMS( const std::vector< double > & qjetmasses ){
   return RMS;
 }
 
-double VTaggingVariables::FindMean(const std::vector< double > & qjetmasses){
+double VTaggingVariables::FindMean(std::vector< double > qjetmasses){
 
  double total = 0.;
  double ctr = 0.;
@@ -239,7 +239,7 @@ double VTaggingVariables::computeQGLikelihood(QGLikelihoodCalculator* qgLikeliho
  
 } 
 
-double VTaggingVariables::computePullAngle(const std::vector<PseudoJet> & subjets, const double & jetR){
+double VTaggingVariables::computePullAngle(std::vector<PseudoJet> subjets, const double & jetR){
 
   PseudoJet subjet0(0,0,0,0) ;
   PseudoJet subjet1(0,0,0,0) ;

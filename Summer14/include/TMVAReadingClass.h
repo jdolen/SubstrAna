@@ -33,11 +33,11 @@ class TMVAReadingClass {
   
   // constructor giving input files
   TMVAReadingClass(const std::vector<TFile*> & SampleFileList, const std::string & TreeName,
-                      const std::string & InputFileWeight , const std::string & Label );
+                   const std::vector<std::string> & InputFileWeight , const std::string & Label );
 
   // constructor giving input trees
   TMVAReadingClass(const std::vector<TTree*> & SampleTreeList, const std::string & TreeName,
-                      const std::string & InputFileWeight , const std::string & Label);
+                   const std::vector<std::string> & InputFileWeight , const std::string & Label);
 
   // default de-constructor
   ~TMVAReadingClass();
@@ -46,7 +46,8 @@ class TMVAReadingClass {
   void AddTrainingVariables ( const std::vector<std::string> & mapTrainingVariables, const std::vector<std::string> & mapSpectatorVariables);
   
   // prepare the preselection cut and the jet pT of training
-  void AddPrepareReader (const std::string & LeptonType, const std::string & preselectionCutType, std::vector<double> * JetPtBinOfTraining = NULL , const int & pTBin = 0, std::vector<double>* PileUpBinOfTraining = NULL, const int & puBin = 0);
+  void AddPrepareReader (const std::string & LeptonType, const std::string & preselectionCutType, const std::vector<double> & JetPtBinOfTraining, 
+                         const std::vector<double> & PileUpBinOfTraining);
 
   // Book MVA method used in the training + weight file for input TMVA weights and the branch og the name where to store the info
   void BookMVAWeight (const std::string & methodName, const std::string & nameBranch) ;
@@ -67,7 +68,7 @@ class TMVAReadingClass {
   void SetSpectatorVariables (const std::vector<std::string> & mapSpectatorVariables);
 
   // Set input file path
-  void SetInputFileWeight ( const std::string & InputFileWeight);
+  void SetInputFileWeight ( const std::vector<std::string> & InputFileWeight);
 
   // Set tree name
   void SetTreeName ( const std::string & TreeName );
@@ -75,22 +76,12 @@ class TMVAReadingClass {
   // Set label
   void SetLabel ( const std::string & Label );
 
-  // Set weight file name
-  void SetWeightFile ( const std::string & weightFile ) ;
-
   // Set reader tree 
   void SetReaderTree ();
   void SetReaderTree (const std::vector<TTree*> & SampleTreeList);
 
 
  private :
-
-  // pT range of the related training
-  double pTJetMin_ ;
-  double pTJetMax_ ;
-  // PU range of the related training
-  double puMin_ ;
-  double puMax_ ;
 
   // sample tree list to fill the weight
   std::vector<TTree*> SampleTreeList_ ;
@@ -105,16 +96,18 @@ class TMVAReadingClass {
   // weight value
   Float_t weight_ ;
 
+  std::vector<double> JetPtBinOfTraining_ ;
+  std::vector<double> PileUpBinOfTraining_ ;
+
   // tree Name and Label
   std::string TreeName_ ;
   std::string Label_ ;
 
   // input file path
-  std::string inputFileWeight_ ;
+  std::vector<std::string> inputFileWeight_ ;
 
   // method Name, weight file and name of the output branch
   std::string methodName_ ;
-  std::string weightFile_ ;
   std::string nameBranch_ ;
  
   // output pointer to the branch
@@ -125,7 +118,7 @@ class TMVAReadingClass {
   std::string LeptonType_ ;
 
   // Reader Object
-  TMVA::Reader*  reader_ ;
+  std::vector<TMVA::Reader*>  reader_ ;
 
   // TreeReader in order to read the inputTree branches
   std::vector<treeReader*> treeReader_ ;
