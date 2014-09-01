@@ -618,7 +618,7 @@ void plotCovarianceMatrix(TCanvas* cCorrelation, TH2D* Matrix, std::string outpu
 
 TMatrixDSym eigenTransform (TMatrixDSym& Matrix){
 
-  //Decomopose Covariance matrix to orthogonal states
+  //copy the original matrix in a new one skipping the last row and columns --> correlation with the full BDT
   TMatrixDSym lSMatrix(Matrix.GetNrows()-1);
   for(int iLine = 0; iLine < Matrix.GetNrows()-1; iLine++) { 
     for(int iRow = 0; iRow < Matrix.GetNcols()-1; iRow++) { 
@@ -626,19 +626,17 @@ TMatrixDSym eigenTransform (TMatrixDSym& Matrix){
     }
   }
 
-  TVectorD lEigVals(Matrix.GetNrows()-1);
+  TVectorD lEigVals(Matrix.GetNrows()-1); // make a vector were store the eigenvalues of the diagonalized matrix
   lEigVals = TMatrixDSymEigen(lSMatrix).GetEigenValues();
-  TMatrixD lEigen = lSMatrix.EigenVectors(lEigVals);
+  TMatrixD lEigen = lSMatrix.EigenVectors(lEigVals); // take the eigenvector matrix
 
-  TMatrixDSym lEigenSym(Matrix.GetNrows());
-  double pCheck = 0;
+  TMatrixDSym lEigenSym(Matrix.GetNrows()); // new matrix loop on the N-1 x N-1 inner line and columns and copy the eigenVectors
   for(int iLine   = 0; iLine < Matrix.GetNrows()-1; iLine++) { 
     for(int iRow = 0; iRow < Matrix.GetNcols()-1; iRow++) { 
-      if(iRow == 2) pCheck +=  lEigen(iLine,iRow)*lEigen(iLine,iRow);
       lEigenSym(iLine,iRow) = lEigen(iLine,iRow);
     }
   }
-  for(int iLine   = 0; iLine < Matrix.GetNrows()-1; iLine++) lEigenSym(Matrix.GetNrows()-1,iLine) = lEigVals(iLine);
+  for(int iLine   = 0; iLine < Matrix.GetNrows()-1; iLine++) lEigenSym(Matrix.GetNrows()-1,iLine) = lEigVals(iLine); // put in the N-1 line all the eigenvalues
   return lEigenSym;
 
 }
@@ -646,16 +644,16 @@ TMatrixDSym eigenTransform (TMatrixDSym& Matrix){
 ///////////////////////////////////////////////////
 TMatrixDSym dimOrder(TMatrixDSym & Matrix,TMatrixDSym & Eigen,TMatrixD & EigenInv) {
 
-  TVectorD lVector(Matrix.GetNrows()-1);
-  for(int iLine = 0; iLine < Matrix.GetNrows()-1; iLine++) lVector(iLine) = Matrix(Matrix.GetNrows()-1,iLine); // take the eigenvalues
+  TVectorD lVector(Matrix.GetNrows()-1); 
+  for(int iLine = 0; iLine < Matrix.GetNrows()-1; iLine++) lVector(iLine) = Matrix(Matrix.GetNrows()-1,iLine); // take the original values of the N-1 line
   double lMag = 0; 
-  for(int iLine = 0; iLine < Matrix.GetNrows()-1; iLine++)  lMag += lVector(iLine)*lVector(iLine); // sum of eigenvalues squared
-  for(int iLine = 0; iLine < Matrix.GetNrows()-1; iLine++)  lVector(iLine)  = lVector(iLine)/sqrt(lMag); // normalize the eigenvalues to be [0,1] in abs value
+  for(int iLine = 0; iLine < Matrix.GetNrows()-1; iLine++) lMag += lVector(iLine)*lVector(iLine); 
+  for(int iLine = 0; iLine < Matrix.GetNrows()-1; iLine++) lVector(iLine)  = lVector(iLine)/sqrt(lMag); 
   lVector = EigenInv * lVector; // multiply this vector for the inverse of the eigenVector matrix
   std::vector<double> lSum; 
   for(int iLine = 0; iLine < Matrix.GetNrows()-1; iLine++) lSum.push_back(lVector(iLine)*lVector(iLine)); // vector of squared of eigenValues
   lMag = 0; 
-  for(int iLine = 0; iLine < Matrix.GetNrows()-1; iLine++)  lMag += lVector(iLine)*lVector(iLine); // new magnitude
+  for(int iLine = 0; iLine < Matrix.GetNrows()-1; iLine++) lMag += lVector(iLine)*lVector(iLine); // new magnitude
 
   std::vector<int>  lRank; // ranking vector
   for(int iLine = 0; iLine < Matrix.GetNrows()-1; iLine++) {
