@@ -157,8 +157,8 @@ def submitJobs(wdir, njobs, queue):
         print 'job %d' %job
         jobdir = '%s/JOB_%d'%(wdir,job)
         jobname = '%s/sub_%d.sh'%(jobdir,job)
-        print 'bsub -q %s -o %s/sub_%d.log %s'%(queue,jobdir,job,jobname )
-        os.system('bsub -q %s -o %s/sub_%d.log %s'%(queue,jobdir,job,jobname ))
+        print 'bsub -q %s -o %s/sub_%d.log -e %s/sub_%d.err %s'%(queue,jobdir,job,jobdir,job,jobname )
+        os.system('bsub -q %s -o %s/sub_%d.log -e %s/sub_%d.err %s'%(queue,jobdir,job,jobdir,job,jobname ))
         
 
 

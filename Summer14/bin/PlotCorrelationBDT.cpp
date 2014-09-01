@@ -25,6 +25,8 @@
 #include "TH2F.h"
 #include "TList.h"
 #include "TRandom3.h"
+#include "TTreeFormula.h"
+#include "TFormula.h"
 
 #include "TKey.h"
 #include "TObjArray.h"
@@ -38,14 +40,22 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/PythonParameterSet/interface/MakeParameterSets.h"
 
+// To calculate covariance matrix depending on the input
 void calculateCovarianceMatrix ( std::vector<TTree*> & inputTrees, TMatrixDSym & correlationMatrixS, TMatrixDSym & correlationMatrixB );
+void calculateCovarianceMatrix ( std::vector<TTree*> & inputTrees, TMatrixDSym & correlationMatrix, std::vector<std::string> & variableName, std::string & cut);
+
+// To plot covariance matrix
 void plotCovarianceMatrix      ( TCanvas* cCorrelation, TH2D* Matrix, std::string outputDirectory, std::vector<std::string> labelNames);
+
+// diagonalize and input matrix
 TMatrixDSym eigenTransform (TMatrixDSym& Matrix);
+
+// dimensional orderign for PCA 
 TMatrixDSym dimOrder(TMatrixDSym & Matrix,TMatrixDSym & Eigen,TMatrixD & EigenInv);
 
 /// Main programme 
 int main (int argc, char **argv){
-  if(argc<2){ std::cout<<" Not correct number of input parameter --> Need Just one cfg file exit "<<std::endl; return -1; }
+  if(argc<3){ std::cout<<" Not correct number of input parameter --> Need Just one cfg file exit and 0 if run on TMVA output, 1 if run on TTree "<<std::endl; return -1; }
 
   // Load TTree Lybrary                                                                                                                                                                   
   gSystem->Load("libTree.so");
@@ -66,177 +76,343 @@ int main (int argc, char **argv){
   gStyle->SetErrorX(0.5);
 
 
-  // parse config file parameter                                                                                                                                                          
+  // parse config file parameter --> using CMSSW parser                                                                                                                         
   std::string configFileName = argv[1];
   boost::shared_ptr<edm::ParameterSet> parameterSet = edm::readConfig(configFileName);
   edm::ParameterSet Options  = parameterSet -> getParameter<edm::ParameterSet>("Options");
 
+  if(atoi(argv[3]) == 0){ // analyze TMVA output files .. one file == one trainning + a variables name  
 
-  std::vector<edm::ParameterSet> InputInformationParamLowPU ;
-  if(Options.existsAs<std::vector<edm::ParameterSet>>("InputLowPUFiles"))
+   std::vector<edm::ParameterSet> InputInformationParamLowPU ;
+   if(Options.existsAs<std::vector<edm::ParameterSet>>("InputLowPUFiles"))
     InputInformationParamLowPU = Options.getParameter<std::vector<edm::ParameterSet>>("InputLowPUFiles");
-  else{ std::cout<<" Exit from code, no input set found for low pile-up files"<<std::endl; return -1; }
+   else{ std::cout<<" Exit from code, no input set found for low pile-up files"<<std::endl; return -1; }
 
-  std::vector<edm::ParameterSet> InputInformationParamHighPU ;
-  if(Options.existsAs<std::vector<edm::ParameterSet>>("InputHighPUFiles"))
-  InputInformationParamHighPU = Options.getParameter<std::vector<edm::ParameterSet>>("InputHighPUFiles");
-  else{ std::cout<<" Exit from code, no input set found for high pile-up files"<<std::endl; return -1; }
+   std::vector<edm::ParameterSet> InputInformationParamHighPU ;
+   if(Options.existsAs<std::vector<edm::ParameterSet>>("InputHighPUFiles"))
+   InputInformationParamHighPU = Options.getParameter<std::vector<edm::ParameterSet>>("InputHighPUFiles");
+   else{ std::cout<<" Exit from code, no input set found for high pile-up files"<<std::endl; return -1; }
 
 
-  std::string outputDirectory;
-  if(Options.existsAs<std::string>("outputDirectory"))
+   std::string outputDirectory;
+   if(Options.existsAs<std::string>("outputDirectory"))
     outputDirectory = Options.getParameter<std::string>("outputDirectory");
-  else{ outputDirectory = "output/"; }
+   else{ outputDirectory = "output/"; }
  
-  system(("mkdir -p "+outputDirectory).c_str());
+   system(("mkdir -p "+outputDirectory).c_str());
 
-  std::vector<TTree*> inputLowPileUpTrees ;
-  std::vector<std::string> reducedNameLowPileUp ;
-  TFile* inputFile = NULL ;
-  // take all the TH1 outputs for S and B for  each variable in input-> low Pile Up
-  std::vector<edm::ParameterSet>::const_iterator itLowPileUp = InputInformationParamLowPU.begin();
-  for( ; itLowPileUp != InputInformationParamLowPU.end() ; ++itLowPileUp){
+   std::vector<TTree*> inputLowPileUpTrees ;  // TTree for input variables inside the TMVA output file
+   std::vector<std::string> reducedNameLowPileUp ; // reduced name for the variables
+   TFile* inputFile = NULL ;
+
+   // take all the TH1 outputs for S and B for  each variable in input-> low Pile Up
+   std::vector<edm::ParameterSet>::const_iterator itLowPileUp = InputInformationParamLowPU.begin();
+   for( ; itLowPileUp != InputInformationParamLowPU.end() ; ++itLowPileUp){
     inputFile = TFile::Open((*itLowPileUp).getParameter<std::string>("fileName").c_str());
     if(inputFile == 0 or inputFile == NULL) continue;
-    inputLowPileUpTrees.push_back((TTree*) inputFile->Get("TestTree"));
+    inputLowPileUpTrees.push_back((TTree*) inputFile->Get("TestTree")); // make the tree list
     reducedNameLowPileUp.push_back((*itLowPileUp).getParameter<std::string>("variableName"));
-  }
+   }
 
-  // Build Up the correlation matrix
-  TMatrixDSym correlationMatrixS_lowPileUP(reducedNameLowPileUp.size()) ;
-  TMatrixDSym correlationMatrixB_lowPileUP(reducedNameLowPileUp.size()) ;
-  for( unsigned int irow = 0 ; irow < reducedNameLowPileUp.size() ; irow++){
-   for( unsigned int icolum = 0 ; icolum < reducedNameLowPileUp.size() ; icolum++){
+   // Build Up the correlation matrix
+   TMatrixDSym correlationMatrixS_lowPileUP(reducedNameLowPileUp.size()) ;
+   TMatrixDSym correlationMatrixB_lowPileUP(reducedNameLowPileUp.size()) ;
+   for( unsigned int irow = 0 ; irow < reducedNameLowPileUp.size() ; irow++){
+    for( unsigned int icolum = 0 ; icolum < reducedNameLowPileUp.size() ; icolum++){
      correlationMatrixS_lowPileUP(irow,icolum) = 0;
      correlationMatrixB_lowPileUP(irow,icolum) = 0;
+    }
    }
-  }
 
-  calculateCovarianceMatrix(inputLowPileUpTrees,correlationMatrixS_lowPileUP,correlationMatrixB_lowPileUP); // calculate mean value for S and B
+   calculateCovarianceMatrix(inputLowPileUpTrees,correlationMatrixS_lowPileUP,correlationMatrixB_lowPileUP); // calculate mean value for S and B
 
-  TH2D* Matrix_S_lowPileUp = new TH2D(correlationMatrixS_lowPileUP);
-  Matrix_S_lowPileUp->SetName("Matrix_S_lowPileUp");
-  TH2D* Matrix_B_lowPileUp = new TH2D(correlationMatrixB_lowPileUP);
-  Matrix_B_lowPileUp->SetName("Matrix_B_lowPileUp");
+   TH2D* Matrix_S_lowPileUp = new TH2D(correlationMatrixS_lowPileUP); // make TH2D for plotting reasons
+   Matrix_S_lowPileUp->SetName("Matrix_S_lowPileUp");
+   TH2D* Matrix_B_lowPileUp = new TH2D(correlationMatrixB_lowPileUP);
+   Matrix_B_lowPileUp->SetName("Matrix_B_lowPileUp");
 
-  Matrix_S_lowPileUp->Scale(100);
-  Matrix_B_lowPileUp->Scale(100);
+   Matrix_S_lowPileUp->Scale(100); // correlation in %
+   Matrix_B_lowPileUp->Scale(100);
 
-  for( int iBinX = 0 ; iBinX < Matrix_S_lowPileUp->GetNbinsX() ; iBinX++){
-   for( int iBinY = 0 ; iBinY < Matrix_S_lowPileUp->GetNbinsX() ; iBinY++){
-     Matrix_S_lowPileUp->SetBinContent(iBinX+1,iBinY+1,int(Matrix_S_lowPileUp->GetBinContent(iBinX+1,iBinY+1)));
-     Matrix_B_lowPileUp->SetBinContent(iBinX+1,iBinY+1,int(Matrix_B_lowPileUp->GetBinContent(iBinX+1,iBinY+1)));
-     if(iBinX+1 == iBinY+1 ) {
-      Matrix_S_lowPileUp->SetBinContent(iBinX+1,iBinY+1,100);
-      Matrix_B_lowPileUp->SetBinContent(iBinX+1,iBinY+1,100);
-     }
-   }
-  }
+   ////////////////////////
+   TCanvas* cCorrelationSignal = new TCanvas("CorrelationBDT_S",Form("Correlation Matrix Signal"),180,52,550,550);
+   plotCovarianceMatrix(cCorrelationSignal,Matrix_S_lowPileUp,outputDirectory,reducedNameLowPileUp);
 
-  ////////////////////////
-  TCanvas* cCorrelationSignal = new TCanvas("CorrelationBDT_S",Form("Correlation Matrix Signal"),180,52,550,550);
-  plotCovarianceMatrix(cCorrelationSignal,Matrix_S_lowPileUp,outputDirectory,reducedNameLowPileUp);
+   ////////////////////////
+   TCanvas* cCorrelationBackground = new TCanvas("CorrelationBDT_B",Form("Correlation Matrix Background"),180,52,550,550);
+   plotCovarianceMatrix(cCorrelationBackground,Matrix_B_lowPileUp,outputDirectory,reducedNameLowPileUp);
 
-  ////////////////////////
-  TCanvas* cCorrelationBackground = new TCanvas("CorrelationBDT_B",Form("Correlation Matrix Background"),180,52,550,550);
-  plotCovarianceMatrix(cCorrelationBackground,Matrix_B_lowPileUp,outputDirectory,reducedNameLowPileUp);
+   //////////////////////////////////////////////////////////////////////
+   //// high pile-up correlation
+   //////////////////////////////////////////////////////////////////////
 
-  //////////////////////////////////////////////////////////////////////
-  //// high pile-up correlation
-  //////////////////////////////////////////////////////////////////////
-
-  inputLowPileUpTrees.clear() ;
-  reducedNameLowPileUp.clear() ;
-  // take all the TH1 outputs for S and B for  each variable in input-> low Pile Up
-  itLowPileUp = InputInformationParamHighPU.begin();
-  for( ; itLowPileUp != InputInformationParamHighPU.end() ; ++itLowPileUp){
+   inputLowPileUpTrees.clear() ;
+   reducedNameLowPileUp.clear() ;
+   // take all the TH1 outputs for S and B for  each variable in input-> low Pile Up
+   itLowPileUp = InputInformationParamHighPU.begin();
+   for( ; itLowPileUp != InputInformationParamHighPU.end() ; ++itLowPileUp){
     inputFile = TFile::Open((*itLowPileUp).getParameter<std::string>("fileName").c_str());
     if(inputFile == 0 or inputFile == NULL) continue;
     inputLowPileUpTrees.push_back((TTree*) inputFile->Get("TestTree"));
     reducedNameLowPileUp.push_back((*itLowPileUp).getParameter<std::string>("variableName"));
-  }
+   }
   
-  // Build Up the correlation matrix
-  TMatrixDSym correlationMatrixS_highPileUP(reducedNameLowPileUp.size()) ;
-  TMatrixDSym correlationMatrixB_highPileUP(reducedNameLowPileUp.size()) ;
-  for( unsigned int irow = 0 ; irow < reducedNameLowPileUp.size() ; irow++){
-   for( unsigned int icolum = 0 ; icolum < reducedNameLowPileUp.size() ; icolum++){
+   // Build Up the correlation matrix
+   TMatrixDSym correlationMatrixS_highPileUP(reducedNameLowPileUp.size()) ;
+   TMatrixDSym correlationMatrixB_highPileUP(reducedNameLowPileUp.size()) ;
+   for( unsigned int irow = 0 ; irow < reducedNameLowPileUp.size() ; irow++){
+    for( unsigned int icolum = 0 ; icolum < reducedNameLowPileUp.size() ; icolum++){
      correlationMatrixS_highPileUP(irow,icolum) = 0;
      correlationMatrixB_highPileUP(irow,icolum) = 0;
+    }
    }
-  }
 
-  calculateCovarianceMatrix(inputLowPileUpTrees,correlationMatrixS_highPileUP,correlationMatrixB_highPileUP); // calculate mean value for S and B
+   calculateCovarianceMatrix(inputLowPileUpTrees,correlationMatrixS_highPileUP,correlationMatrixB_highPileUP); // calculate mean value for S and B
   
-  TH2D* Matrix_S_highPileUp = new TH2D(correlationMatrixS_highPileUP);
-  Matrix_S_highPileUp->SetName("Matrix_S_highPileUp");
-  TH2D* Matrix_B_highPileUp = new TH2D(correlationMatrixB_highPileUP);
-  Matrix_B_highPileUp->SetName("Matrix_B_highPileUp");
+   TH2D* Matrix_S_highPileUp = new TH2D(correlationMatrixS_highPileUP);
+   Matrix_S_highPileUp->SetName("Matrix_S_highPileUp");
+   TH2D* Matrix_B_highPileUp = new TH2D(correlationMatrixB_highPileUP);
+   Matrix_B_highPileUp->SetName("Matrix_B_highPileUp");
 
-  Matrix_S_highPileUp->Scale(100);
-  Matrix_B_highPileUp->Scale(100);
+   Matrix_S_highPileUp->Scale(100); // correlation in %
+   Matrix_B_highPileUp->Scale(100);
 
-  for( int iBinX = 0 ; iBinX < Matrix_S_highPileUp->GetNbinsX() ; iBinX++){
-   for( int iBinY = 0 ; iBinY < Matrix_S_highPileUp->GetNbinsX() ; iBinY++){
+   for( int iBinX = 0 ; iBinX < Matrix_S_highPileUp->GetNbinsX() ; iBinX++){
+    for( int iBinY = 0 ; iBinY < Matrix_S_highPileUp->GetNbinsX() ; iBinY++){
      Matrix_S_highPileUp->SetBinContent(iBinX+1,iBinY+1,int(Matrix_S_highPileUp->GetBinContent(iBinX+1,iBinY+1)));
      Matrix_B_highPileUp->SetBinContent(iBinX+1,iBinY+1,int(Matrix_B_highPileUp->GetBinContent(iBinX+1,iBinY+1)));
      if(iBinX+1 == iBinY+1 ) {
          Matrix_S_highPileUp->SetBinContent(iBinX+1,iBinY+1,100);
          Matrix_B_highPileUp->SetBinContent(iBinX+1,iBinY+1,100);
      }
+    }
    }
-  }
 
-  /*    
-  TH2D* Matrix_S_highPileUp = new TH2D(correlationMatrixS_lowPileUP);
-  Matrix_S_highPileUp->SetName("Matrix_S_highPileUp");
-  TH2D* Matrix_B_highPileUp = new TH2D(correlationMatrixB_lowPileUP);
-  Matrix_B_highPileUp->SetName("Matrix_B_highPileUp");
-
-  Matrix_S_highPileUp->Scale(100);
-  Matrix_B_highPileUp->Scale(100);
-  
-  TRandom3 rand ;
-  for( int iBinX = 0 ; iBinX < Matrix_S_highPileUp->GetNbinsX() ; iBinX++){
-   for( int iBinY = iBinX ; iBinY < Matrix_S_highPileUp->GetNbinsX() ; iBinY++){
-     double svalue = int(rand.Gaus(Matrix_S_highPileUp->GetBinContent(iBinX+1,iBinY+1),5));
-     double bvalue = int(rand.Gaus(Matrix_B_highPileUp->GetBinContent(iBinX+1,iBinY+1),5));
-     Matrix_S_highPileUp->SetBinContent(iBinX+1,iBinY+1,svalue);
-     Matrix_S_highPileUp->SetBinContent(iBinY+1,iBinX+1,svalue);
-     Matrix_B_highPileUp->SetBinContent(iBinX+1,iBinY+1,bvalue);
-     Matrix_B_highPileUp->SetBinContent(iBinY+1,iBinX+1,bvalue);
-     if(iBinX == iBinY){
-      Matrix_S_highPileUp->SetBinContent(iBinX+1,iBinY+1,100);
-      Matrix_B_highPileUp->SetBinContent(iBinX+1,iBinY+1,100);
-     }
-   }
-  }
-  */
-
-  TCanvas* cCorrelationSignal_highPU = new TCanvas("CorrelationBDT_S_highPU",Form("Correlation Matrix Signal highPU"),180,52,550,550);
-  plotCovarianceMatrix(cCorrelationSignal_highPU,Matrix_S_highPileUp,outputDirectory,reducedNameLowPileUp);
-  TCanvas* cCorrelationBackground_highPU = new TCanvas("CorrelationBDT_B_highPU",Form("Correlation Matrix Background"),180,52,550,550);
-  plotCovarianceMatrix(cCorrelationBackground_highPU,Matrix_B_highPileUp,outputDirectory,reducedNameLowPileUp);
+   TCanvas* cCorrelationSignal_highPU = new TCanvas("CorrelationBDT_S_highPU",Form("Correlation Matrix Signal highPU"),180,52,550,550);
+   plotCovarianceMatrix(cCorrelationSignal_highPU,Matrix_S_highPileUp,outputDirectory,reducedNameLowPileUp);
+   TCanvas* cCorrelationBackground_highPU = new TCanvas("CorrelationBDT_B_highPU",Form("Correlation Matrix Background"),180,52,550,550);
+   plotCovarianceMatrix(cCorrelationBackground_highPU,Matrix_B_highPileUp,outputDirectory,reducedNameLowPileUp);
 
 
-  ////////////////////////////
-  // Correlation difference among high pile-up bin and low pile-up bin for both S and B
-  ////////////////////////////
+   ////////////////////////////
+   // Correlation difference among high pile-up bin and low pile-up bin for both S and B
+   ////////////////////////////
 
-  TH2D* CorrelationS_difference = new TH2D("CorrelationS_difference","",reducedNameLowPileUp.size(),0,reducedNameLowPileUp.size(),reducedNameLowPileUp.size(),0,reducedNameLowPileUp.size());
-  TH2D* CorrelationB_difference = new TH2D("CorrelationB_difference","",reducedNameLowPileUp.size(),0,reducedNameLowPileUp.size(),reducedNameLowPileUp.size(),0,reducedNameLowPileUp.size());
+   TH2D* CorrelationS_difference = new TH2D("CorrelationS_difference","",reducedNameLowPileUp.size(),0,reducedNameLowPileUp.size(),reducedNameLowPileUp.size(),0,reducedNameLowPileUp.size());
+   TH2D* CorrelationB_difference = new TH2D("CorrelationB_difference","",reducedNameLowPileUp.size(),0,reducedNameLowPileUp.size(),reducedNameLowPileUp.size(),0,reducedNameLowPileUp.size());
 
-  for(int iBinX = 0; iBinX < Matrix_S_highPileUp->GetNbinsX(); iBinX++){
-   for(int iBinY = 0; iBinY < Matrix_S_highPileUp->GetNbinsY(); iBinY++){  
+   for(int iBinX = 0; iBinX < Matrix_S_highPileUp->GetNbinsX(); iBinX++){
+    for(int iBinY = 0; iBinY < Matrix_S_highPileUp->GetNbinsY(); iBinY++){  
      CorrelationS_difference->SetBinContent(iBinX+1,iBinY+1,Matrix_S_highPileUp->GetBinContent(iBinX+1,iBinY+1)-Matrix_S_lowPileUp->GetBinContent(iBinX+1,iBinY+1));
      CorrelationB_difference->SetBinContent(iBinX+1,iBinY+1,Matrix_B_highPileUp->GetBinContent(iBinX+1,iBinY+1)-Matrix_B_lowPileUp->GetBinContent(iBinX+1,iBinY+1));
+    }
    }
+
+   TCanvas* cCorrelationSignal_difference = new TCanvas("cCorrelationSignal_difference",Form("Correlation Matrix Difference Signal"),180,52,550,550);
+   plotCovarianceMatrix(cCorrelationSignal_difference,CorrelationS_difference,outputDirectory,reducedNameLowPileUp);
+   TCanvas* cCorrelationBackground_difference = new TCanvas("cCorrelationBackground_difference",Form("Correlation Matrix Difference Background"),180,52,550,550);
+   plotCovarianceMatrix(cCorrelationBackground_difference,CorrelationS_difference,outputDirectory,reducedNameLowPileUp);
+
   }
 
-  TCanvas* cCorrelationSignal_difference = new TCanvas("cCorrelationSignal_difference",Form("Correlation Matrix Difference Signal"),180,52,550,550);
-  plotCovarianceMatrix(cCorrelationSignal_difference,CorrelationS_difference,outputDirectory,reducedNameLowPileUp);
-  TCanvas* cCorrelationBackground_difference = new TCanvas("cCorrelationBackground_difference",Form("Correlation Matrix Difference Background"),180,52,550,550);
-  plotCovarianceMatrix(cCorrelationBackground_difference,CorrelationS_difference,outputDirectory,reducedNameLowPileUp);
+  else{
+  
+    std::vector<std::string> InputInformationParamLowPUSignal ; // here each variable one root file; S and B. in the input also a cut should be provided and the tree branch name of each variable
+    if(Options.existsAs<std::vector<std::string>>("InputLowPUFilesSignal"))
+     InputInformationParamLowPUSignal = Options.getParameter<std::vector<std::string>>("InputLowPUFilesSignal");
+    else{ std::cout<<" Exit from code, no input set found for low pile-up files Signal"<<std::endl; return -1; }
+
+    std::vector<std::string> InputInformationParamHighPUSignal ;
+    if(Options.existsAs<std::vector<std::string>>("InputHighPUFilesSignal"))
+     InputInformationParamHighPUSignal = Options.getParameter<std::vector<std::string>>("InputHighPUFiles");
+    else{ std::cout<<" Exit from code, no input set found for high pile-up files Signal"<<std::endl; return -1; }
+
+    std::vector<std::string> InputInformationParamLowPUBackground ;
+    if(Options.existsAs<std::vector<std::string>>("InputLowPUFilesBackground"))
+     InputInformationParamLowPUBackground = Options.getParameter<std::vector<std::string>>("InputLowPUFilesBackground");
+    else{ std::cout<<" Exit from code, no input set found for low pile-up files Background"<<std::endl; return -1; }
+
+    std::vector<std::string> InputInformationParamHighPUBackground ;
+    if(Options.existsAs<std::vector<std::string>>("InputHighPUFilesBackground"))
+     InputInformationParamHighPUBackground = Options.getParameter<std::vector<std::string>>("InputHighPUFilesBackground");
+    else{ std::cout<<" Exit from code, no input set found for high pile-up files Background"<<std::endl; return -1; }
+
+    std::vector<edm::ParameterSet> InputVariables ;
+    if(Options.existsAs<std::vector<edm::ParameterSet>>("InputVariables"))
+     InputVariables = Options.getParameter<std::vector<edm::ParameterSet>>("InputVariables");
+    else{ std::cout<<" Exit from code, no input variables found"<<std::endl; return -1; }
+
+
+    std::string outputDirectory;
+    if(Options.existsAs<std::string>("outputDirectory"))
+     outputDirectory = Options.getParameter<std::string>("outputDirectory");
+    else{ outputDirectory = "output/"; }
+
+    system(("mkdir -p "+outputDirectory).c_str());
+
+    std::string treeName;
+    if(Options.existsAs<std::string>("treeName"))
+     treeName = Options.getParameter<std::string>("treeName");
+    else{ treeName = ""; }
+
+    std::string cutStringSignal;
+    if(Options.existsAs<std::string>("cutStringSignal"))
+     cutStringSignal = Options.getParameter<std::string>("cutStringSignal");
+    else{ cutStringSignal = ""; }
+
+    std::string cutStringBackground;
+    if(Options.existsAs<std::string>("cutStringBackground"))
+     cutStringBackground = Options.getParameter<std::string>("cutStringBackground");
+    else{ cutStringBackground = ""; }
+
+    std::vector<TTree*> inputLowPileUpTreesSignal ;
+    std::vector<TTree*> inputLowPileUpTreesBackground ;
+    std::vector<std::string> reducedName ;
+    std::vector<std::string> variablesName ;
+
+    TFile* inputFile = NULL ;
+    // take all the signal trees low pile up
+    std::vector<std::string>::const_iterator itLowPileUp = InputInformationParamLowPUSignal.begin();
+    for( ; itLowPileUp != InputInformationParamLowPUSignal.end() ; ++itLowPileUp){
+     inputFile = TFile::Open((*itLowPileUp).c_str());
+     if(inputFile == 0 or inputFile == NULL) continue;
+     inputLowPileUpTreesSignal.push_back((TTree*) inputFile->Get(treeName.c_str())); // tree name should be provided
+    }
+    // take all the background trees low pile up
+    itLowPileUp = InputInformationParamLowPUBackground.begin();
+    for( ; itLowPileUp != InputInformationParamLowPUBackground.end() ; ++itLowPileUp){
+     inputFile = TFile::Open((*itLowPileUp).c_str());
+     if(inputFile == 0 or inputFile == NULL) continue;
+     inputLowPileUpTreesBackground.push_back((TTree*) inputFile->Get(treeName.c_str())); // tree name should be provided
+    }
+
+    //take the variables
+    std::vector<edm::ParameterSet>::const_iterator itVar = InputVariables.begin();
+    for( ; itVar != InputVariables.end() ; ++itVar){
+      variablesName.push_back((*itVar).getParameter<std::string>("variableName"));
+      variablesName.push_back((*itVar).getParameter<std::string>("reducedName"));
+    }
+
+    // Build Up the correlation matrix
+    TMatrixDSym correlationMatrixS_lowPileUP(reducedName.size()) ;
+    TMatrixDSym correlationMatrixB_lowPileUP(reducedName.size()) ;
+    for( unsigned int irow = 0 ; irow < reducedName.size() ; irow++){
+     for( unsigned int icolum = 0 ; icolum < reducedName.size() ; icolum++){
+      correlationMatrixS_lowPileUP(irow,icolum) = 0;
+      correlationMatrixB_lowPileUP(irow,icolum) = 0;
+     }
+    }
+
+    calculateCovarianceMatrix(inputLowPileUpTreesSignal,correlationMatrixS_lowPileUP,variablesName,cutStringSignal); // calculate mean value for S and B
+    calculateCovarianceMatrix(inputLowPileUpTreesBackground,correlationMatrixB_lowPileUP,variablesName,cutStringBackground); // calculate mean value for S and B
+
+    TH2D* Matrix_S_lowPileUp = new TH2D(correlationMatrixS_lowPileUP); // make TH2D for plotting reasons
+    Matrix_S_lowPileUp->SetName("Matrix_S_lowPileUp");
+    TH2D* Matrix_B_lowPileUp = new TH2D(correlationMatrixB_lowPileUP);
+    Matrix_B_lowPileUp->SetName("Matrix_B_lowPileUp");
+
+    Matrix_S_lowPileUp->Scale(100); // correlation in %
+    Matrix_B_lowPileUp->Scale(100);
+  
+    for( int iBinX = 0 ; iBinX < Matrix_S_lowPileUp->GetNbinsX() ; iBinX++){
+     for( int iBinY = 0 ; iBinY < Matrix_S_lowPileUp->GetNbinsX() ; iBinY++){
+      Matrix_S_lowPileUp->SetBinContent(iBinX+1,iBinY+1,int(Matrix_S_lowPileUp->GetBinContent(iBinX+1,iBinY+1)));
+      Matrix_B_lowPileUp->SetBinContent(iBinX+1,iBinY+1,int(Matrix_B_lowPileUp->GetBinContent(iBinX+1,iBinY+1)));
+      if(iBinX+1 == iBinY+1 ) {
+       Matrix_S_lowPileUp->SetBinContent(iBinX+1,iBinY+1,100);
+       Matrix_B_lowPileUp->SetBinContent(iBinX+1,iBinY+1,100);
+      }
+     }
+    }
+
+    ////////////////////////
+    TCanvas* cCorrelationSignal = new TCanvas("CorrelationBDT_S",Form("Correlation Matrix Signal"),180,52,550,550);
+    plotCovarianceMatrix(cCorrelationSignal,Matrix_S_lowPileUp,outputDirectory,reducedName);
+
+    ////////////////////////
+    TCanvas* cCorrelationBackground = new TCanvas("CorrelationBDT_B",Form("Correlation Matrix Background"),180,52,550,550);
+    plotCovarianceMatrix(cCorrelationBackground,Matrix_B_lowPileUp,outputDirectory,reducedName);
+
+    //////////////////////////////////////////////////////////////////////
+    //// high pile-up correlation
+    //////////////////////////////////////////////////////////////////////
+
+    std::vector<TTree*> inputHighPileUpTreesSignal ;
+    std::vector<TTree*> inputHighPileUpTreesBackground ;
+
+    // take all the signal trees low pile up
+    std::vector<std::string>::const_iterator itHighPileUp = InputInformationParamHighPUSignal.begin();
+    for( ; itHighPileUp != InputInformationParamHighPUSignal.end() ; ++itHighPileUp){
+     inputFile = TFile::Open((*itHighPileUp).c_str());
+     if(inputFile == 0 or inputFile == NULL) continue;
+     inputHighPileUpTreesSignal.push_back((TTree*) inputFile->Get(treeName.c_str())); // tree name should be provided
+    }
+    // take all the background trees low pile up
+    itHighPileUp = InputInformationParamHighPUBackground.begin();
+    for( ; itHighPileUp != InputInformationParamHighPUBackground.end() ; ++itHighPileUp){
+     inputFile = TFile::Open((*itHighPileUp).c_str());
+     if(inputFile == 0 or inputFile == NULL) continue;
+     inputHighPileUpTreesBackground.push_back((TTree*) inputFile->Get(treeName.c_str())); // tree name should be provided
+    }
+
+    // Build Up the correlation matrix
+    TMatrixDSym correlationMatrixS_highPileUP(reducedName.size()) ;
+    TMatrixDSym correlationMatrixB_highPileUP(reducedName.size()) ;
+    for( unsigned int irow = 0 ; irow < reducedName.size() ; irow++){
+     for( unsigned int icolum = 0 ; icolum < reducedName.size() ; icolum++){
+      correlationMatrixS_highPileUP(irow,icolum) = 0;
+      correlationMatrixB_highPileUP(irow,icolum) = 0;
+     }
+    }
+
+    calculateCovarianceMatrix(inputHighPileUpTreesSignal,correlationMatrixS_highPileUP,variablesName,cutStringSignal); // calculate mean value for S and B
+    calculateCovarianceMatrix(inputHighPileUpTreesBackground,correlationMatrixB_highPileUP,variablesName,cutStringBackground); // calculate mean value for S and B
+
+    TH2D* Matrix_S_highPileUp = new TH2D(correlationMatrixS_highPileUP);
+    Matrix_S_highPileUp->SetName("Matrix_S_highPileUp");
+    TH2D* Matrix_B_highPileUp = new TH2D(correlationMatrixB_highPileUP);
+    Matrix_B_highPileUp->SetName("Matrix_B_highPileUp");
+
+    Matrix_S_highPileUp->Scale(100); // correlation in %
+    Matrix_B_highPileUp->Scale(100);
+
+    for( int iBinX = 0 ; iBinX < Matrix_S_highPileUp->GetNbinsX() ; iBinX++){
+     for( int iBinY = 0 ; iBinY < Matrix_S_highPileUp->GetNbinsX() ; iBinY++){
+      Matrix_S_highPileUp->SetBinContent(iBinX+1,iBinY+1,int(Matrix_S_highPileUp->GetBinContent(iBinX+1,iBinY+1)));
+      Matrix_B_highPileUp->SetBinContent(iBinX+1,iBinY+1,int(Matrix_B_highPileUp->GetBinContent(iBinX+1,iBinY+1)));
+      if(iBinX+1 == iBinY+1 ) {
+         Matrix_S_highPileUp->SetBinContent(iBinX+1,iBinY+1,100);
+         Matrix_B_highPileUp->SetBinContent(iBinX+1,iBinY+1,100);
+      }
+     }
+    }
+
+    TCanvas* cCorrelationSignal_highPU = new TCanvas("CorrelationBDT_S_highPU",Form("Correlation Matrix Signal highPU"),180,52,550,550);
+    plotCovarianceMatrix(cCorrelationSignal_highPU,Matrix_S_highPileUp,outputDirectory,reducedName);
+    TCanvas* cCorrelationBackground_highPU = new TCanvas("CorrelationBDT_B_highPU",Form("Correlation Matrix Background"),180,52,550,550);
+    plotCovarianceMatrix(cCorrelationBackground_highPU,Matrix_B_highPileUp,outputDirectory,reducedName);
+
+
+    ////////////////////////////
+    // Correlation difference among high pile-up bin and low pile-up bin for both S and B
+    ////////////////////////////
+
+    TH2D* CorrelationS_difference = new TH2D("CorrelationS_difference","",reducedName.size(),0,reducedName.size(),reducedName.size(),0,reducedName.size());
+    TH2D* CorrelationB_difference = new TH2D("CorrelationB_difference","",reducedName.size(),0,reducedName.size(),reducedName.size(),0,reducedName.size());
+
+    for(int iBinX = 0; iBinX < Matrix_S_highPileUp->GetNbinsX(); iBinX++){
+     for(int iBinY = 0; iBinY < Matrix_S_highPileUp->GetNbinsY(); iBinY++){  
+     CorrelationS_difference->SetBinContent(iBinX+1,iBinY+1,Matrix_S_highPileUp->GetBinContent(iBinX+1,iBinY+1)-Matrix_S_lowPileUp->GetBinContent(iBinX+1,iBinY+1));
+     CorrelationB_difference->SetBinContent(iBinX+1,iBinY+1,Matrix_B_highPileUp->GetBinContent(iBinX+1,iBinY+1)-Matrix_B_lowPileUp->GetBinContent(iBinX+1,iBinY+1));
+     }
+    }
+
+    TCanvas* cCorrelationSignal_difference = new TCanvas("cCorrelationSignal_difference",Form("Correlation Matrix Difference Signal"),180,52,550,550);
+    plotCovarianceMatrix(cCorrelationSignal_difference,CorrelationS_difference,outputDirectory,reducedName);
+    TCanvas* cCorrelationBackground_difference = new TCanvas("cCorrelationBackground_difference",Form("Correlation Matrix Difference Background"),180,52,550,550);
+    plotCovarianceMatrix(cCorrelationBackground_difference,CorrelationS_difference,outputDirectory,reducedName);
+
+  }
 
   return 0 ;
 
@@ -313,6 +489,70 @@ void calculateCovarianceMatrix (std::vector<TTree*> & inputTrees, TMatrixDSym & 
    }     
   }
 
+
+}
+
+
+/// Calculate Mean Value
+void calculateCovarianceMatrix ( std::vector<TTree*> & inputTrees, TMatrixDSym & correlationMatrix, std::vector<std::string> & variableName, std::string & cut){
+
+  std::vector<float> MeanValue; MeanValue.resize(variableName.size());
+  std::vector<int> ientry ; ientry.resize(variableName.size());
+
+  // signal computation
+  std::vector<TTreeFormula*> variablesFormula;
+  std::vector<TTreeFormula*> cutFormula;
+  
+  for(size_t iTree = 0 ; iTree<inputTrees.size(); iTree++){   
+    cutFormula.push_back(new TTreeFormula(cut.c_str(),cut.c_str(),inputTrees.at(iTree)));
+    for(size_t iVar = 0; iVar < variableName.size(); iVar++){
+      variablesFormula.push_back(new TTreeFormula (variableName.at(iVar).c_str(),variableName.at(iVar).c_str(),inputTrees.at(iTree)));
+    }
+    // loop on signal entries to compute mean values      
+    for(int iEntries = 0; iEntries < inputTrees.at(iTree)->GetEntries(); iEntries++){
+      inputTrees.at(iTree)->GetEntry(iEntries);
+      if(cutFormula.at(iTree)->EvalInstance() == 0) continue;
+      for(size_t iVar = 0; iVar < variableName.size(); iVar++){
+        ientry.at(iVar)++;
+	MeanValue.at(iVar) += variablesFormula.at(inputTrees.size()*iTree+iVar)->EvalInstance();
+      }
+    }
+  }
+
+  // get the mean value
+  for( unsigned int iVec = 0 ; iVec < MeanValue.size(); iVec++)
+    MeanValue.at(iVec) = MeanValue.at(iVec)/ientry.at(iVec);
+
+  // compute distance for signal
+  for(unsigned int iTree = 0 ; iTree<inputTrees.size(); iTree++){     
+    // loop on entries 
+    for(int iEntry = 0 ; iEntry < inputTrees.at(iTree)->GetEntries(); iEntry++){
+      inputTrees.at(iTree)->GetEntry(iEntry);
+      if(cutFormula.at(iTree)->EvalInstance() == 0) continue;
+      for(unsigned int iVarX = 0 ; iVarX<variableName.size(); iVarX++){    
+       for(unsigned int iVarY = 0 ; iVarY<variableName.size(); iVarY++){    
+	correlationMatrix(iVarX,iVarY) += double((variablesFormula.at(iVarX+inputTrees.size()*iTree)->EvalInstance()-MeanValue.at(iVarX))*(variablesFormula.at(iVarY+inputTrees.size()*iTree)->EvalInstance()-MeanValue.at(iVarY)));
+      }
+     }
+    }
+  }
+
+  for( int binX = 0; binX < correlationMatrix.GetNrows(); binX ++){
+    for( int binY = 0; binY < correlationMatrix.GetNcols(); binY ++){
+     correlationMatrix(binX,binY) /= double(ientry.at(binX));
+   }
+  }
+ 
+  std::vector<float> Sigma ; Sigma.resize(variableName.size());
+  for(int binX = 0; binX < correlationMatrix.GetNrows(); binX ++) {
+    Sigma.at(binX) = sqrt(correlationMatrix(binX,binX));
+  }
+  
+  for( int binX = 0; binX < correlationMatrix.GetNrows(); binX ++){
+    for( int binY = 0; binY < correlationMatrix.GetNcols(); binY ++){
+     correlationMatrix(binX,binY) /= double(Sigma.at(binX)*Sigma.at(binY));
+   }     
+  }
 
 }
 
@@ -440,3 +680,47 @@ TMatrixDSym dimOrder(TMatrixDSym & Matrix,TMatrixDSym & Eigen,TMatrixD & EigenIn
   for(int iLine   = 0; iLine < Matrix.GetNrows()-1; iLine++) lOutMatrix(Matrix.GetNrows()-1,lRank[iLine]) = lVector(iLine)/sqrt(lMag);  
   return lOutMatrix;
 }
+
+
+TMatrixDSym eigenCov(TMatrixDSym &iEigen,std::vector<std::string> variableName, std::vector<TTree*> inputTrees, std::string iCut) {
+
+  std::vector<std::string> lOrthoVars; // orthogonal variables
+
+  for(int iLine = 0; iLine < iEigen.GetNrows()-1; iLine++) { 
+    std::stringstream pVec;
+    for(int iCol = 0; iCol < iEigen.GetNcols(); iCol++) { 
+      pVec << iEigen(iCol,iLine) << "*" << variableName.at(iCol);
+      if(iCol != iEigen.GetNcols()-2) pVec << " + ";
+    } 
+    lOrthoVars.push_back(pVec.str());
+  }
+
+  lOrthoVars.push_back("bdt_all");
+  TMatrixDSym lEigenSym(variableName.size());
+  calculateCovarianceMatrix(inputTrees,lEigenSym,lOrthoVars,iCut);
+
+  for(int iLine   = 0; iLine < lEigenSym.GetNrows()-1; iLine++) {
+    for(int iCol = 0; iCol < lEigenSym.GetNcols(); iCol++) {
+      lEigenSym(iLine,iCol) = iEigen(iLine,iCol);
+    }
+  }
+
+  for(int iLine = 0; iLine < lEigenSym.GetNrows(); iLine++) lEigenSym(iLine,lEigenSym.GetNrows()-1) = 0; 
+
+  std::vector<int> lRank;
+  for(int iLine = 0; iLine < lEigenSym.GetNrows()-1; iLine++) {
+    int pRank = 0;
+    for(int iCol = 0; iCol < lEigenSym.GetNcols()-1; iCol++) if(fabs(lEigenSym(lEigenSym.GetNrows()-1,iCol)) > fabs(lEigenSym(lEigenSym.GetNrows()-1,iLine))) pRank++;
+    lRank.push_back(pRank);
+  }
+
+  TMatrixDSym lOutMatrix(lEigenSym.GetNrows());
+  for(int iLine     = 0; iLine < lEigenSym.GetNrows(); iLine++) for(int iCol   = 0; iCol < lEigenSym.GetNcols(); iCol++)  lOutMatrix(iLine,iCol) = 0;
+  for(int iLine   = 0; iLine < lEigenSym.GetNrows(); iLine++) {
+    for(int iCol = 0; iCol < lEigenSym.GetNcols()-1; iCol++) {
+      lOutMatrix(iLine,lRank[iCol]) = lEigenSym(iLine,iCol);
+    }
+  }
+  return lOutMatrix;
+}
+
