@@ -771,7 +771,9 @@ void setGenJet( PseudoJet &iJet, // current jet
         vector<PseudoJet> kept_subjets0 = cms_top_candidate.structure_of<CMSTopTagger>().W().pieces();
         vector<PseudoJet> kept_subjets1 = cms_top_candidate.structure_of<CMSTopTagger>().non_W().pieces();
         vector<PseudoJet> all_subjets = kept_subjets0;
-        all_subjets.insert( all_subjets.end(), kept_subjets1.begin(), kept_subjets1.end() );
+        vector<PseudoJet>::const_iterator itVec = kept_subjets1.begin();
+        for( ; itVec != kept_subjets1.end(); itVec++)
+ 	  all_subjets.push_back(*itVec);
 
         cmsttJetMass = cms_top_candidate.m();
         cmsttMinMass = cms_top_candidate.structure_of<CMSTopTagger>().W().m();
@@ -1163,7 +1165,9 @@ void setRecoJet(PseudoJet &iJet, // input reco Jet
       vector<PseudoJet> kept_subjets0 = cms_top_candidate.structure_of<CMSTopTagger>().W().pieces();
       vector<PseudoJet> kept_subjets1 = cms_top_candidate.structure_of<CMSTopTagger>().non_W().pieces();
       vector<PseudoJet> all_subjets = kept_subjets0;
-      all_subjets.insert( all_subjets.end(), kept_subjets1.begin(), kept_subjets1.end() );
+      vector<PseudoJet>::const_iterator itVec = kept_subjets1.begin();
+      for( ; itVec != kept_subjets1.end(); itVec++)
+	all_subjets.push_back(*itVec);
 
       cmsttJetMass      = cms_top_candidate.m();
       cmsttMinMass      = cms_top_candidate.structure_of<CMSTopTagger>().W().m();
@@ -1783,6 +1787,7 @@ int main (int argc, char ** argv) {
   lTree->SetBranchAddress("PV",&PV);
 
   // --- Setup JEC on the fly  
+  
   std::vector<JetCorrectorParameters> corrParams;
   corrParams.push_back(JetCorrectorParameters(L1FastJetJEC.c_str()));  
   corrParams.push_back(JetCorrectorParameters(L2RelativeJEC.c_str()));  
@@ -1792,7 +1797,7 @@ int main (int argc, char ** argv) {
   
   FactorizedJetCorrector   *jetCorr = new FactorizedJetCorrector(corrParams); //correction
   JetCorrectionUncertainty *jetUnc  = new JetCorrectionUncertainty(param);    //uncertainty
-
+  
   vtagger = new VTaggingVariables();
   
   // --- Setup JEC on the fly  for CHS
@@ -1835,7 +1840,8 @@ int main (int argc, char ** argv) {
   
   // --- Setup output trees -> one tree for each jet collection type: GenJets, PFJets, PFCHS, Puppi, cmssw and softkiller
   TFile *fout = new TFile(fOut.c_str(),"RECREATE");
-  
+  fout->cd();
+
   TTree *genTree = NULL;
   if(isMC)    genTree  = new TTree("gen"  , "gen"  );
   TTree *pfTree            = new TTree("pf"   , "pf"   );
@@ -1848,7 +1854,7 @@ int main (int argc, char ** argv) {
   
   GenJetInfo JGenInfo;
   JetInfo JPFInfo, JCHSInfo, JPuppiInfo, JSoftKillerInfo, JCMSSWPFInfo; // declare structures to fill the output tree information + make branches
-  
+    
   if(isMC) setupGenTree(genTree,   JGenInfo    , "" );
   setupTree(pfTree,    JPFInfo     , "" );
   setupTree(chsTree,   JCHSInfo    , "" );
@@ -1923,17 +1929,17 @@ int main (int argc, char ** argv) {
 
     // clean jets from gen lepton for semi-leptonic events    
     if(isMC && leptonVector.pt() > 0){
-      vector<PseudoJet>::iterator itJet = puppiJets.begin() ;
-      for( ; itJet != puppiJets.end() ; ++itJet){
-        if( matchingIndex((*itJet),leptonVector,true) == false) puppiJetsCleaned.push_back((*itJet));
+      vector<PseudoJet>::iterator itPuppi = puppiJets.begin() ;
+      for( ; itPuppi != puppiJets.end() ; ++itPuppi){
+        if( matchingIndex((*itPuppi),leptonVector,true) == false) puppiJetsCleaned.push_back((*itPuppi));
       }
-      itJet = pfJets.begin() ;
-      for( ; itJet != pfJets.end() ; ++itJet){
-        if( matchingIndex((*itJet),leptonVector,true) == false) pfJetsCleaned.push_back((*itJet)); 
+      vector<PseudoJet>::iterator itPf = pfJets.begin() ;
+      for( ; itPf != pfJets.end() ; ++itPf){
+        if( matchingIndex((*itPf),leptonVector,true) == false) pfJetsCleaned.push_back((*itPf)); 
       }
-      itJet = chsJets.begin() ;
-      for( ; itJet != chsJets.end() ; ++itJet){
-        if( matchingIndex((*itJet),leptonVector,true) == false) chsJetsCleaned.push_back((*itJet));
+      vector<PseudoJet>::iterator itChs = chsJets.begin() ;
+      for( ; itChs != chsJets.end() ; ++itChs){
+        if( matchingIndex((*itChs),leptonVector,true) == false) chsJetsCleaned.push_back((*itChs));
       }
     }
     else{
@@ -1978,25 +1984,29 @@ int main (int argc, char ** argv) {
    }
    
   cout<<"done event loop"<<endl;
-  // --- Write trees 
-  fout->cd();
-  if (isMC){ genTree ->Write();  
-  cout<<"Wrote Gen Tree"<<endl;
+
+  if (isMC){ cout<<"Write Gen Tree"<<endl;
+             genTree ->Write();  
   }
+
+  cout<<"Write PF Tree"<<endl;
   pfTree   ->Write();
-  cout<<"Wrote PF Tree"<<endl;
+  cout<<"Write CHS Tree"<<endl;
   chsTree  ->Write();
-  cout<<"Wrote CHS Tree"<<endl;
+  cout<<"Write puppi Tree"<<endl;
   puppiTree->Write();
-  cout<<"Wrote Puppi Tree"<<endl;
-  if (doSoftKillerJets){ softkillerTree->Write();
-  cout<<"Wrote SoftKiller Tree"<<endl;
+  if (doSoftKillerJets){ 
+     cout<<"Write SoftKiller Tree"<<endl;
+     softkillerTree->Write();
   }
-  if (doCMSSWJets){  cmsswTree->Write();
-  cout<<"Wrote CMSSW tree"<<endl;
+  if (doCMSSWJets){  
+    cout<<"Write CMSSW tree"<<endl;
+    cmsswTree->Write();
   }
   fout->Close();
   cout<<"done write trees"<<endl;
+
+  return 0 ;
 }  
 
  
