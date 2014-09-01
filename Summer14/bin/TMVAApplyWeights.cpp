@@ -170,6 +170,11 @@ int main (int argc, char** argv){
       TString VarName  = Form("%s",variableList.at(iVar).c_str());
       TString position = Form("[%d]",JetToRead);
       if(VarName.Contains(position)) VarName.ReplaceAll(position.Data(),"");
+      VarName.ReplaceAll("/","_");
+      VarName.ReplaceAll("/","_");
+      VarName.ReplaceAll("*","x");
+      VarName.ReplaceAll("+","_plus_");
+      VarName.ReplaceAll("-","_minus_");
       NameBranch = Form("%s_%s",NameBranch.Data(),VarName.Data());
     }
     std::cout<<" NameBranch "<<NameBranch<<std::endl;

@@ -29,7 +29,6 @@ TMVAReadingClass::TMVAReadingClass(const std::vector<TTree*> & SampleTreeList, c
     TString NameReader = Form("%s_%s_weight_%d",TreeName_.c_str(),Label_.c_str(),int(iWeight));
     reader_.push_back( new TMVA::Reader(NameReader.Data()));
   }
-
 }
 
 // Deconstructor                                                                                                                                                         
@@ -77,7 +76,6 @@ void TMVAReadingClass::AddTrainingVariables ( const std::vector<std::string> & m
 void TMVAReadingClass::AddPrepareReader (const std::string & LeptonType, const std::string & preselectionCutType,
   					 const std::vector<double> & JetPtBinOfTraining, const std::vector<double> & PileUpBinOfTraining){
 
-
   if(JetPtBinOfTraining.size()!=0)  JetPtBinOfTraining_ = JetPtBinOfTraining ;
   if(PileUpBinOfTraining.size()!=0) PileUpBinOfTraining_ = PileUpBinOfTraining;
   // store the cut type .. should be a string
@@ -98,14 +96,32 @@ void TMVAReadingClass::BookMVAWeight (const std::string & methodName, const std:
     reader_.at(iWeight)->BookMVA(methodName_.c_str(),inputFileWeight_.at(iWeight).c_str()) ; // book the MVA reader method
 
   return ;
-
 }
 
 // Fill the MVA weight
 void TMVAReadingClass::FillMVAWeight (const int & iJetToRead, const bool & optionCut) {
-  
+
+       
   // loop on the sample list and create the branch
   for(size_t iTree = 0; iTree < SampleTreeList_.size() ; iTree++){
+    
+    treeFormulaVar_.clear(); // eliminate the formulas already there
+    treeFormulaSpec_.clear(); // eliminate the formulas already there
+
+    // Evaluate the formulas
+    for( size_t iVar = 0 ; iVar < mapTrainingVariables_.size() ; iVar ++ ) {
+	 TString variableName = Form("%s",mapTrainingVariables_.at(iVar).c_str());
+         TString position     = Form("[%d]",iJetToRead);
+         if(variableName.Contains(position)) variableName.ReplaceAll(position.Data(),"");
+         treeFormulaVar_.push_back(new TTreeFormula (variableName.Data(),variableName.Data(),SampleTreeList_.at(iTree))); 
+    }
+
+    for( size_t iVar = 0 ; iVar < mapSpectatorVariables_.size() ; iVar ++ ){
+	 TString variableName = Form("%s",mapSpectatorVariables_.at(iVar).c_str());
+         TString position     = Form("[%d]",iJetToRead);
+         if(variableName.Contains(position)) variableName.ReplaceAll(position.Data(),"");
+	 treeFormulaSpec_.push_back(new TTreeFormula (variableName.Data(),variableName.Data(),SampleTreeList_.at(iTree))); 
+    }        
 
     if(SampleTreeList_.at(iTree)->FindBranch(nameBranch_.c_str())) // if already exist the branch take it and fill again (when trainings are done in exclusive pT bins you might want just one branch filled alternatively as a function of the events      
       newBranch_ = SampleTreeList_.at(iTree)->GetBranch(nameBranch_.c_str());
@@ -158,6 +174,13 @@ void TMVAReadingClass::FillMVAWeight (const int & iJetToRead, const bool & optio
 
        //std::cout<<" pt "<<treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead)<<" puJet "<<pUjet<<" match "<<treeReader_.at(iTree)->GetInt("imatch")->at(iJetToRead)<<" eta "<<fabs(treeReader_.at(iTree)->GetFloat("eta")->at(iJetToRead))<<" isGoodEvent "<<isGoodEvent<<" ptpos "<<pTPosition<<" pile-up "<<pUPosition<<" size "<<JetPtBinOfTraining_.size()<<"  "<<PileUpBinOfTraining_.size()<<std::endl;
 
+       // read input variables
+       for( size_t iVar = 0 ; iVar < mapTrainingVariables_.size() ; iVar ++ ) {
+         setTrainingVariables_->at(iVar) = treeFormulaVar_.at(iVar)->EvalInstance();
+       }
+       for( size_t iVar = 0 ; iVar < mapSpectatorVariables_.size() ; iVar ++ ) {
+         setSpectatorVariables_->at(iVar) = treeFormulaSpec_.at(iVar)->EvalInstance();
+       }
        // take the correct weight file to be read for this event --> look for a string  
        int weightFilePosition = -1 ;
        if( pTPosition !=-1 and pUPosition !=-1){
@@ -166,49 +189,9 @@ void TMVAReadingClass::FillMVAWeight (const int & iJetToRead, const bool & optio
          if(TString(inputFileWeight_.at(iWeight).c_str()).Contains(weightFileSuffix.Data())) weightFilePosition = iWeight;
 	}
        }
-
-       //if(weightFilePosition!=-1) std::cout<<" weight file "<<weightFilePosition<<" name "<<inputFileWeight_.at(weightFilePosition)<<std::endl;
-											              
-       // fill the value of the training and spectator variable for each event
-       for( size_t iVar = 0 ; iVar < mapTrainingVariables_.size() ; iVar ++ ) {
-	 TString variableName = Form("%s",mapTrainingVariables_.at(iVar).c_str());
-         TString position     = Form("[%d]",iJetToRead);
-         if(variableName.Contains(position)) variableName.ReplaceAll(position.Data(),"");
-         if(treeReader_.at(iTree)->isFloat(variableName.Data())){ 
-           setTrainingVariables_->at(iVar) = treeReader_.at(iTree)->GetFloat(variableName.Data())->at(iJetToRead) ; // used treeReader class to fill the value of each input variable  in the vector	 
-	 } 
-         else if(treeReader_.at(iTree)->isDouble(variableName.Data()))
-	   setTrainingVariables_->at(iVar) = float(treeReader_.at(iTree)->GetDouble(variableName.Data())->at(iJetToRead)) ;        
-         else if(treeReader_.at(iTree)->isInt(variableName.Data()))
-	   setTrainingVariables_->at(iVar) = float(treeReader_.at(iTree)->GetInt(variableName.Data())->at(iJetToRead)) ;        
-         else if(treeReader_.at(iTree)->is_Float(variableName.Data())) 
-           setTrainingVariables_->at(iVar) = treeReader_.at(iTree)->getFloat(variableName.Data())[iJetToRead] ; 
-         else if(treeReader_.at(iTree)->is_Double(variableName.Data()))
-	   setTrainingVariables_->at(iVar) = float(treeReader_.at(iTree)->getDouble(variableName.Data())[iJetToRead]) ;        
-         else if(treeReader_.at(iTree)->is_Int(variableName.Data()))
-	   setTrainingVariables_->at(iVar) = float(treeReader_.at(iTree)->getInt(variableName.Data())[iJetToRead]) ;        
-         else { std::cerr<<" not found branch for this input variable --> "<<variableName.Data()<<" --> stop the program pleas check "<<std::endl; break ;}
-       }      
-
-       for( size_t iVar = 0 ; iVar < mapSpectatorVariables_.size() ; iVar ++ ){
-	 TString variableName = Form("%s",mapSpectatorVariables_.at(iVar).c_str());
-         TString position     = Form("[%d]",iJetToRead);
-         if(variableName.Contains(position)) variableName.ReplaceAll(position.Data(),"");
-         if(treeReader_.at(iTree)->isFloat(variableName.Data())) 
-           setSpectatorVariables_->at(iVar) = treeReader_.at(iTree)->GetFloat(variableName.Data())->at(iJetToRead) ; 
-         else if(treeReader_.at(iTree)->isDouble(variableName.Data()))
-	   setSpectatorVariables_->at(iVar) = float(treeReader_.at(iTree)->GetDouble(variableName.Data())->at(iJetToRead)) ;        
-         else if(treeReader_.at(iTree)->isInt(variableName.Data()))
-	   setSpectatorVariables_->at(iVar) = float(treeReader_.at(iTree)->GetInt(variableName.Data())->at(iJetToRead)) ;        
-         else if(treeReader_.at(iTree)->is_Float(variableName.Data())) 
-           setSpectatorVariables_->at(iVar) = treeReader_.at(iTree)->getFloat(variableName.Data())[iJetToRead] ; 
-         else if(treeReader_.at(iTree)->is_Double(variableName.Data()))
-	   setSpectatorVariables_->at(iVar) = float(treeReader_.at(iTree)->getDouble(variableName.Data())[iJetToRead]) ;        
-         else if(treeReader_.at(iTree)->is_Int(variableName.Data()))
-	   setSpectatorVariables_->at(iVar) = float(treeReader_.at(iTree)->getInt(variableName.Data())[iJetToRead]) ;       
-         else { std::cerr<<" not found branch for this spectator variable --> "<<variableName.Data()<<" --> stop the program pleas check "<<std::endl; break ;}
-       }
        
+       //if(weightFilePosition!=-1) std::cout<<" weight file "<<weightFilePosition<<" name "<<inputFileWeight_.at(weightFilePosition)<<std::endl;
+											                     
      // if is a good event -> fill the branch with the value of the output      
       if(isGoodEvent and pTPosition !=-1 and pUPosition !=-1 and weightFilePosition !=-1) { 
   	  weight_ = reader_.at(weightFilePosition)->EvaluateMVA(methodName_.c_str());  // read the weight if the event is good -> re-applying the cut here
@@ -217,12 +200,13 @@ void TMVAReadingClass::FillMVAWeight (const int & iJetToRead, const bool & optio
      else { weight_ = -100. ; 
             newBranch_->Fill() ; // fill a default value
      }        
-      //std::cout<<" weight "<<weight_<<std::endl;  
+    //std::cout<<" weight "<<weight_<<std::endl;  
+      
     }       
     SampleTreeList_.at(iTree)->Write("", TObject::kOverwrite); // rewrite the tree
   }
+    
   return ;
-  
 }
 
 
@@ -235,9 +219,7 @@ void TMVAReadingClass::SetInputTree (const std::vector<TFile*> & SampleFileList,
   for(size_t iFile = 0 ; iFile < SampleFileList.size() ; iFile ++){
     if(SampleFileList.at(iFile)!=0)  SampleTreeList_.push_back((TTree*) SampleFileList.at(iFile)->Get(TreeName_.c_str()));
   }
-
   return ;
-
 }
 
 void TMVAReadingClass::SetInputTree (const std::vector<TTree*> & SampleTreeList){
@@ -245,9 +227,7 @@ void TMVAReadingClass::SetInputTree (const std::vector<TTree*> & SampleTreeList)
   for(unsigned int iTree = 0; iTree< SampleTreeList.size(); iTree++){
     if(SampleTreeList.at(iTree)->GetEntries()>0) SampleTreeList_.push_back(SampleTreeList.at(iTree)) ;
   }
-
   return ;
-
 }
 
 // Set Training variables name
@@ -256,7 +236,6 @@ void TMVAReadingClass::SetTrainingVariables  (const std::vector<std::string> & m
   if(mapTrainingVariables.size()!=0) mapTrainingVariables_ = mapTrainingVariables;
 
   return ;
-
 }
 
 void TMVAReadingClass::SetSpectatorVariables (const std::vector<std::string> & mapSpectatorVariables){
@@ -264,7 +243,6 @@ void TMVAReadingClass::SetSpectatorVariables (const std::vector<std::string> & m
   if(mapSpectatorVariables.size()!=0) mapSpectatorVariables_ = mapSpectatorVariables;
  
   return ;
-
 }
 
 // Set input path

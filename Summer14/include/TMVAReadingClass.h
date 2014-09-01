@@ -13,6 +13,7 @@
 #include "TSystem.h"
 #include "TROOT.h"
 #include "TCut.h"
+#include "TTreeFormula.h"
 
 #include "treeReader.h"
 
@@ -122,6 +123,8 @@ class TMVAReadingClass {
 
   // TreeReader in order to read the inputTree branches
   std::vector<treeReader*> treeReader_ ;
+  std::vector<TTreeFormula*> treeFormulaVar_ ;
+  std::vector<TTreeFormula*> treeFormulaSpec_ ;
 
 };
 
