@@ -87,6 +87,9 @@ process.Options = cms.PSet(
 
     #energy correlator                                                                                                                                                            
     energyCorrelator = cms.VPSet(
+
+     cms.PSet( ecfAlgo = cms.string('antikt_algorithm'), Rparam = cms.double(2.0), nPoint = cms.int32(1), beta = cms.double(1.0), type = cms.int32(0)),
+
      cms.PSet( ecfAlgo = cms.string('antikt_algorithm'), Rparam = cms.double(2.0), nPoint = cms.int32(2), beta = cms.double(0.5), type = cms.int32(0)),
      cms.PSet( ecfAlgo = cms.string('antikt_algorithm'), Rparam = cms.double(2.0), nPoint = cms.int32(2), beta = cms.double(1.0), type = cms.int32(0)),
      cms.PSet( ecfAlgo = cms.string('antikt_algorithm'), Rparam = cms.double(2.0), nPoint = cms.int32(2), beta = cms.double(1.5), type = cms.int32(0)),

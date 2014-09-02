@@ -18,7 +18,8 @@ parser.add_option("-e","--executable" , dest="executable" , type="string", defau
 parser.add_option("-q","--queue"      , dest="queue"      , type="string", default="1nh",help="Name of the queue on lxbatch")
 parser.add_option(""  ,"--checkJobs"  , dest="checkJobs"  , action="store_true", default=False,help="Checks job status")
 parser.add_option(""  ,"--resubmit"   , dest="resubmit"   , action="store_true", default=False,help="Resubmit job ")
-parser.add_option("-j","--job"        , dest="job"        , type="int", help="Job number (for resubmission). You can resubmit one job at time for now.")
+parser.add_option("-j","--jobmin"     , dest="jobmin"     , type="int", help="Job number (for resubmission). You can resubmit one job at time for now.")
+parser.add_option("-x","--jobmax"     , dest="jobmax"     , type="int", help="Job number (for resubmission). You can resubmit one job at time for now.")
 parser.add_option(""  ,"--dryRun"     , dest="dryRun"     , default=False, action="store_true",help="Do not submit jobs")
 parser.add_option(""  ,"--eventsPerJob" , dest="eventsPerJob", default=3500, type="int",help="Number of events in each job .. don't look at the number of files")
 parser.add_option(""  ,"--jobtype" , dest="jobtype", default=0, type="int",help="1 means specify number of jobs, 0 means number of jobs per event")
@@ -225,11 +226,12 @@ if not options.checkJobs and not options.resubmit:
     # -- submit jobs 
     if not options.dryRun:
          submitJobs(workingdir, options.njobs, options.queue)
-elif options.resubmit and options.job >-1 :
-    print 'Resubmitting job %d ' %options.job
-    resubcmd = 'bsub -q %s -o %s/JOB_%d/sub_%d.log %s/JOB_%d/sub_%d.sh'%(options.queue,workingdir,options.job,options.job,workingdir,options.job,options.job )
-    #print resubcmd
-    os.system(resubcmd)
+elif options.resubmit and options.jobmin >-1 and options.jobmax >-1:
+    for ijob in range(options.jobmax-options.jobmin):
+     print 'Resubmitting job %d ' %(ijob+options.jobmin)
+     resubcmd = 'bsub -q %s -o %s/JOB_%d/sub_%d.log %s/JOB_%d/sub_%d.sh'%(options.queue,workingdir,options.jobmin+ijob,options.jobmin+ijob,workingdir,options.jobmin+ijob,options.jobmin+ijob)
+     #print resubcmd
+     os.system(resubcmd)
 
 elif options.checkJobs:
     checkJobs(workingdir,options.outputname, options.queue, eosoutdir)

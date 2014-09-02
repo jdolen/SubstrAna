@@ -322,7 +322,7 @@ void setupGenTree(TTree *iTree, GenJetInfo &iJet, std::string iName) {
     
   for( ; itTrim != trimmingParam.end() ; ++itTrim){
    TString name ;
-   name = Form("_Rtrim_%0.2f_Ptfrac_%0.2f",(*itTrim).getParameter<double>("R_trimming"),(*itTrim).getParameter<double>("PtFraction"));
+   name = Form("_R_%0.2f_Pt_%0.2f",(*itTrim).getParameter<double>("R_trimming"),(*itTrim).getParameter<double>("PtFraction"));
    name.ReplaceAll(".","");
    iTree->Branch((iName+"pttrim"+std::string(name)     ).c_str(),"vector<float>",&iJet.pttrim[iPos]);
    iTree->Branch((iName+"mtrim"+std::string(name)      ).c_str(),"vector<float>",&iJet.mtrim[iPos]);  
@@ -346,7 +346,7 @@ void setupGenTree(TTree *iTree, GenJetInfo &iJet, std::string iName) {
 
   for( ; itPruned != pruningParam.end() ; ++itPruned){
    TString name ;
-   name = Form("_zcut_%0.2f_R_cut_%0.2f",(*itPruned).getParameter<double>("z_cut"),(*itPruned).getParameter<double>("R_Cut"));
+   name = Form("_z_%0.2f_R_%0.2f",(*itPruned).getParameter<double>("z_cut"),(*itPruned).getParameter<double>("R_Cut"));
    name.ReplaceAll(".","");
    iTree->Branch((iName+"ptpruned"+std::string(name)     ).c_str(),"vector<float>",&iJet.ptpruned[iPos]);
    iTree->Branch((iName+"mpruned"+std::string(name)      ).c_str(),"vector<float>",&iJet.mpruned[iPos]);
@@ -370,7 +370,10 @@ void setupGenTree(TTree *iTree, GenJetInfo &iJet, std::string iName) {
 
   for( ; itsoftDrop != softDropParam.end() ; ++itsoftDrop){
    TString name;
-   name = Form("zcut%0.1f_beta%0.1f",(*itsoftDrop).getParameter<double>("symmetry_cut"),(*itsoftDrop).getParameter<double>("beta"));
+   if((*itsoftDrop).getParameter<double>("beta") >= 0) 
+     name = Form("_z_%0.2f_beta_%0.1f",(*itsoftDrop).getParameter<double>("symmetry_cut"),(*itsoftDrop).getParameter<double>("beta"));
+   else
+     name = Form("_z_%0.2f_beta_m%0.1f",(*itsoftDrop).getParameter<double>("symmetry_cut"),fabs((*itsoftDrop).getParameter<double>("beta")));
    name.ReplaceAll(".","");
    iTree->Branch((iName+"ptsoftdrop"+std::string(name)     ).c_str(),"vector<float>",&iJet.ptsoftdrop[iPos]);
    iTree->Branch((iName+"msoftdrop"+std::string(name)      ).c_str(),"vector<float>",&iJet.msoftdrop[iPos]);
@@ -440,7 +443,7 @@ void setupGenTree(TTree *iTree, GenJetInfo &iJet, std::string iName) {
   iJet.ecf.resize(ecfParam.size()) ;  
   for( ; itECF !=ecfParam.end() ; ++itECF){
    TString name;
-   name = Form("_nPoint_%d_beta_%0.1f",(*itECF).getParameter<int>("nPoint"),(*itECF).getParameter<double>("beta"));
+   name = Form("_nP_%d_beta_%0.1f",(*itECF).getParameter<int>("nPoint"),(*itECF).getParameter<double>("beta"));
    name.ReplaceAll(".","");
    iTree->Branch((iName+"ecf"+std::string(name)).c_str(),"vector<float>",&iJet.ecf[iPos]);
    iPos++;
