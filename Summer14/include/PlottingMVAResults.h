@@ -36,9 +36,9 @@
 #include "TPaletteAxis.h"
 
 // default definition for ROC curve color, style and width                                                                                                                                
-static double color []      = {1,2,4,210,6,7,9,12,3,95,28};
-static double linestyle []  = {1,1,8,9,7,2,5,9,1,6,10};
-static double linewidth []  = {2,2,2,2,2,2,2,2,2,2,2};
+static double color []      = {1,2,4,210,6,7,9,12,3,95,28,5,46,40};
+static double linestyle []  = {1,1,8,9,7,2,5,9,1,6,10,8,7,1};
+static double linewidth []  = {2,2,2,2,2,2,2,2,2,2,2,2,2,2};
 
 static std::vector<double> vec_color(color, color + sizeof(color)/sizeof(double));
 static std::vector<double> vec_linewidth(linewidth, linewidth + sizeof(linewidth)/sizeof(double));

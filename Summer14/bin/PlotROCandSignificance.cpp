@@ -34,7 +34,7 @@
 
 /// Main programme 
 int main (int argc, char **argv){
-  if(argc<2){ std::cout<<" Not correct number of input parameter --> Need Just one cfg file exit "<<std::endl; return -1; }
+  if(argc<2){ std::cout<<" Not correct number of input parameter --> Need Just one cfg file exit "<<std::endl; std::exit(EXIT_FAILURE) ; }
 
   // Load TTree Lybrary                                                                                                                                                                   
   gSystem->Load("libTree.so");
@@ -64,12 +64,12 @@ int main (int argc, char **argv){
   std::vector<edm::ParameterSet> InputInformationParam ;
   if(Options.existsAs<std::vector<edm::ParameterSet>>("InputInformationParam"))
     InputInformationParam = Options.getParameter<std::vector<edm::ParameterSet>>("InputInformationParam");
-  else{ std::cout<<" Exit from code, no input set found for MVA training output"<<std::endl; return -1; }
+  else{ std::cout<<" Exit from code, no input set found for MVA training output"<<std::endl; std::exit(EXIT_FAILURE) ; }
 
   std::string TreeName ;
   if(Options.existsAs<std::string>("TreeName"))
     TreeName = Options.getParameter<std::string>("TreeName");
-  else{ std::cout<<" Exit from code, no TreeName found "<<std::endl; return -1; }
+  else{ std::cout<<" Exit from code, no TreeName found "<<std::endl; std::exit(EXIT_FAILURE) ; }
 
   std::string Label;
   if(Options.existsAs<std::string>("Label"))

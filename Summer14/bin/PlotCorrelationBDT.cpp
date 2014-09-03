@@ -55,7 +55,7 @@ TMatrixDSym dimOrder(TMatrixDSym & Matrix,TMatrixDSym & Eigen,TMatrixD & EigenIn
 
 /// Main programme 
 int main (int argc, char **argv){
-  if(argc<3){ std::cout<<" Not correct number of input parameter --> Need Just one cfg file exit and 0 if run on TMVA output, 1 if run on TTree "<<std::endl; return -1; }
+  if(argc<3){ std::cout<<" Not correct number of input parameter --> Need Just one cfg file exit and 0 if run on TMVA output, 1 if run on TTree "<<std::endl; std::exit(EXIT_FAILURE); }
 
   // Load TTree Lybrary                                                                                                                                                                   
   gSystem->Load("libTree.so");
@@ -86,12 +86,12 @@ int main (int argc, char **argv){
    std::vector<edm::ParameterSet> InputInformationParamLowPU ;
    if(Options.existsAs<std::vector<edm::ParameterSet>>("InputLowPUFiles"))
     InputInformationParamLowPU = Options.getParameter<std::vector<edm::ParameterSet>>("InputLowPUFiles");
-   else{ std::cout<<" Exit from code, no input set found for low pile-up files"<<std::endl; return -1; }
+   else{ std::cout<<" Exit from code, no input set found for low pile-up files"<<std::endl; std::exit(EXIT_FAILURE) ; }
 
    std::vector<edm::ParameterSet> InputInformationParamHighPU ;
    if(Options.existsAs<std::vector<edm::ParameterSet>>("InputHighPUFiles"))
    InputInformationParamHighPU = Options.getParameter<std::vector<edm::ParameterSet>>("InputHighPUFiles");
-   else{ std::cout<<" Exit from code, no input set found for high pile-up files"<<std::endl; return -1; }
+   else{ std::cout<<" Exit from code, no input set found for high pile-up files"<<std::endl; std::exit(EXIT_FAILURE) ; }
 
 
    std::string outputDirectory;
@@ -220,27 +220,27 @@ int main (int argc, char **argv){
     std::vector<std::string> InputInformationParamLowPUSignal ; // here each variable one root file; S and B. in the input also a cut should be provided and the tree branch name of each variable
     if(Options.existsAs<std::vector<std::string>>("InputLowPUFilesSignal"))
      InputInformationParamLowPUSignal = Options.getParameter<std::vector<std::string>>("InputLowPUFilesSignal");
-    else{ std::cout<<" Exit from code, no input set found for low pile-up files Signal"<<std::endl; return -1; }
+    else{ std::cout<<" Exit from code, no input set found for low pile-up files Signal"<<std::endl; std::exit(EXIT_FAILURE) ; }
 
     std::vector<std::string> InputInformationParamHighPUSignal ;
     if(Options.existsAs<std::vector<std::string>>("InputHighPUFilesSignal"))
      InputInformationParamHighPUSignal = Options.getParameter<std::vector<std::string>>("InputHighPUFiles");
-    else{ std::cout<<" Exit from code, no input set found for high pile-up files Signal"<<std::endl; return -1; }
+    else{ std::cout<<" Exit from code, no input set found for high pile-up files Signal"<<std::endl; std::exit(EXIT_FAILURE) ; }
 
     std::vector<std::string> InputInformationParamLowPUBackground ;
     if(Options.existsAs<std::vector<std::string>>("InputLowPUFilesBackground"))
      InputInformationParamLowPUBackground = Options.getParameter<std::vector<std::string>>("InputLowPUFilesBackground");
-    else{ std::cout<<" Exit from code, no input set found for low pile-up files Background"<<std::endl; return -1; }
+    else{ std::cout<<" Exit from code, no input set found for low pile-up files Background"<<std::endl; std::exit(EXIT_FAILURE) ; }
 
     std::vector<std::string> InputInformationParamHighPUBackground ;
     if(Options.existsAs<std::vector<std::string>>("InputHighPUFilesBackground"))
      InputInformationParamHighPUBackground = Options.getParameter<std::vector<std::string>>("InputHighPUFilesBackground");
-    else{ std::cout<<" Exit from code, no input set found for high pile-up files Background"<<std::endl; return -1; }
+    else{ std::cout<<" Exit from code, no input set found for high pile-up files Background"<<std::endl; std::exit(EXIT_FAILURE) ; }
 
     std::vector<edm::ParameterSet> InputVariables ;
     if(Options.existsAs<std::vector<edm::ParameterSet>>("InputVariables"))
      InputVariables = Options.getParameter<std::vector<edm::ParameterSet>>("InputVariables");
-    else{ std::cout<<" Exit from code, no input variables found"<<std::endl; return -1; }
+    else{ std::cout<<" Exit from code, no input variables found"<<std::endl; std::exit(EXIT_FAILURE) ; }
 
 
     std::string outputDirectory;

@@ -57,7 +57,7 @@ std::vector<MatrixEntry> rocMatrix(std::vector<TTree*> InputTreeSignal,std::vect
 /// Main programme 
 int main (int argc, char **argv){
 
-  if(argc < 3){ std::cout<<" Not correct number of input parameter --> Need Just one cfg and one number to specify the kind of output file --> exit "<<std::endl; return -1; }
+  if(argc < 3){ std::cout<<" Not correct number of input parameter --> Need Just one cfg and one number to specify the kind of output file --> exit "<<std::endl; std::exit(EXIT_FAILURE) ; }
 
   // Load TTree Lybrary                                                                                                                                                                   
   gSystem->Load("libTree.so");
@@ -89,12 +89,12 @@ int main (int argc, char **argv){
    std::vector<edm::ParameterSet> InputInformationParamLowPU ;
    if(Options.existsAs<std::vector<edm::ParameterSet>>("InputLowPUFiles"))
     InputInformationParamLowPU = Options.getParameter<std::vector<edm::ParameterSet>>("InputLowPUFiles");
-   else{ std::cout<<" Exit from code, no input set found for low pile-up files"<<std::endl; return -1; }
+   else{ std::cout<<" Exit from code, no input set found for low pile-up files"<<std::endl; std::exit(EXIT_FAILURE) ; }
 
    std::vector<edm::ParameterSet> InputInformationParamHighPU ;
    if(Options.existsAs<std::vector<edm::ParameterSet>>("InputHighPUFiles"))
     InputInformationParamHighPU = Options.getParameter<std::vector<edm::ParameterSet>>("InputHighPUFiles");
-   else{ std::cout<<" Exit from code, no input set found for high pile-up files"<<std::endl; return -1; }
+   else{ std::cout<<" Exit from code, no input set found for high pile-up files"<<std::endl; std::exit(EXIT_FAILURE) ; }
 
    std::string outputDirectory;
    if(Options.existsAs<std::string>("outputDirectory"))
@@ -115,9 +115,10 @@ int main (int argc, char **argv){
    // take all the TH1 outputs for S and B for  each variable in input-> low Pile Up
    TList TrainingMethods;
    TList Titles;
-
-   std::vector<edm::ParameterSet>::const_iterator itLowPileUp = InputInformationParamLowPU.begin();
-   for( ; itLowPileUp != InputInformationParamLowPU.end() ; ++itLowPileUp){
+ 
+   if(InputInformationParamLowPU.size() == 0){ std::cout<<" empty LowPU file list --> exit "<<std::endl; std::exit(EXIT_FAILURE)  ;}
+   std::vector<edm::ParameterSet>::const_reverse_iterator itLowPileUp = InputInformationParamLowPU.rbegin();
+   for( ; itLowPileUp != InputInformationParamLowPU.rend() ; ++itLowPileUp){
      inputFile = TFile::Open((*itLowPileUp).getParameter<std::string>("fileName").c_str());
      if(inputFile == 0 or inputFile == NULL){
       MatrixEntry entry ; 
@@ -167,7 +168,8 @@ int main (int argc, char **argv){
    //For getting the number of bins is enough to cycle on all the entry and count the diagonal terms
    int numberOfBins = 0;
    for(unsigned int ientry = 0 ; ientry < performanceValue.size(); ientry++){
-     if(performanceValue.at(ientry).binXName == performanceValue.at(ientry).binYName) numberOfBins++;
+     if(performanceValue.at(ientry).binXName != performanceValue.at(ientry).binYName) continue;
+      numberOfBins++;     
    }
 
    TH2F* performanceBDT_lowPileUP  = new TH2F("backgroundMatrix_lowPileUP","",numberOfBins,0,numberOfBins,numberOfBins,0,numberOfBins);
@@ -182,54 +184,40 @@ int main (int argc, char **argv){
     }
    }
 
-   int vecPos = 0;
+   unsigned int iPos = 0;
+   for(int iBinY = 0; iBinY < performanceBDT_lowPileUP->GetNbinsX(); iBinY ++){
+     while(iPos < performanceValue.size()){
+       if(performanceValue.at(iPos).binXName != performanceValue.at(iPos).binYName){ iPos++; continue;}
+       performanceBDT_lowPileUP->GetYaxis()->SetBinLabel(iBinY+1,performanceValue.at(iPos).binYName.c_str());
+       performanceBDT_lowPileUP_float->GetYaxis()->SetBinLabel(iBinY+1,performanceValue.at(iPos).binYName.c_str());
+       performanceBDT_lowPileUP_error->GetYaxis()->SetBinLabel(iBinY+1,performanceValue.at(iPos).binYName.c_str());
+       performanceBDT_lowPileUP->GetXaxis()->SetBinLabel(iBinY+1,performanceValue.at(iPos).binYName.c_str());
+       performanceBDT_lowPileUP_float->GetXaxis()->SetBinLabel(iBinY+1,performanceValue.at(iPos).binYName.c_str());
+       performanceBDT_lowPileUP_error->GetXaxis()->SetBinLabel(iBinY+1,performanceValue.at(iPos).binYName.c_str());
+       iPos++; 
+       break;
+     }
+   }
+
    for(int iBinX = 0; iBinX < performanceBDT_lowPileUP->GetNbinsX(); iBinX ++){  
     for(int iBinY = iBinX; iBinY < performanceBDT_lowPileUP->GetNbinsY(); iBinY ++){
-     if(iBinY < (performanceBDT_lowPileUP->GetNbinsY()-1) and iBinX < (performanceBDT_lowPileUP->GetNbinsX()-1) and vecPos < int(performanceValue.size()-1)){
-
-       performanceBDT_lowPileUP_float->SetBinContent(iBinX+1,iBinY+1,performanceValue.at(vecPos).value);
-       if(performanceValue.at(vecPos).value - int(performanceValue.at(vecPos).value) < 0.5)
-        performanceBDT_lowPileUP->SetBinContent(iBinX+1,iBinY+1,int(performanceValue.at(vecPos).value));
-       else
-        performanceBDT_lowPileUP->SetBinContent(iBinX+1,iBinY+1,int(performanceValue.at(vecPos).value)+1);
-       if(performanceValue.at(vecPos).error - int(performanceValue.at(vecPos).error) < 0.5)
-        performanceBDT_lowPileUP_error->SetBinContent(iBinX+1,iBinY+1,int(performanceValue.at(vecPos).error));
-       else
-        performanceBDT_lowPileUP_error->SetBinContent(iBinX+1,iBinY+1,int(performanceValue.at(vecPos).error)+1);
-
-        performanceBDT_lowPileUP->SetBinContent(iBinX+1,iBinY+1,int(performanceValue.at(vecPos).value));
-        performanceBDT_lowPileUP_error->SetBinContent(iBinX+1,iBinY+1,int(performanceValue.at(vecPos).error));
-
-       if(std::string(performanceBDT_lowPileUP->GetYaxis()->GetBinLabel(iBinY+1)) == ""){
-	 performanceBDT_lowPileUP->GetYaxis()->SetBinLabel(iBinY+1,(performanceValue.at(vecPos).binYName).c_str());
-         performanceBDT_lowPileUP_error->GetYaxis()->SetBinLabel(iBinY+1,(performanceValue.at(vecPos).binYName).c_str());
-       }
-       if(std::string(performanceBDT_lowPileUP->GetXaxis()->GetBinLabel(iBinY+1)) == ""){
-         performanceBDT_lowPileUP->GetXaxis()->SetBinLabel(iBinY+1,(performanceValue.at(vecPos).binYName).c_str());
-         performanceBDT_lowPileUP_error->GetXaxis()->SetBinLabel(iBinY+1,(performanceValue.at(vecPos).binYName).c_str());
-       }
-       vecPos++; 
-     }    
-     else if (iBinY == (performanceBDT_lowPileUP->GetNbinsY()-1) and iBinX < (performanceBDT_lowPileUP->GetNbinsX()-1)) continue ;
-     else if (iBinY < (performanceBDT_lowPileUP->GetNbinsY()-1) and iBinX == (performanceBDT_lowPileUP->GetNbinsX()-1)) continue ;
-     else if (iBinY == (performanceBDT_lowPileUP->GetNbinsY()-1) and iBinX == (performanceBDT_lowPileUP->GetNbinsX()-1)){
-       performanceBDT_lowPileUP_float->SetBinContent(iBinX+1,iBinY+1,performanceValue.at(vecPos).value);
-       if(performanceValue.back().value-int(performanceValue.back().value)<0.5)
-        performanceBDT_lowPileUP->SetBinContent(iBinX+1,iBinY+1,int(performanceValue.back().value));
-       else
-        performanceBDT_lowPileUP->SetBinContent(iBinX+1,iBinY+1,int(performanceValue.back().value)+1);
-
-       performanceBDT_lowPileUP->GetXaxis()->SetBinLabel(iBinX+1,(performanceValue.back().binXName).c_str());
-       performanceBDT_lowPileUP->GetYaxis()->SetBinLabel(iBinY+1,(performanceValue.back().binXName).c_str());
-       if(performanceValue.back().error-int(performanceValue.back().error)<0.5)
-        performanceBDT_lowPileUP_error->SetBinContent(iBinX+1,iBinY+1,int(performanceValue.back().error));
-       else  
-        performanceBDT_lowPileUP_error->SetBinContent(iBinX+1,iBinY+1,int(performanceValue.back().error)+1);
-       performanceBDT_lowPileUP_error->GetXaxis()->SetBinLabel(iBinX+1,(performanceValue.back().binXName).c_str());
-       performanceBDT_lowPileUP_error->GetYaxis()->SetBinLabel(iBinY+1,(performanceValue.back().binXName).c_str());
-     }
+      for( unsigned int iPos = 0; iPos < performanceValue.size(); iPos++){
+        if(performanceValue.at(iPos).binXName == performanceBDT_lowPileUP->GetXaxis()->GetBinLabel(iBinX+1) and 
+           performanceValue.at(iPos).binYName == performanceBDT_lowPileUP->GetYaxis()->GetBinLabel(iBinY+1)){
+           performanceBDT_lowPileUP_float->SetBinContent(iBinX+1,iBinY+1,performanceValue.at(iPos).value);
+   	   if(performanceValue.at(iPos).value - int(performanceValue.at(iPos).value) < 0.5)
+            performanceBDT_lowPileUP->SetBinContent(iBinX+1,iBinY+1,int(performanceValue.at(iPos).value));
+           else
+            performanceBDT_lowPileUP->SetBinContent(iBinX+1,iBinY+1,int(performanceValue.at(iPos).value)+1);
+           if(performanceValue.at(iPos).error - int(performanceValue.at(iPos).error) < 0.5)
+            performanceBDT_lowPileUP_error->SetBinContent(iBinX+1,iBinY+1,int(performanceValue.at(iPos).error));
+           else
+            performanceBDT_lowPileUP_error->SetBinContent(iBinX+1,iBinY+1,int(performanceValue.at(iPos).error)+1);
+	}
+      }
     }
    }
+
 
    TCanvas* cPerformance_lowPU = new TCanvas("cPerformance_lowPU","",180,52,500,550);
 
@@ -311,8 +299,9 @@ int main (int argc, char **argv){
 
    // high PU part
    performanceValue.clear();
-   std::vector<edm::ParameterSet>::const_iterator itHighPileUp = InputInformationParamHighPU.begin();
-   for( ; itHighPileUp != InputInformationParamHighPU.end() ; ++itHighPileUp){
+   if(InputInformationParamHighPU.size() == 0){ std::cout<<" empty HighPU file list --> exit "<<std::endl; std::exit(EXIT_FAILURE)  ;}
+   std::vector<edm::ParameterSet>::const_reverse_iterator itHighPileUp = InputInformationParamHighPU.rbegin();
+   for( ; itHighPileUp != InputInformationParamHighPU.rend() ; ++itHighPileUp){
     inputFile = TFile::Open((*itHighPileUp).getParameter<std::string>("fileName").c_str());
     if(inputFile == 0 or inputFile == NULL){
       MatrixEntry entry ; 
@@ -359,10 +348,11 @@ int main (int argc, char **argv){
     }
    }
 
-   //for getting the number of bins is enough to cycle on all the entry and count the diagonal terms
+   //For getting the number of bins is enough to cycle on all the entry and count the diagonal terms
    numberOfBins = 0;
    for(unsigned int ientry = 0 ; ientry < performanceValue.size(); ientry++){
-    if(performanceValue.at(ientry).binXName == performanceValue.at(ientry).binYName) numberOfBins++;
+     if(performanceValue.at(ientry).binXName != performanceValue.at(ientry).binYName) continue;
+      numberOfBins++;     
    }
 
    TH2F* performanceBDT_highPileUP        = new TH2F("backgroundMatrix_highPileUP","",numberOfBins,0,numberOfBins,numberOfBins,0,numberOfBins);
@@ -378,56 +368,38 @@ int main (int argc, char **argv){
     }
    }
 
-   vecPos = 0;
-   for(int iBinX = 0; iBinX < performanceBDT_highPileUP->GetNbinsX(); iBinX ++){
-    for(int iBinY = iBinX; iBinY < performanceBDT_highPileUP->GetNbinsY(); iBinY ++){
-     if(iBinY < (performanceBDT_highPileUP->GetNbinsY()-1) and iBinX < (performanceBDT_highPileUP->GetNbinsX()-1) and vecPos < int(performanceValue.size()-1)){
-       performanceBDT_highPileUP_float->SetBinContent(iBinX+1,iBinY+1,performanceValue.at(vecPos).value);
-       if(performanceValue.at(vecPos).value-int(performanceValue.at(vecPos).value) < 0.5) 
-        performanceBDT_highPileUP->SetBinContent(iBinX+1,iBinY+1,int(performanceValue.at(vecPos).value));
-       else 
-        performanceBDT_highPileUP->SetBinContent(iBinX+1,iBinY+1,int(performanceValue.at(vecPos).value)+1);
-       if( performanceValue.at(vecPos).error-int(performanceValue.at(vecPos).error) <0.5)
-        performanceBDT_highPileUP_error->SetBinContent(iBinX+1,iBinY+1,int(performanceValue.at(vecPos).error));
-       else
-        performanceBDT_highPileUP_error->SetBinContent(iBinX+1,iBinY+1,int(performanceValue.at(vecPos).error)+1);
-       if(std::string(performanceBDT_highPileUP->GetYaxis()->GetBinLabel(iBinY+1)) == ""){ 
-          performanceBDT_highPileUP->GetYaxis()->SetBinLabel(iBinY+1,(performanceValue.at(vecPos).binYName).c_str());
-          performanceBDT_highPileUP_error->GetYaxis()->SetBinLabel(iBinY+1,(performanceValue.at(vecPos).binYName).c_str());
-          performanceDifference->GetYaxis()->SetBinLabel(iBinY+1,(performanceValue.at(vecPos).binYName).c_str());
-          performanceRatio->GetYaxis()->SetBinLabel(iBinY+1,(performanceValue.at(vecPos).binYName).c_str());
-       }
-       if(std::string(performanceBDT_highPileUP->GetXaxis()->GetBinLabel(iBinY+1)) == ""){
-          performanceBDT_highPileUP->GetXaxis()->SetBinLabel(iBinY+1,(performanceValue.at(vecPos).binYName).c_str());
-          performanceBDT_highPileUP_error->GetXaxis()->SetBinLabel(iBinY+1,(performanceValue.at(vecPos).binYName).c_str());
-          performanceDifference->GetXaxis()->SetBinLabel(iBinY+1,(performanceValue.at(vecPos).binYName).c_str());
-          performanceRatio->GetXaxis()->SetBinLabel(iBinY+1,(performanceValue.at(vecPos).binYName).c_str());
-       }
-       vecPos++;
-     }    
-     else if (iBinY == (performanceBDT_highPileUP->GetNbinsY()-1) and iBinX < (performanceBDT_highPileUP->GetNbinsX()-1)) continue ;
-     else if (iBinY < (performanceBDT_highPileUP->GetNbinsY()-1) and iBinX == (performanceBDT_highPileUP->GetNbinsX()-1)) continue ;
-     else if (iBinY == (performanceBDT_highPileUP->GetNbinsY()-1) and iBinX == (performanceBDT_highPileUP->GetNbinsX()-1)){
-       performanceBDT_highPileUP_float->SetBinContent(iBinX+1,iBinY+1,performanceValue.at(vecPos).value);
-       if(performanceValue.back().value-int(performanceValue.back().value) < 0.5)
-        performanceBDT_highPileUP->SetBinContent(iBinX+1,iBinY+1,int(performanceValue.back().value));
-       else 
-        performanceBDT_highPileUP->SetBinContent(iBinX+1,iBinY+1,int(performanceValue.back().value)+1);
-       if(performanceValue.back().error-int(performanceValue.back().error) < 0.5)
-        performanceBDT_highPileUP_error->SetBinContent(iBinX+1,iBinY+1,int(performanceValue.back().error));
-       else
-        performanceBDT_highPileUP_error->SetBinContent(iBinX+1,iBinY+1,int(performanceValue.back().error)+1);
-
-       performanceBDT_highPileUP->GetXaxis()->SetBinLabel(iBinX+1,(performanceValue.back().binXName).c_str());
-       performanceBDT_highPileUP->GetYaxis()->SetBinLabel(iBinY+1,(performanceValue.back().binXName).c_str());
-       performanceBDT_highPileUP_error->GetXaxis()->SetBinLabel(iBinX+1,(performanceValue.back().binXName).c_str());
-       performanceBDT_highPileUP_error->GetYaxis()->SetBinLabel(iBinY+1,(performanceValue.back().binXName).c_str());
-       performanceDifference->GetXaxis()->SetBinLabel(iBinX+1,(performanceValue.back().binXName).c_str());
-       performanceDifference->GetYaxis()->SetBinLabel(iBinY+1,(performanceValue.back().binYName).c_str());
-       performanceRatio->GetXaxis()->SetBinLabel(iBinX+1,(performanceValue.back().binXName).c_str());
-       performanceRatio->GetYaxis()->SetBinLabel(iBinY+1,(performanceValue.back().binYName).c_str());
+   iPos = 0;
+   for(int iBinY = 0; iBinY < performanceBDT_highPileUP->GetNbinsX(); iBinY ++){
+     while(iPos < performanceValue.size()){
+       if(performanceValue.at(iPos).binXName != performanceValue.at(iPos).binYName){ iPos++; continue;}
+       performanceBDT_highPileUP->GetYaxis()->SetBinLabel(iBinY+1,performanceValue.at(iPos).binYName.c_str());
+       performanceBDT_highPileUP_float->GetYaxis()->SetBinLabel(iBinY+1,performanceValue.at(iPos).binYName.c_str());
+       performanceBDT_highPileUP_error->GetYaxis()->SetBinLabel(iBinY+1,performanceValue.at(iPos).binYName.c_str());
+       performanceBDT_highPileUP->GetXaxis()->SetBinLabel(iBinY+1,performanceValue.at(iPos).binYName.c_str());
+       performanceBDT_highPileUP_float->GetXaxis()->SetBinLabel(iBinY+1,performanceValue.at(iPos).binYName.c_str());
+       performanceBDT_highPileUP_error->GetXaxis()->SetBinLabel(iBinY+1,performanceValue.at(iPos).binYName.c_str());
+       iPos++; 
+       break;
      }
-    }   
+   }
+
+   for(int iBinX = 0; iBinX < performanceBDT_highPileUP->GetNbinsX(); iBinX ++){  
+    for(int iBinY = iBinX; iBinY < performanceBDT_highPileUP->GetNbinsY(); iBinY ++){
+      for( unsigned int iPos = 0; iPos < performanceValue.size(); iPos++){
+        if(performanceValue.at(iPos).binXName == performanceBDT_highPileUP->GetXaxis()->GetBinLabel(iBinX+1) and 
+           performanceValue.at(iPos).binYName == performanceBDT_highPileUP->GetYaxis()->GetBinLabel(iBinY+1)){
+           performanceBDT_highPileUP_float->SetBinContent(iBinX+1,iBinY+1,performanceValue.at(iPos).value);
+   	   if(performanceValue.at(iPos).value - int(performanceValue.at(iPos).value) < 0.5)
+            performanceBDT_highPileUP->SetBinContent(iBinX+1,iBinY+1,int(performanceValue.at(iPos).value));
+           else
+            performanceBDT_highPileUP->SetBinContent(iBinX+1,iBinY+1,int(performanceValue.at(iPos).value)+1);
+           if(performanceValue.at(iPos).error - int(performanceValue.at(iPos).error) < 0.5)
+            performanceBDT_highPileUP_error->SetBinContent(iBinX+1,iBinY+1,int(performanceValue.at(iPos).error));
+           else
+            performanceBDT_highPileUP_error->SetBinContent(iBinX+1,iBinY+1,int(performanceValue.at(iPos).error)+1);
+	}
+      }
+    }
    }
 
    ////
@@ -580,17 +552,17 @@ int main (int argc, char **argv){
    std::vector<std::string> InputTreeSignal ;
    if(Options.existsAs<std::vector<std::string>>("InputTreeSignal"))
     InputTreeSignal = Options.getParameter<std::vector<std::string>>("InputTreeSignal");
-   else{ std::cout<<" Exit from code, no input set found for low pile-up files"<<std::endl; return -1; }
+   else{ std::cout<<" Exit from code, no input set found for low pile-up files"<<std::endl; std::exit(EXIT_FAILURE) ; }
 
    std::vector<std::string> InputTreeBackground ;
    if(Options.existsAs<std::vector<std::string>>("InputTreeBackground"))
     InputTreeBackground = Options.getParameter<std::vector<std::string>>("InputTreeBackground");
-   else{ std::cout<<" Exit from code, no input set found for low pile-up files"<<std::endl; return -1; }
+   else{ std::cout<<" Exit from code, no input set found for low pile-up files"<<std::endl; std::exit(EXIT_FAILURE) ; }
 
    std::vector<edm::ParameterSet> InputVariableName ;
    if(Options.existsAs<std::vector<edm::ParameterSet>>("InputVariableName"))
      InputVariableName = Options.getParameter<std::vector<edm::ParameterSet>>("InputVariableName");
-   else{ std::cout<<" Exit from code, no input set of variables found "<<std::endl; return -1; }
+   else{ std::cout<<" Exit from code, no input set of variables found "<<std::endl; std::exit(EXIT_FAILURE) ; }
 
    std::string outputDirectory;
    if(Options.existsAs<std::string>("outputDirectory"))

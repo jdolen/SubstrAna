@@ -30,7 +30,7 @@ int main (int argc, char** argv){
 
   if (argc < 2){
     std::cerr << ">>> Usage:   " << argv[1] << "   cfg file" <<  std::endl;
-    return -1;
+    std::exit(EXIT_FAILURE);
   }
 
   // Load TTree Lybrary                                                                                                                                                                  
@@ -47,18 +47,18 @@ int main (int argc, char** argv){
   std::vector<edm::ParameterSet> InputBackgroundParam ;
   if(Options.existsAs<std::vector<edm::ParameterSet>>("InputBackgroundParam"))
      InputBackgroundParam = Options.getParameter<std::vector<edm::ParameterSet>>("InputBackgroundParam");
-  else{ std::cout<<" Exit from code, no input set found for background"<<std::endl; return -1; }
+  else{ std::cout<<" Exit from code, no input set found for background"<<std::endl; std::exit(EXIT_FAILURE); }
 
   std::vector<edm::ParameterSet> InputSignalParam ;
   if(Options.existsAs<std::vector<edm::ParameterSet>>("InputSignalParam"))
      InputSignalParam = Options.getParameter<std::vector<edm::ParameterSet>>("InputSignalParam");
-  else{ std::cout<<" Exit from code, no input set found for background"<<std::endl; return -1; }
+  else{ std::cout<<" Exit from code, no input set found for background"<<std::endl; std::exit(EXIT_FAILURE); }
 
 
   std::vector<std::string> InputVariableList;
   if(Options.existsAs<std::vector<std::string>>("InputVariableList"))  
      InputVariableList = Options.getParameter<std::vector<std::string>>("InputVariableList");
-  else{ std::cout<<" Exit from code, no input variable file list found "<<std::endl; return -1; }
+  else{ std::cout<<" Exit from code, no input variable file list found "<<std::endl; std::exit(EXIT_FAILURE); }
 
   std::cout << std::endl;
   std::cout << " >>>>> Option::InputVariableList size = " << InputVariableList.size() << std::endl;
@@ -71,7 +71,7 @@ int main (int argc, char** argv){
   std::vector<std::string> InputSpectatorList;
   if(Options.existsAs<std::vector<std::string>>("InputSpectatorList"))  
      InputSpectatorList = Options.getParameter<std::vector<std::string>>("InputSpectatorList");
-  else{ std::cout<<" Exit from code, no input variable file list found "<<std::endl; return -1; }
+  else{ std::cout<<" Exit from code, no input variable file list found "<<std::endl; std::exit(EXIT_FAILURE); }
 
   std::cout << std::endl;
   std::cout << " >>>>> Option::InputSpectatorList size = " << InputSpectatorList.size() << std::endl;
@@ -84,7 +84,7 @@ int main (int argc, char** argv){
   std::string TreeName ; 
   if(Options.existsAs<std::string>("TreeName"))  
    TreeName = Options.getParameter<std::string>("TreeName");
-  else{ std::cout<<" Exit from code, no TreeName found "<<std::endl; return -1; }
+  else{ std::cout<<" Exit from code, no TreeName found "<<std::endl; std::exit(EXIT_FAILURE); }
  
   std::string Label;
   if(Options.existsAs<std::string>("Label"))  
@@ -158,7 +158,7 @@ int main (int argc, char** argv){
   std::vector<std::string> UseMethodName;
   if(Options.existsAs<std::vector<std::string> >("UseMethodName"))
     UseMethodName  = Options.getParameter<std::vector<std::string>>("UseMethodName");
-  else{ std::cout<<" UseMethodName --> not found --> exit from the code "<<std::endl; return -1; }
+  else{ std::cout<<" UseMethodName --> not found --> exit from the code "<<std::endl; std::exit(EXIT_FAILURE) ; }
 
   std::cout << std::endl;
   std::cout << " >>>>> Option::UseMethodName size = " << UseMethodName.size() << std::endl;
