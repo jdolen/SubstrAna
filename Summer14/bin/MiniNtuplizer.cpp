@@ -1475,13 +1475,9 @@ void fillGenJetsInfo(vector<PseudoJet> &iJets, // set of GenJets in the event
   ClusterSequenceArea clust_seq_rho(iParticles, jet_def_for_rho, area_def); // cluster the initial particles with the k_t + active ghost for bkg determination
   JetMedianBackgroundEstimator  bge_rho(rho_range, clust_seq_rho);
   JetMedianBackgroundEstimator  bge_rhom(rho_range, clust_seq_rho); // get mediam background estimator
-  BackgroundJetPtMDensity m_density;
-  bge_rhom.set_jet_density_class(&m_density);
     
   // -- Background estimator for constituents subtractor
   JetMedianBackgroundEstimator bge_rhoC(rho_range,jet_def_for_rho, area_def);
-  BackgroundJetScalarPtDensity scalarPtDensity ;
-  bge_rhoC.set_jet_density_class(&scalarPtDensity);
   bge_rhoC.set_particles(iParticles);
     
   // -- Clear jet info for each event                                                                                                                                     
@@ -1521,13 +1517,9 @@ void fillRecoJetsInfo(vector<PseudoJet> &iJets,
   ClusterSequenceArea clust_seq_rho(iAllParticles, jet_def_for_rho, area_def); // cluster sequence
   JetMedianBackgroundEstimator bge_rho(rho_range, clust_seq_rho);
   JetMedianBackgroundEstimator bge_rhom(rho_range, clust_seq_rho);
-  BackgroundJetPtMDensity m_density;
-  bge_rhom.set_jet_density_class(&m_density);
   
   // -- Background estimator for constituents subtractor
   JetMedianBackgroundEstimator bge_rhoC(rho_range,jet_def_for_rho, area_def);
-  BackgroundJetScalarPtDensity scalarPtDensity;
-  bge_rhoC.set_jet_density_class(&scalarPtDensity);
   bge_rhoC.set_particles(iParticles);
 
   // -- Compute rho, rho_m for SafeAreaSubtraction -> same procedure is used for GenJets
@@ -1537,12 +1529,9 @@ void fillRecoJetsInfo(vector<PseudoJet> &iJets,
   ClusterSequenceArea clust_seq_rho_chs(iParticles, jet_def_for_rho_chs, area_def_chs); // only for chs particles
   JetMedianBackgroundEstimator  bge_rho_chs  (rho_range_chs, clust_seq_rho_chs);
   JetMedianBackgroundEstimator  bge_rhom_chs (rho_range_chs, clust_seq_rho_chs);
-  BackgroundJetPtMDensity m_density_chs;
-  bge_rhom_chs.set_jet_density_class(&m_density_chs);
+
   // -- Background estimator for constituents subtractor
   JetMedianBackgroundEstimator bge_rhoC_chs(rho_range_chs,jet_def_for_rho_chs, area_def_chs);
-  BackgroundJetScalarPtDensity scalarPtDensity_chs; 
-  bge_rhoC_chs.set_jet_density_class(&scalarPtDensity_chs);
   bge_rhoC_chs.set_particles(iParticles);
 
   // -- Clear jet info for each event                                                                                                                                           

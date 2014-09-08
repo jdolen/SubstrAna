@@ -251,7 +251,7 @@ int main (int argc, char **argv){
    tex2->SetTextSize(0.04);
    tex2->SetLineWidth(2);
    tex2->Draw();
-   TLatex* tex3 = new TLatex(0.2324,0.92,"Preliminary Simulation");
+   TLatex* tex3 = new TLatex(0.2324,0.92,"Simulation Preliminary");
    tex3->SetNDC();
    tex3->SetTextFont(52);
    tex3->SetTextSize(0.0304);
@@ -719,7 +719,7 @@ int main (int argc, char **argv){
    tex2->SetTextSize(0.04);
    tex2->SetLineWidth(2);
    tex2->Draw();
-   TLatex* tex3 = new TLatex(0.2324,0.92,"Preliminary Simulation");
+   TLatex* tex3 = new TLatex(0.2324,0.92,"Simulation Preliminary");
    tex3->SetNDC();
    tex3->SetTextFont(52);
    tex3->SetTextSize(0.0304);

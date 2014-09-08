@@ -487,7 +487,7 @@ void TMVAGlob::CreateCanvasandFrameROC(const double & minPTbin, const double & m
   tex->SetTextSize(0.04);
   tex->SetLineWidth(2);
   tex->Draw();
-  tex = new TLatex(0.2324,0.92,"Preliminary Simulation");
+  tex = new TLatex(0.2324,0.92,"Simulation Preliminary");
   tex->SetNDC();
   tex->SetTextFont(52);
   tex->SetTextSize(0.0304);
@@ -541,7 +541,7 @@ void TMVAGlob::CreateCanvasandFrameROC(const double & minPTbin, const double & m
   tex->SetTextSize(0.04);
   tex->SetLineWidth(2);
   tex->Draw();
-  tex = new TLatex(0.2324,0.92,"Preliminary Simulation");
+  tex = new TLatex(0.2324,0.92,"Simulation Preliminary");
   tex->SetNDC();
   tex->SetTextFont(52);
   tex->SetTextSize(0.0304);
@@ -1164,7 +1164,7 @@ void TMVAGlob::plotMVAs(TFile* inputFile,  const std::string & inputName, HistTy
       tex->SetTextSize(0.04);
       tex->SetLineWidth(2);
       tex->Draw();
-      tex = new TLatex(0.2324,0.92,"Preliminary Simulation");
+      tex = new TLatex(0.2324,0.92,"Simulation Preliminary");
       tex->SetNDC();
       tex->SetTextFont(52);
       tex->SetTextSize(0.0304);
@@ -1528,7 +1528,7 @@ void TMVAGlob::plotSignificance (TFile* inputFile, const std::string & inputName
     tex->SetTextSize(0.04);
     tex->SetLineWidth(2);
     tex->Draw();
-    tex = new TLatex(0.2324,0.92,"Preliminary Simulation");
+    tex = new TLatex(0.2324,0.92,"Simulation Preliminary");
     tex->SetNDC();
     tex->SetTextFont(52);
     tex->SetTextSize(0.0304);

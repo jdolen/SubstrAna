@@ -602,7 +602,7 @@ void plotCovarianceMatrix(TCanvas* cCorrelation, TH2D* Matrix, std::string outpu
   tex->SetTextSize(0.04);
   tex->SetLineWidth(2);
   tex->Draw();
-  tex = new TLatex(0.2324,0.92,"Preliminary Simulation");
+  tex = new TLatex(0.2324,0.92,"Simulation Preliminary");
   tex->SetNDC();
   tex->SetTextFont(52);
   tex->SetTextSize(0.0304);
