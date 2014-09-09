@@ -961,6 +961,20 @@ void setGenJet( PseudoJet &iJet, // current jet
       iJetI.pullangle.at(iPrun).push_back(999.);       
       iJetI.pullmagnitude.at(iPrun).push_back(999.);       
     }
+  
+    for(unsigned int iTrim = 0; iTrim < lTrim.size(); iTrim++){
+     iJetI.pttrim.at(iTrim).push_back(999.);
+     iJetI.mtrim.at(iTrim).push_back(999.);
+     iJetI.pttrimsafe.at(iTrim).push_back(999.);
+     iJetI.mtrimsafe.at(iTrim).push_back(999.);
+    } 
+
+    for( unsigned int iSoft = 0 ; iSoft < lSoftDropped.size() ; iSoft++){ // prunung information
+     iJetI.msoftdrop.at(iSoft).push_back(999);
+     iJetI.ptsoftdrop.at(iSoft).push_back(999);
+     iJetI.msoftdropsafe.at(iSoft).push_back(999);
+     iJetI.ptsoftdropsafe.at(iSoft).push_back(999);
+    }
 
     for(unsigned int iNsubjettiness = 0; iNsubjettiness < NsubjettinessParam.size() ; iNsubjettiness++){
       (iJetI.tau1 ).at(iNsubjettiness).push_back(999.);
@@ -1387,6 +1401,21 @@ void setRecoJet(PseudoJet &iJet, // input reco Jet
 
     for( unsigned int iECF = 0; iECF < ecfParam.size() ; iECF++)
       iJetI.ecf.at(iECF).push_back(999.);
+
+    for( unsigned int iSoft = 0 ; iSoft < lSoftDropped.size() ; iSoft++){ // prunung information
+     iJetI.msoftdrop.at(iSoft).push_back(999);
+     iJetI.ptsoftdrop.at(iSoft).push_back(999);
+     iJetI.msoftdropsafe.at(iSoft).push_back(999);
+     iJetI.ptsoftdropsafe.at(iSoft).push_back(999);
+    }
+
+  
+    for(unsigned int iTrim = 0; iTrim < lTrim.size(); iTrim++){
+     iJetI.pttrim.at(iTrim).push_back(999.);
+     iJetI.mtrim.at(iTrim).push_back(999.);
+     iJetI.pttrimsafe.at(iTrim).push_back(999.);
+     iJetI.mtrimsafe.at(iTrim).push_back(999.);
+    } 
 
     for( unsigned int iPrun = 0 ; iPrun < lPruned.size() ; iPrun++){
       iJetI.QGLikelihood_pr.at(iPrun).push_back(999.);
