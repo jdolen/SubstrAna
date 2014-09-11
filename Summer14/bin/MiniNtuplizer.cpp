@@ -1241,7 +1241,6 @@ void setRecoJet(PseudoJet &iJet, // input reco Jet
      iJetI.mpruned.at(iPruned).push_back(lPruned.at(iPruned).m());
      iJetI.ptprunedsafe.at(iPruned).push_back(lPrunedSafe.at(iPruned).pt());
      iJetI.mprunedsafe.at(iPruned).push_back(lPrunedSafe.at(iPruned).m());
-     std::cout<<"jet mass "<<lPruned.at(iPruned).m()<<" jet safe "<<lPrunedSafe.at(iPruned).m()<<std::endl;  
    }
   }
   else{
@@ -1983,8 +1982,8 @@ int main (int argc, char ** argv) {
     }   
     
     // save jet info in a tree
-    //    fillRecoJetsInfo(puppiJetsCleaned, puppi_event, puppi_event, JPuppiInfo    , JGenInfo, false, jetCorr, jetUnc,lCorr, cleanser_vect,nPU, nPV, rho, eta_Boson, phi_Boson,true,isMC);
-    //fillRecoJetsInfo(pfJetsCleaned   , pf_event   , pf_event,    JPFInfo       , JGenInfo, false, jetCorr, jetUnc,lCorr, cleanser_vect,nPU, nPV, rho, eta_Boson, phi_Boson,false,isMC); 
+    fillRecoJetsInfo(puppiJetsCleaned, puppi_event, puppi_event, JPuppiInfo    , JGenInfo, false, jetCorr, jetUnc,lCorr, cleanser_vect,nPU, nPV, rho, eta_Boson, phi_Boson,true,isMC);
+    fillRecoJetsInfo(pfJetsCleaned   , pf_event   , pf_event,    JPFInfo       , JGenInfo, false, jetCorr, jetUnc,lCorr, cleanser_vect,nPU, nPV, rho, eta_Boson, phi_Boson,false,isMC); 
     fillRecoJetsInfo(chsJetsCleaned  , chs_event  , pf_event,    JCHSInfo      , JGenInfo, true , jetCorr_CHS, jetUnc_CHS,lCorr, cleanser_vect, nPU, nPV, rho, eta_Boson, phi_Boson,false,isMC );      
      
     if (isMC) genTree->Fill();        
