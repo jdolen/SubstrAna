@@ -4,10 +4,10 @@ process = cms.Process("PlotEfficiency")
 
 process.Options = cms.PSet(
 
-   ## Name of the tree on which perform th training
+   ### Name of the tree on which perform th training
    TreeName           = cms.string("puppi"), 
 
-   ## string which is used in the TMVATraining class to define a cut to be applied on the events
+   ### string which is used in the TMVATraining class to define a cut to be applied on the events
    PreselectionCutSignal = cms.string("pt[0] > 150 && abs(eta[0]) < 2.4 && is_MatchedToBoson[0] == 1"),
    PreselectionCutBackground = cms.string("pt[0] > 150 && abs(eta[0]) < 2.4 && is_MatchedToBoson[0] == 0"),
 
@@ -17,17 +17,17 @@ process.Options = cms.PSet(
    WtagCut    = cms.double(0.6),
    WtagVariable = cms.PSet(VariableName = cms.string("tau2_beta_08[0]/tau1_beta_08[0]"), ReducedName = cms.string("#tau_{2}/#tau_{1} (#beta=0.8)")),
 
-   ## binning in PT, PU and eta
+   ### binning in PT, PU and eta
    JetPtBinSignal       = cms.vdouble(0,500,800,1100,1500,2000,2500,3000,3500),
    JetPtBinBackground   = cms.vdouble(0,700,1200,1800,2300,3500),
    JetPUBin   = cms.vdouble(10,20,25,30,35,40,45,50,55,70),
    JetEtaBin  = cms.vdouble(-2.4,-2.,-1.5,-1.,-0.5,0,0.5,1.,1.5,2.,2.4),
 
-   ## output directory for root and weight file
+   ### output directory for root and weight file
    outputFileDirectory  = cms.string("cfgTraining/outputEfficiency_puppi_beta08"),
 
 
-   ## mass observables to be checked
+   ### mass observables to be checked
    InputMassVariables = cms.VPSet(cms.PSet( VariableName = cms.string("mprunedsafe_z_010_R_050[0]"),  ReducedName = cms.string("M_{pruned}^{safe}(z=0.1,R=0.5)")),
                                   cms.PSet( VariableName = cms.string("msoftdropsafe_z_010_beta_20[0]"),  ReducedName = cms.string("M_{softD}(z=0.1,#beta=2)")),
                                   cms.PSet( VariableName = cms.string("msoftdropsafe_z_010_beta_10[0]"),  ReducedName = cms.string("M_{softD}(z=0.1,#beta=1)")),
@@ -43,7 +43,7 @@ process.Options = cms.PSet(
 #                                  cms.PSet( VariableName = cms.string("msoftdropsafe_z_015_beta_m10[0]"), ReducedName = cms.string("M_{softD}(z=0.15,#beta=-1)"))
    ),
 
-   ## input directory where background trees are placed
+   ### input directory where background trees are placed
    InputBackgroundFiles = cms.vstring("root://eoscms.cern.ch//store/user/rgerosa/MiniNtuple_csa14/QCD1000_711_splitMergedNeutrals_PU40_1500/outtree_0.root",
                                       "root://eoscms.cern.ch//store/user/rgerosa/MiniNtuple_csa14/QCD1000_711_splitMergedNeutrals_PU40_1500/outtree_1.root",
                                       "root://eoscms.cern.ch//store/user/rgerosa/MiniNtuple_csa14/QCD1000_711_splitMergedNeutrals_PU40_1500/outtree_2.root",
