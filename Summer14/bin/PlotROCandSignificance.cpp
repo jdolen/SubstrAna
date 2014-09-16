@@ -76,6 +76,11 @@ int main (int argc, char **argv){
     Label = Options.getParameter<std::string>("Label");
   else{ std::cout<<" Label set to Test "<<std::endl; Label = "Test"; }
 
+  int plotType ;
+  if(Options.existsAs<int>("plotType"))
+    plotType = Options.getParameter<int>("plotType");
+  else{ std::cout<<" plotType set to 0 "<<std::endl; plotType = 0; }
+
   std::string LeptonType;
   if(Options.existsAs<std::string>("LeptonType"))
     LeptonType  = Options.getParameter<std::string>("LeptonType");
@@ -194,7 +199,7 @@ int main (int argc, char **argv){
   TMVATraining->openFileInput(fileName);
   TMVATraining->SetMethodName(inputVariableName); 
   std::vector<TFile*> inputFile = TMVATraining->GetInputFile();
-  TMVATraining->plotROCs(gDirectory,ptBin.at(0).first,ptBin.at(0).second,puBin.at(0).first,puBin.at(0).second); // call the plot efficiency function 
+  TMVATraining->plotROCs(gDirectory,plotType,ptBin.at(0).first,ptBin.at(0).second,puBin.at(0).first,puBin.at(0).second); // call the plot efficiency function 
   TMVATraining->PrintImageROC(gDirectory,outputPlotDirectory);
   for(unsigned int iFile = 0 ; iFile < inputFile.size(); iFile++){
     TMVATraining->plotCorrelationMatrix(inputFile.at(iFile),inputVariableReducedName.at(iFile),outputPlotDirectory);

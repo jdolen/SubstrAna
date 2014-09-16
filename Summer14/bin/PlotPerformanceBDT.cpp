@@ -110,7 +110,7 @@ int main (int argc, char **argv){
 
    std::vector<MatrixEntry> performanceValue ;
 
-   TFile* inputFile = NULL ;
+   std::vector<TFile*> inputFile;
 
    // take all the TH1 outputs for S and B for  each variable in input-> low Pile Up
    TList TrainingMethods;
@@ -119,8 +119,8 @@ int main (int argc, char **argv){
    if(InputInformationParamLowPU.size() == 0){ std::cout<<" empty LowPU file list --> exit "<<std::endl; std::exit(EXIT_FAILURE)  ;}
    std::vector<edm::ParameterSet>::const_reverse_iterator itLowPileUp = InputInformationParamLowPU.rbegin();
    for( ; itLowPileUp != InputInformationParamLowPU.rend() ; ++itLowPileUp){
-     inputFile = TFile::Open((*itLowPileUp).getParameter<std::string>("fileName").c_str());
-     if(inputFile == 0 or inputFile == NULL){
+     inputFile.push_back(TFile::Open((*itLowPileUp).getParameter<std::string>("fileName").c_str()));
+     if(inputFile.back() == 0 or inputFile.back() == NULL){
       MatrixEntry entry ; 
       entry.binXName = (*itLowPileUp).getParameter<std::string>("variableNameX");
       entry.binYName = (*itLowPileUp).getParameter<std::string>("variableNameY");
@@ -130,7 +130,7 @@ int main (int argc, char **argv){
       continue;
      }
      // take the background efficiency related to the target
-     inputFile->cd();
+     inputFile.back()->cd();
      TrainingMethods.Clear();
      int res = GetListOfMethods(TrainingMethods);
      if(res == 0) std::cout<<" No methods found "<<std::endl ;
@@ -171,10 +171,10 @@ int main (int argc, char **argv){
      if(performanceValue.at(ientry).binXName != performanceValue.at(ientry).binYName) continue;
       numberOfBins++;     
    }
-
-   TH2F* performanceBDT_lowPileUP  = new TH2F("backgroundMatrix_lowPileUP","",numberOfBins,0,numberOfBins,numberOfBins,0,numberOfBins);
-   TH2F* performanceBDT_lowPileUP_float  = new TH2F("backgroundMatrix_lowPileUP_float","",numberOfBins,0,numberOfBins,numberOfBins,0,numberOfBins);
-   TH2F* performanceBDT_lowPileUP_error  = new TH2F("backgroundMatrix_lowPileUP_error","",numberOfBins,0,numberOfBins,numberOfBins,0,numberOfBins);
+  
+   TH2F* performanceBDT_lowPileUP  = new TH2F("performanceBDT_lowPileUP","",numberOfBins,0,numberOfBins,numberOfBins,0,numberOfBins);
+   TH2F* performanceBDT_lowPileUP_float  = new TH2F("performanceBDT_lowPileUP_float","",numberOfBins,0,numberOfBins,numberOfBins,0,numberOfBins);
+   TH2F* performanceBDT_lowPileUP_error  = new TH2F("performanceBDT_lowPileUP_error","",numberOfBins,0,numberOfBins,numberOfBins,0,numberOfBins);
 
    for(int iBinX = 0; iBinX < performanceBDT_lowPileUP->GetNbinsX(); iBinX ++){
     for(int iBinY = 0; iBinY < performanceBDT_lowPileUP->GetNbinsY(); iBinY ++){
@@ -219,7 +219,7 @@ int main (int argc, char **argv){
    }
 
 
-   TCanvas* cPerformance_lowPU = new TCanvas("cPerformance_lowPU","",180,52,500,550);
+   TCanvas* cPerformance_lowPU = new TCanvas("cPerformance_lowPU","",180,52,1050,700);
 
    cPerformance_lowPU->SetGrid();
    cPerformance_lowPU->SetTicks();
@@ -267,7 +267,7 @@ int main (int argc, char **argv){
    cPerformance_lowPU->Print((outputDirectory+"/PerformanceBDT_lowPU_Log.root").c_str(),"root");
 
    // Error
-   TCanvas* cPerformance_lowPU_error = new TCanvas("cPerformance_lowPU_error","",180,52,500,550);
+   TCanvas* cPerformance_lowPU_error = new TCanvas("cPerformance_lowPU_error","",180,52,1050,700);
 
    cPerformance_lowPU_error->SetGrid();
    cPerformance_lowPU_error->SetTicks();
@@ -297,13 +297,24 @@ int main (int argc, char **argv){
    cPerformance_lowPU_error->Print((outputDirectory+"/PerformanceBDT_lowPU_Log_error.png").c_str(),"png");
    cPerformance_lowPU_error->Print((outputDirectory+"/PerformanceBDT_lowPU_Log_error.root").c_str(),"root");
 
+   TFile * temp = new TFile("temp.root","RECREATE");
+   temp->cd();
+   performanceBDT_lowPileUP->Write();
+   performanceBDT_lowPileUP_float->Write();
+   performanceBDT_lowPileUP_error->Write();
+   temp->Close();
+
    // high PU part
    performanceValue.clear();
+   for (size_t iFile = 0 ; iFile < inputFile.size(); iFile++){
+     if(inputFile.at(iFile) !=NULL or inputFile.at(iFile) !=0) inputFile.at(iFile)->Close();
+   }
+
    if(InputInformationParamHighPU.size() == 0){ std::cout<<" empty HighPU file list --> exit "<<std::endl; std::exit(EXIT_FAILURE)  ;}
    std::vector<edm::ParameterSet>::const_reverse_iterator itHighPileUp = InputInformationParamHighPU.rbegin();
    for( ; itHighPileUp != InputInformationParamHighPU.rend() ; ++itHighPileUp){
-    inputFile = TFile::Open((*itHighPileUp).getParameter<std::string>("fileName").c_str());
-    if(inputFile == 0 or inputFile == NULL){
+     inputFile.push_back(TFile::Open((*itHighPileUp).getParameter<std::string>("fileName").c_str()));
+     if(inputFile.back() == 0 or inputFile.back() == NULL){
       MatrixEntry entry ; 
       entry.binXName = (*itHighPileUp).getParameter<std::string>("variableNameX");
       entry.binYName = (*itHighPileUp).getParameter<std::string>("variableNameY");
@@ -313,7 +324,7 @@ int main (int argc, char **argv){
       continue;
     }
     // take the background efficiency related to the target
-    inputFile->cd();
+    inputFile.back()->cd();
     TrainingMethods.Clear();
     int res = GetListOfMethods(TrainingMethods);
     if(res == 0) std::cout<<" No methods found "<<std::endl ;
@@ -348,6 +359,10 @@ int main (int argc, char **argv){
     }
    }
 
+   for (size_t iFile = 0 ; iFile < inputFile.size(); iFile++){
+     if(inputFile.at(iFile) !=NULL or inputFile.at(iFile) !=0){ inputFile.at(iFile)->Close();}
+   }
+
    //For getting the number of bins is enough to cycle on all the entry and count the diagonal terms
    numberOfBins = 0;
    for(unsigned int ientry = 0 ; ientry < performanceValue.size(); ientry++){
@@ -355,11 +370,9 @@ int main (int argc, char **argv){
       numberOfBins++;     
    }
 
-   TH2F* performanceBDT_highPileUP        = new TH2F("backgroundMatrix_highPileUP","",numberOfBins,0,numberOfBins,numberOfBins,0,numberOfBins);
-   TH2F* performanceBDT_highPileUP_float  = new TH2F("backgroundMatrix_highPileUP_float","",numberOfBins,0,numberOfBins,numberOfBins,0,numberOfBins);
-   TH2F* performanceBDT_highPileUP_error  = new TH2F("backgroundMatrix_highPileUP_error","",numberOfBins,0,numberOfBins,numberOfBins,0,numberOfBins);
-   TH2F* performanceDifference            = new TH2F("performanceDifference","",numberOfBins,0,numberOfBins,numberOfBins,0,numberOfBins);
-   TH2F* performanceRatio                 = new TH2F("performanceRatio","",numberOfBins,0,numberOfBins,numberOfBins,0,numberOfBins);
+   TH2F* performanceBDT_highPileUP        = new TH2F("performanceBDT_highPileUP","",numberOfBins,0,numberOfBins,numberOfBins,0,numberOfBins);
+   TH2F* performanceBDT_highPileUP_float  = new TH2F("performanceBDT_highPileUP_float","",numberOfBins,0,numberOfBins,numberOfBins,0,numberOfBins);
+   TH2F* performanceBDT_highPileUP_error  = new TH2F("performanceBDT_highPileUP_error","",numberOfBins,0,numberOfBins,numberOfBins,0,numberOfBins);
 
    for(int iBinX = 0; iBinX < performanceBDT_highPileUP->GetNbinsX(); iBinX ++){
     for(int iBinY = 0; iBinY < performanceBDT_highPileUP->GetNbinsY(); iBinY ++){
@@ -403,7 +416,7 @@ int main (int argc, char **argv){
    }
 
    ////
-   TCanvas* cPerformance_highPU = new TCanvas("cPerformance_highPU","",180,52,500,550);
+   TCanvas* cPerformance_highPU = new TCanvas("cPerformance_highPU","",180,52,1050,700);
    cPerformance_highPU->SetGrid();
    cPerformance_highPU->SetTicks();
    cPerformance_highPU->cd();
@@ -433,7 +446,7 @@ int main (int argc, char **argv){
    cPerformance_highPU->Print((outputDirectory+"/PerformanceBDT_highPU_Log.root").c_str(),"root");
 
    ////
-   TCanvas* cPerformance_highPU_error = new TCanvas("cPerformance_highPU_error","",180,52,500,550);
+   TCanvas* cPerformance_highPU_error = new TCanvas("cPerformance_highPU_error","",180,52,1050,700);
 
    cPerformance_highPU_error->SetGrid();
    cPerformance_highPU_error->SetTicks();
@@ -462,22 +475,33 @@ int main (int argc, char **argv){
    cPerformance_highPU_error->Print((outputDirectory+"/PerformanceBDT_highPU_Log_error.pdf").c_str(),"pdf");
    cPerformance_highPU_error->Print((outputDirectory+"/PerformanceBDT_highPU_Log_error.png").c_str(),"png");
    cPerformance_highPU_error->Print((outputDirectory+"/PerformanceBDT_highPU_Log_error.root").c_str(),"root");
-  
+   
    // Difference Plot
-   TCanvas* cPerformance_difference = new TCanvas("cPerformance_difference","",180,52,500,550);
+   TCanvas* cPerformance_difference = new TCanvas("cPerformance_difference","",180,52,1050,700);
+   TH2F* performanceDifference            = new TH2F("performanceDifference","",numberOfBins,0,numberOfBins,numberOfBins,0,numberOfBins);
+   TH2F* performanceRatio                 = new TH2F("performanceRatio","",numberOfBins,0,numberOfBins,numberOfBins,0,numberOfBins);
 
    cPerformance_difference->SetGrid();
    cPerformance_difference->SetTicks();
    cPerformance_difference->cd();
- 
+   temp = temp->Open("temp.root","READ");
+
+   performanceBDT_lowPileUP = (TH2F*) temp->Get("performanceBDT_lowPileUP");
+   performanceBDT_lowPileUP_error = (TH2F*) temp->Get("performanceBDT_lowPileUP_error");
+   performanceBDT_lowPileUP_float = (TH2F*) temp->Get("performanceBDT_lowPileUP_float");
+
    for( int binX = 0 ; binX < performanceBDT_highPileUP->GetNbinsX(); binX++){
     for( int binY = binX ; binY < performanceBDT_highPileUP->GetNbinsY(); binY++){
-     if(performanceBDT_highPileUP->GetBinContent(binX+1,binY+1)-performanceBDT_lowPileUP->GetBinContent(binX+1,binY+1) == 0) continue;
-     if(performanceBDT_highPileUP->GetBinContent(binX+1,binY+1) == 0 or performanceBDT_lowPileUP->GetBinContent(binX+1,binY+1) == 0) continue;
-     else performanceDifference->SetBinContent(binX+1,binY+1,performanceBDT_highPileUP->GetBinContent(binX+1,binY+1)-performanceBDT_lowPileUP->GetBinContent(binX+1,binY+1));
+      performanceDifference->GetXaxis()->SetBinLabel(binX+1,performanceBDT_highPileUP->GetXaxis()->GetBinLabel(binX+1));
+      performanceDifference->GetYaxis()->SetBinLabel(binY+1,performanceBDT_highPileUP->GetYaxis()->GetBinLabel(binY+1));
+      performanceRatio->GetXaxis()->SetBinLabel(binX+1,performanceBDT_highPileUP->GetXaxis()->GetBinLabel(binX+1));
+      performanceRatio->GetYaxis()->SetBinLabel(binY+1,performanceBDT_highPileUP->GetYaxis()->GetBinLabel(binY+1));
+      if(performanceBDT_highPileUP->GetBinContent(binX+1,binY+1)-performanceBDT_lowPileUP->GetBinContent(binX+1,binY+1) == 0) continue;
+      if(performanceBDT_highPileUP->GetBinContent(binX+1,binY+1) == 0 or performanceBDT_lowPileUP->GetBinContent(binX+1,binY+1) == 0) continue;
+      else performanceDifference->SetBinContent(binX+1,binY+1,performanceBDT_highPileUP->GetBinContent(binX+1,binY+1)-performanceBDT_lowPileUP->GetBinContent(binX+1,binY+1));
     }
    }
-
+   
    performanceDifference->SetMarkerSize(1.5);
    performanceDifference->SetMarkerColor(0);
    performanceDifference->GetXaxis()->SetLabelSize(0.035);
@@ -504,7 +528,7 @@ int main (int argc, char **argv){
    cPerformance_difference->Print((outputDirectory+"/PerformanceBDT_Difference_Log.root").c_str(),"root");
 
    // Ratio Plot
-   TCanvas* cPerformance_ratio = new TCanvas("cPerformance_ratio","",180,52,500,550);
+   TCanvas* cPerformance_ratio = new TCanvas("cPerformance_ratio","",180,52,1050,700);
 
    cPerformance_ratio->SetGrid();
    cPerformance_ratio->SetTicks();
@@ -544,6 +568,8 @@ int main (int argc, char **argv){
   cPerformance_ratio->Print((outputDirectory+"/PerformanceBDT_Ratio_Log.pdf").c_str(),"pdf");
   cPerformance_ratio->Print((outputDirectory+"/PerformanceBDT_Ratio_Log.png").c_str(),"png");
   cPerformance_ratio->Print((outputDirectory+"/PerformanceBDT_Ratio_Log.root").c_str(),"root");
+
+  system("rm temp.root");
 
   }
 
@@ -687,7 +713,7 @@ int main (int argc, char **argv){
     }
    }
 
-   TCanvas* cPerformance_lowPU = new TCanvas("cPerformance_lowPU","",180,52,500,550);
+   TCanvas* cPerformance_lowPU = new TCanvas("cPerformance_lowPU","",180,52,1050,700);
 
    cPerformance_lowPU->SetGrid();
    cPerformance_lowPU->SetTicks();
@@ -735,7 +761,7 @@ int main (int argc, char **argv){
    cPerformance_lowPU->Print((outputDirectory+"/PerformanceBDT_lowPU_Log.root").c_str(),"root");
 
    // Error
-   TCanvas* cPerformance_lowPU_error = new TCanvas("cPerformance_lowPU_error","",180,52,500,550);
+   TCanvas* cPerformance_lowPU_error = new TCanvas("cPerformance_lowPU_error","",180,52,1050,700);
 
    cPerformance_lowPU_error->SetGrid();
    cPerformance_lowPU_error->SetTicks();
@@ -851,7 +877,7 @@ int main (int argc, char **argv){
    }
 
    ////
-   TCanvas* cPerformance_highPU = new TCanvas("cPerformance_highPU","",180,52,500,550);
+   TCanvas* cPerformance_highPU = new TCanvas("cPerformance_highPU","",180,52,1050,700);
    cPerformance_highPU->SetGrid();
    cPerformance_highPU->SetTicks();
    cPerformance_highPU->cd();
@@ -881,7 +907,7 @@ int main (int argc, char **argv){
    cPerformance_highPU->Print((outputDirectory+"/PerformanceBDT_highPU_Log.root").c_str(),"root");
 
    ////
-   TCanvas* cPerformance_highPU_error = new TCanvas("cPerformance_highPU_error","",180,52,500,550);
+   TCanvas* cPerformance_highPU_error = new TCanvas("cPerformance_highPU_error","",180,52,1050,700);
 
    cPerformance_highPU_error->SetGrid();
    cPerformance_highPU_error->SetTicks();
@@ -912,7 +938,7 @@ int main (int argc, char **argv){
    cPerformance_highPU_error->Print((outputDirectory+"/PerformanceBDT_highPU_Log_error.root").c_str(),"root");
   
    // Difference Plot
-   TCanvas* cPerformance_difference = new TCanvas("cPerformance_difference","",180,52,500,550);
+   TCanvas* cPerformance_difference = new TCanvas("cPerformance_difference","",180,52,1050,700);
 
    cPerformance_difference->SetGrid();
    cPerformance_difference->SetTicks();
@@ -952,7 +978,7 @@ int main (int argc, char **argv){
    cPerformance_difference->Print((outputDirectory+"/PerformanceBDT_Difference_Log.root").c_str(),"root");
 
    // Ratio Plot
-   TCanvas* cPerformance_ratio = new TCanvas("cPerformance_ratio","",180,52,500,550);
+   TCanvas* cPerformance_ratio = new TCanvas("cPerformance_ratio","",180,52,1050,700);
 
    cPerformance_ratio->SetGrid();
    cPerformance_ratio->SetTicks();

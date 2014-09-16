@@ -156,24 +156,34 @@ void TMVAReadingClass::FillMVAWeight (const int & iJetToRead, const bool & optio
               
        bool isGoodEvent = false ;      
        if(optionCut == true){	
-  	  if( preselectionCutType_ == "basicJetsCutCSA14" && (LeptonType_ == "Jets" || LeptonType_ == "jets") and  TreeName_ !="gen") {
-	    isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) > 200 && treeReader_.at(iTree)->GetInt("imatch")->at(iJetToRead) >= 0 && fabs(treeReader_.at(iTree)->GetFloat("eta")->at(iJetToRead))<2.4; 
-	  }
-	  else if( preselectionCutType_ == "basicJetsCutCSA14" && (LeptonType_ == "Jets" || LeptonType_ == "jets") and  TreeName_ =="gen") {
-           isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) > 200 && treeReader_.at(iTree)->GetInt("imatch")->at(iJetToRead) >= 0  ;
-	  }
-  	  else if( preselectionCutType_ == "basicJetsCutCSA14Mass" && (LeptonType_ == "Jets" || LeptonType_ == "jets") and  TreeName_ !="gen") {
-	    isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) > 200 && treeReader_.at(iTree)->GetInt("imatch")->at(iJetToRead) >= 0 && fabs(treeReader_.at(iTree)->GetFloat("eta")->at(iJetToRead))<2.4 && treeReader_.at(iTree)->GetFloat("mprunedsafe_z_010_R_050")->at(iJetToRead) > 65 && treeReader_.at(iTree)->GetFloat("mprunedsafe_z_010_R_050")->at(iJetToRead) < 105; 
-	  }
-	  else if( preselectionCutType_ == "basicJetsCutCSA14Mass" && (LeptonType_ == "Jets" || LeptonType_ == "jets") and  TreeName_ =="gen") {
-	    isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) > 200 && treeReader_.at(iTree)->GetInt("imatch")->at(iJetToRead) >= 0 && treeReader_.at(iTree)->GetFloat("mprunedsafe_z_010_R_050")->at(iJetToRead) > 65 && treeReader_.at(iTree)->GetFloat("mprunedsafe_z_010_R_050")->at(iJetToRead) < 105  ;
-	  }
-   	  else if( preselectionCutType_ == "basicJetsCutCSA14TTbar" && (LeptonType_ == "Jets" || LeptonType_ == "jets") and  TreeName_ !="gen") {
-           isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) > 200 && treeReader_.at(iTree)->GetInt("imatch")->at(iJetToRead) >= 0 && fabs(treeReader_.at(iTree)->GetFloat("eta")->at(iJetToRead))<2.4 && treeReader_.at(iTree)->GetFloat("mprunedsafe_z_010_R_050")->at(iJetToRead) <=120;
-	  }
-  	  else if( preselectionCutType_ == "basicJetsCutCSA14TTbar" && (LeptonType_ == "Jets" || LeptonType_ == "jets") and  TreeName_ =="gen") {
-           isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) > 200 && treeReader_.at(iTree)->GetInt("imatch")->at(iJetToRead) >= 0 && treeReader_.at(iTree)->GetFloat("mprunedsafe_z_010_R_050")->at(iJetToRead) <=120;
-	  }
+  	  if( preselectionCutType_ == "basicJetsCutCSA14" && (LeptonType_ == "Jets" || LeptonType_ == "jets") and  TreeName_ !="gen") 
+	    isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) > 200 && treeReader_.at(iTree)->GetInt("imatch")->at(iJetToRead) >= 0 && 
+                          fabs(treeReader_.at(iTree)->GetFloat("eta")->at(iJetToRead))<2.4; 	  
+
+	  else if( preselectionCutType_ == "basicJetsCutCSA14" && (LeptonType_ == "Jets" || LeptonType_ == "jets") and  TreeName_ =="gen") 
+            isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) > 200 && treeReader_.at(iTree)->GetInt("imatch")->at(iJetToRead) >= 0  ;	  
+
+	  else if( preselectionCutType_ == "basicJetsCutCSA14NoGen" && (LeptonType_ == "Jets" || LeptonType_ == "jets") and  TreeName_ !="gen") 
+            isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) > 200 && fabs(treeReader_.at(iTree)->GetFloat("eta")->at(iJetToRead))<2.4;	  
+
+  	  else if( preselectionCutType_ == "basicJetsCutCSA14Mass" && (LeptonType_ == "Jets" || LeptonType_ == "jets") and  TreeName_ !="gen") 
+	    isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) > 200 && treeReader_.at(iTree)->GetInt("imatch")->at(iJetToRead) >= 0 && 
+                          fabs(treeReader_.at(iTree)->GetFloat("eta")->at(iJetToRead))<2.4 && treeReader_.at(iTree)->GetFloat("mprunedsafe_z_010_R_050")->at(iJetToRead) > 65 && 
+                          treeReader_.at(iTree)->GetFloat("mprunedsafe_z_010_R_050")->at(iJetToRead) < 105; 
+	  
+	  else if( preselectionCutType_ == "basicJetsCutCSA14Mass" && (LeptonType_ == "Jets" || LeptonType_ == "jets") and  TreeName_ =="gen") 
+	    isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) > 200 && treeReader_.at(iTree)->GetInt("imatch")->at(iJetToRead) >= 0 && 
+                          treeReader_.at(iTree)->GetFloat("mprunedsafe_z_010_R_050")->at(iJetToRead) > 65 && 
+                          treeReader_.at(iTree)->GetFloat("mprunedsafe_z_010_R_050")->at(iJetToRead) < 105  ;
+	  
+   	  else if( preselectionCutType_ == "basicJetsCutCSA14TTbar" && (LeptonType_ == "Jets" || LeptonType_ == "jets") and  TreeName_ !="gen") 
+            isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) > 200 && treeReader_.at(iTree)->GetInt("imatch")->at(iJetToRead) >= 0 && 
+                          fabs(treeReader_.at(iTree)->GetFloat("eta")->at(iJetToRead))<2.4 && treeReader_.at(iTree)->GetFloat("mprunedsafe_z_010_R_050")->at(iJetToRead) <=120;
+	  
+  	  else if( preselectionCutType_ == "basicJetsCutCSA14TTbar" && (LeptonType_ == "Jets" || LeptonType_ == "jets") and  TreeName_ =="gen")
+            isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) > 200 && treeReader_.at(iTree)->GetInt("imatch")->at(iJetToRead) >= 0 && 
+                          treeReader_.at(iTree)->GetFloat("mprunedsafe_z_010_R_050")->at(iJetToRead) <=120;
+	  
           else isGoodEvent = treeReader_.at(iTree)->GetFloat("pt")->at(iJetToRead) > 200 && treeReader_.at(iTree)->GetInt("imatch")->at(iJetToRead) >= 0 ;
        }	  	     	       
        else isGoodEvent = true ;      

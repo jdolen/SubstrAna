@@ -193,7 +193,7 @@ class TMVAGlob {
   void SetBackgroundType(const bool & type = false) { backgroundType_ = type; }
 
   // plot ROC curve
-  void plotROCs (TDirectory* dir, const double & minPTbin = 200, const double & maxPTbin = 1000, const double & minPU = 0, const double & maxPU = 1000, const std::string & outputPlotDirectory = "");
+  void plotROCs (TDirectory* dir, const int & = 0, const double & minPTbin = 200, const double & maxPTbin = 1000, const double & minPU = 0, const double & maxPU = 1000, const std::string & outputPlotDirectory = "");
   // plot correlation Matrix
   void plotCorrelationMatrix (TFile* inputFile = 0, const std::string & inputName = "", const std::string & outputPlotDirectory = "");
   // plot output distribution

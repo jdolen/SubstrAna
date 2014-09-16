@@ -561,7 +561,7 @@ void TMVAGlob::CreateCanvasandFrameROC(const double & minPTbin, const double & m
 }
 
 // methods for plot the efficiency (ROC) curve for a given inputFile
-void TMVAGlob::plotROCs (TDirectory* dir, const double & minPTbin, const double & maxPTbin, const double & puMin, const double & puMax, const std::string & outputPlotDirectory){
+void TMVAGlob::plotROCs (TDirectory* dir, const int & plotType, const double & minPTbin, const double & maxPTbin, const double & puMin, const double & puMax, const std::string & outputPlotDirectory){
 
   // Plot the ROC curve with a proper style from root file originated by TMVA                                                                                                         
   if(cROC_==NULL) (*this).CreateCanvasandFrameROC(minPTbin,maxPTbin,puMin,puMax); 
@@ -596,7 +596,8 @@ void TMVAGlob::plotROCs (TDirectory* dir, const double & minPTbin, const double 
         h = (TH1F*)hkey->ReadObj();
         TString hname = h->GetName();    // only the one which are called rejBvsS
         h -> SetName(Form("%s_%s",inputFiles_.at(iFile)->GetName(),h->GetName()));	
-        if (hname.Contains("effBvsS") && hname.BeginsWith("MVA_") && not hname.Contains("effBvsSLocal")) {
+        if(plotType == 0){
+         if (hname.Contains("effBvsS") && hname.BeginsWith("MVA_") && not hname.Contains("effBvsSLocal")) {
           if(size_t(color_index) <= vec_color.size()){
 	    h->SetLineWidth(vec_linewidth[color_index]);
 	    h->SetLineColor(vec_color[color_index]);
@@ -619,11 +620,38 @@ void TMVAGlob::plotROCs (TDirectory* dir, const double & minPTbin, const double 
 	    hists.Add(h);
             color_index = color_index+1;
           }	
-        }
+         }
+	}
+	else{
+         if (hname.Contains("rejBvsS") && hname.BeginsWith("MVA_")) {
+          if(size_t(color_index) <= vec_color.size()){
+	    h->SetLineWidth(vec_linewidth[color_index]);
+	    h->SetLineColor(vec_color[color_index]);
+	    h->SetLineStyle(vec_linestyle[color_index]);
+            cROC_->cd();
+	    h->Draw("csame");
+            cROCLog_->cd();
+	    h->Draw("csame");
+            hists.Add(h);
+            color_index = color_index+1;
+          }
+          else{
+	    h->SetLineWidth(vec_linewidth[color_index-vec_color.size()]);
+	    h->SetLineColor(vec_color[color_index-vec_color.size()]);
+	    h->SetLineStyle(vec_linestyle[color_index-vec_color.size()]);
+            cROC_->cd();
+	    h->Draw("csame");
+            cROCLog_->cd();
+	    h->Draw("csame");
+	    hists.Add(h);
+            color_index = color_index+1;
+          }	
+	 }
+	}
       }
-    }
+     }
    }
-  
+
   /// Loop on the different histos                                                                                                                                                        
   while (hists.GetSize()) {
     TListIter hIt(&hists); // define an iterator                                                                                                                                          
@@ -642,13 +670,13 @@ void TMVAGlob::plotROCs (TDirectory* dir, const double & minPTbin, const double 
       break;
     }    
       
-   // set legend names 
-   legROC_->AddEntry(histWithLargestInt,inputMethodName_.at(method_index).c_str(),"l");
-   method_index ++ ;
-   hists.Remove(histWithLargestInt);
+    // set legend names 
+    legROC_->AddEntry(histWithLargestInt,inputMethodName_.at(method_index).c_str(),"l");
+    method_index ++ ;
+    hists.Remove(histWithLargestInt);
   }
+  }  
   
-  }
 
   cROC_->cd();  
   legROC_->Draw("same");
