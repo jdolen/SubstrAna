@@ -641,25 +641,24 @@ std::pair<TString,TString> TrainingMVAClass::GetPreselectionCut (const std::stri
       cutString.second = Form("pt[0]>200 && abs(eta[0])<2.4 && (pt[0] >= %f  && pt[0] <= %f ) && (npu > %f && npu <= %f) ",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
       return cutString;
     }
-
     else if( preselectionCutType == "basicJetsCutCSA14Mass" && (LeptonType == "Jets" || LeptonType == "jets") and  TreeName_ !="gen"){
-      cutString.first  = Form("pt[0]>200 && abs(eta[0])<2.4 && imatch[0] >= 0 && mprunedsafe_z_010_R_050[0] > 65 && mprunedsafe_z_010_R_050[0] < 105 && (pt[0] >= %f  && pt[0] <= %f ) && (npu > %f && npu <= %f) ",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
-      cutString.second = Form("pt[0]>200 && abs(eta[0])<2.4 && imatch[0] >= 0 && mprunedsafe_z_010_R_050[0] > 65 && mprunedsafe_z_010_R_050[0] < 105 && (pt[0] >= %f  && pt[0] <= %f ) && (npu > %f && npu <= %f) ",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
+      cutString.first  = Form("pt[0]>200 && abs(eta[0])<2.4 && imatch[0] >= 0 && msoftdropsafe_z_010_beta_00[0] > 60 && msoftdropsafe_z_010_beta_00[0] < 100 && (pt[0] >= %f  && pt[0] <= %f ) && (npu > %f && npu <= %f) ",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
+      cutString.second = Form("pt[0]>200 && abs(eta[0])<2.4 && imatch[0] >= 0 && msoftdropsafe_z_010_beta_00[0] > 60 && msoftdropsafe_z_010_beta_00[0] < 100 && (pt[0] >= %f  && pt[0] <= %f ) && (npu > %f && npu <= %f) ",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
       return cutString;
     }
     else if ( preselectionCutType == "basicJetsCutCSA14Mass" && (LeptonType == "Jets" || LeptonType == "jets") and  TreeName_ =="gen"){
-      cutString.first  = Form("pt[0] > 200 && abs(eta[0])<2.4 && mprunedsafe_z_010_R_050[0] > 65 && mprunedsafe_z_010_R_050[0] < 105 && (pt[0] >= %f  && pt[0] <= %f )  && (npu > %f && npu <= %f)",pTJetMin_,pTJetMax_,npuMin_,npuMax_); 
-      cutString.second = Form("pt[0] > 200 && abs(eta[0])<2.4 && mprunedsafe_z_010_R_050[0] > 65 && mprunedsafe_z_010_R_050[0] < 105 && (pt[0] >= %f  && pt[0] <= %f )  && (npu > %f && npu <= %f)",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
+      cutString.first  = Form("pt[0] > 200 && abs(eta[0])<2.4 && msoftdropsafe_z_010_beta_00[0] > 60 && msoftdropsafe_z_010_beta_00[0] < 100 && (pt[0] >= %f  && pt[0] <= %f )  && (npu > %f && npu <= %f)",pTJetMin_,pTJetMax_,npuMin_,npuMax_); 
+      cutString.second = Form("pt[0] > 200 && abs(eta[0])<2.4 && msoftdropsafe_z_010_beta_00[0] > 60 && msoftdropsafe_z_010_beta_00[0] < 100 && (pt[0] >= %f  && pt[0] <= %f )  && (npu > %f && npu <= %f)",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
       return cutString;
     }  
     if( preselectionCutType == "basicJetsCutCSA14TTbar" && (LeptonType == "Jets" || LeptonType == "jets") and  TreeName_ !="gen"){
-      cutString.first  = Form("pt[0]>200 && abs(eta[0])<2.4 && imatch[0] >= 0 && (pt[0] >= %f  && pt[0] <= %f ) && (npu > %f && npu <= %f) && mprunedsafe_z_010_R_050[0] < 120",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
-      cutString.second = Form("pt[0]>200 && abs(eta[0])<2.4 && imatch[0] >= 0 && (pt[0] >= %f  && pt[0] <= %f ) && (npu > %f && npu <= %f) && mprunedsafe_z_010_R_050[0] < 120 ",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
+      cutString.first  = Form("pt[0]>200 && abs(eta[0])<2.4 && imatch[0] >= 0 && (pt[0] >= %f  && pt[0] <= %f ) && (npu > %f && npu <= %f) && msoftdropsafe_z_010_beta_00[0] < 120",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
+      cutString.second = Form("pt[0]>200 && abs(eta[0])<2.4 && imatch[0] >= 0 && (pt[0] >= %f  && pt[0] <= %f ) && (npu > %f && npu <= %f) && msoftdropsafe_z_010_beta_00[0] < 120 ",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
       return cutString;
     }
     else if ( preselectionCutType == "basicJetsCutCSA14TTbar" && (LeptonType == "Jets" || LeptonType == "jets") and  TreeName_ =="gen"){
-      cutString.first  = Form("pt[0] > 200 && abs(eta[0])<2.4 && (pt[0] >= %f  && pt[0] <= %f )  && (npu > %f && npu <= %f) && mprunedsafe_z_010_R_050[0] < 120",pTJetMin_,pTJetMax_,npuMin_,npuMax_); 
-      cutString.second = Form("pt[0] > 200 && abs(eta[0])<2.4 && (pt[0] >= %f  && pt[0] <= %f )  && (npu > %f && npu <= %f) && mprunedsafe_z_010_R_050[0] < 120 ",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
+      cutString.first  = Form("pt[0] > 200 && abs(eta[0])<2.4 && (pt[0] >= %f  && pt[0] <= %f )  && (npu > %f && npu <= %f) && msoftdropsafe_z_010_beta_00[0] < 120",pTJetMin_,pTJetMax_,npuMin_,npuMax_); 
+      cutString.second = Form("pt[0] > 200 && abs(eta[0])<2.4 && (pt[0] >= %f  && pt[0] <= %f )  && (npu > %f && npu <= %f) && msoftdropsafe_z_010_beta_00[0] < 120 ",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
       return cutString;
     }  
     else{
@@ -690,25 +689,25 @@ std::pair<TString,TString> TrainingMVAClass::GetPreselectionCut (const std::stri
 
 
     else if( preselectionCutType == "basicJetsCutCSA14Mass" && (LeptonType == "Jets" || LeptonType == "jets") and  TreeName_ !="gen"){
-      cutString.first  = Form("pt[0]>200 && abs(eta[0])<2.4 && imatch[0] >= 0 && mprunedsafe_z_010_R_050[0] > 65 && mprunedsafe_z_010_R_050[0] < 105 && (pt[0] >= %f  && pt[0] <= %f ) && (npu > %f && npu <= %f) && is_MatchedToBoson == 1 ",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
-      cutString.second = Form("pt[0]>200 && abs(eta[0])<2.4 && imatch[0] >= 0 && mprunedsafe_z_010_R_050[0] > 65 && mprunedsafe_z_010_R_050[0] < 105 && (pt[0] >= %f  && pt[0] <= %f ) && (npu > %f && npu <= %f) ",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
+      cutString.first  = Form("pt[0]>200 && abs(eta[0])<2.4 && imatch[0] >= 0 && msoftdropsafe_z_010_beta_00[0] > 60 && msoftdropsafe_z_010_beta_00[0] < 100 && (pt[0] >= %f  && pt[0] <= %f ) && (npu > %f && npu <= %f) && is_MatchedToBoson == 1 ",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
+      cutString.second = Form("pt[0]>200 && abs(eta[0])<2.4 && imatch[0] >= 0 && msoftdropsafe_z_010_beta_00[0] > 60 && msoftdropsafe_z_010_beta_00[0] < 100 && (pt[0] >= %f  && pt[0] <= %f ) && (npu > %f && npu <= %f) ",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
       return cutString;
     }
 
     else if ( preselectionCutType == "basicJetsCutCSA14Mass" && (LeptonType == "Jets" || LeptonType == "jets") and  TreeName_ =="gen"){
-      cutString.first  = Form("pt[0] > 200 && abs(eta[0])<2.4 && mprunedsafe_z_010_R_050[0] > 65 && mprunedsafe_z_010_R_050[0] < 105 && (pt[0] >= %f  && pt[0] <= %f )  && (npu > %f && npu <= %f) && is_MatchedToBoson == 1",pTJetMin_,pTJetMax_,npuMin_,npuMax_); 
-      cutString.second = Form("pt[0] > 200 && abs(eta[0])<2.4 && mprunedsafe_z_010_R_050[0] > 65 && mprunedsafe_z_010_R_050[0] < 105 && (pt[0] >= %f  && pt[0] <= %f )  && (npu > %f && npu <= %f)",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
+      cutString.first  = Form("pt[0] > 200 && abs(eta[0])<2.4 && msoftdropsafe_z_010_beta_00[0] > 60 && msoftdropsafe_z_010_beta_00[0] < 100 && (pt[0] >= %f  && pt[0] <= %f )  && (npu > %f && npu <= %f) && is_MatchedToBoson == 1",pTJetMin_,pTJetMax_,npuMin_,npuMax_); 
+      cutString.second = Form("pt[0] > 200 && abs(eta[0])<2.4 && msoftdropsafe_z_010_beta_00[0] > 60 && msoftdropsafe_z_010_beta_00[0] < 100 && (pt[0] >= %f  && pt[0] <= %f )  && (npu > %f && npu <= %f)",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
       return cutString;
     }  
 
     if( preselectionCutType == "basicJetsCutCSA14TTbar" && (LeptonType == "Jets" || LeptonType == "jets") and  TreeName_ !="gen"){
-      cutString.first  = Form("pt[0]>200 && abs(eta[0])<2.4 && imatch[0] >= 0 && (pt[0] >= %f  && pt[0] <= %f ) && (npu > %f && npu <= %f) && is_MatchedToBoson == 1 && mprunedsafe_z_010_R_050[0] < 120 ",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
-      cutString.second = Form("pt[0]>200 && abs(eta[0])<2.4 && imatch[0] >= 0 && (pt[0] >= %f  && pt[0] <= %f ) && (npu > %f && npu <= %f)  && mprunedsafe_z_010_R_050[0] < 120",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
+      cutString.first  = Form("pt[0]>200 && abs(eta[0])<2.4 && imatch[0] >= 0 && (pt[0] >= %f  && pt[0] <= %f ) && (npu > %f && npu <= %f) && is_MatchedToBoson == 1 && msoftdropsafe_z_010_beta_00[0] < 120 ",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
+      cutString.second = Form("pt[0]>200 && abs(eta[0])<2.4 && imatch[0] >= 0 && (pt[0] >= %f  && pt[0] <= %f ) && (npu > %f && npu <= %f)  && msoftdropsafe_z_010_beta_00[0] < 120",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
       return cutString;
     }
     else if ( preselectionCutType == "basicJetsCutCSA14TTbar" && (LeptonType == "Jets" || LeptonType == "jets") and  TreeName_ =="gen"){
-    cutString.first  = Form("pt[0] > 200 && abs(eta[0])<2.4 && (pt[0] >= %f  && pt[0] <= %f )  && (npu > %f && npu <= %f) && is_MatchedToBoson == 1  && mprunedsafe_z_010_R_050[0] < 120 ",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
-    cutString.second = Form("pt[0] > 200 && abs(eta[0])<2.4 && (pt[0] >= %f  && pt[0] <= %f )  && (npu > %f && npu <= %f) && mprunedsafe_z_010_R_050[0] < 120 ",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
+    cutString.first  = Form("pt[0] > 200 && abs(eta[0])<2.4 && (pt[0] >= %f  && pt[0] <= %f )  && (npu > %f && npu <= %f) && is_MatchedToBoson == 1  && msoftdropsafe_z_010_beta_00[0] < 120 ",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
+    cutString.second = Form("pt[0] > 200 && abs(eta[0])<2.4 && (pt[0] >= %f  && pt[0] <= %f )  && (npu > %f && npu <= %f) && msoftdropsafe_z_010_beta_00[0] < 120 ",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
     return cutString;
     }  
     else{

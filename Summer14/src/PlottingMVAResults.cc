@@ -409,10 +409,15 @@ TDirectory *TMVAGlob::GetCorrelationPlotsDir( TMVAGlob::TypeOfPlot type, TDirect
 }
 
 // Produce a banner for ROC plots 
-void TMVAGlob::banner4Plot (const bool & isLabel, const float & ptMin, const float & ptMax,const float & puMin, const float & puMax ){
+void TMVAGlob::banner4Plot (const bool & isLabel, const float & ptMin, const float & ptMax,const float & puMin, const float & puMax, const int & plotType){
 
   //TPaveText* pt = new TPaveText(.36,0.71,.43,.88,"NDC");
-  TPaveText* pt = new TPaveText(.23,0.26,.30,.41,"NDC"); 
+  TPaveText* pt =  NULL;
+
+  if(plotType == 0)
+   pt = new TPaveText(.23,0.26,.30,.41,"NDC"); 
+  else
+   pt = new TPaveText(.57,0.21,.64,.36,"NDC"); 
 
   pt->AddText("AK R = 0.8");
   TString BoostLegend ; BoostLegend.Form("%d < p_{T} < %d GeV",int(ptMin),int(ptMax));
@@ -436,7 +441,7 @@ void TMVAGlob::banner4Plot (const bool & isLabel, const float & ptMin, const flo
 
 
 // create canvas, frame and legend for ROC plot
-void TMVAGlob::CreateCanvasandFrameROC(const double & minPTbin, const double & maxPTbin, const double & puMin, const double & puMax){
+void TMVAGlob::CreateCanvasandFrameROC(const int & plotType, const double & minPTbin, const double & maxPTbin, const double & puMin, const double & puMax){
                                
 
   cROC_ = new TCanvas((std::string("cROC")+std::string(inputFiles_.at(0)->GetName())).c_str(),"cROC",180,52,550,550);
@@ -460,21 +465,24 @@ void TMVAGlob::CreateCanvasandFrameROC(const double & minPTbin, const double & m
   frameROC_->SetMarkerSize(0.3);
   frameROC_->GetXaxis()->SetNdivisions(405);
   frameROC_->GetYaxis()->SetNdivisions(405);
-  frameROC_->GetXaxis()->SetTitle("#varepsilon_{sig}");
+  frameROC_->GetXaxis()->SetTitle("#varepsilon_{sig}"); 
   frameROC_->GetXaxis()->SetLabelOffset(0.012);
   frameROC_->GetXaxis()->SetLabelSize(0.042);
   frameROC_->GetXaxis()->SetTitleSize(0.05);
   frameROC_->GetXaxis()->SetTitleOffset(1.05);
-  frameROC_->GetYaxis()->SetTitle("#varepsilon_{bkg}");
+  if(plotType == 0)
+   frameROC_->GetYaxis()->SetTitle("#varepsilon_{bkg}");
+  else
+   frameROC_->GetYaxis()->SetTitle("1-#varepsilon_{bkg}");
   frameROC_->GetYaxis()->SetLabelOffset(0.012);
   frameROC_->GetYaxis()->SetLabelSize(0.042);
   frameROC_->GetYaxis()->SetTitleSize(0.05);
   frameROC_->GetYaxis()->SetTitleOffset(1.25);
   frameROC_->Draw("");
 
-  banner4Plot(false,minPTbin,maxPTbin,puMin,puMax);
+  banner4Plot(false,minPTbin,maxPTbin,puMin,puMax,plotType);
 
-  TLatex *   tex = new TLatex(0.85,0.92," 13 TeV");
+  TLatex *   tex = new TLatex(0.95,0.92," 13 TeV");
   tex->SetNDC();
   tex->SetTextAlign(31);
   tex->SetTextFont(42);
@@ -526,7 +534,7 @@ void TMVAGlob::CreateCanvasandFrameROC(const double & minPTbin, const double & m
   frameROCLog_->GetYaxis()->SetTitleOffset(1.25);
   frameROCLog_->Draw("");
 
-  banner4Plot(false,minPTbin,maxPTbin,puMin,puMax);
+  banner4Plot(false,minPTbin,maxPTbin,puMin,puMax,plotType);
 
   tex = new TLatex(0.85,0.92," 13 TeV");
   tex->SetNDC();
@@ -547,8 +555,11 @@ void TMVAGlob::CreateCanvasandFrameROC(const double & minPTbin, const double & m
   tex->SetTextSize(0.0304);
   tex->SetLineWidth(2);
   tex->Draw();
-  
-  legROC_ = new TLegend(0.17,0.43,0.56,0.87,NULL,"brNDC");
+ 
+  if(plotType == 0) 
+   legROC_ = new TLegend(0.17,0.43,0.56,0.87,NULL,"brNDC");
+  else
+   legROC_ = new TLegend(0.17,0.20,0.55,0.64,NULL,"brNDC");
 
   legROC_->SetBorderSize(0);
   legROC_->SetTextSize(0.033);
@@ -564,7 +575,7 @@ void TMVAGlob::CreateCanvasandFrameROC(const double & minPTbin, const double & m
 void TMVAGlob::plotROCs (TDirectory* dir, const int & plotType, const double & minPTbin, const double & maxPTbin, const double & puMin, const double & puMax, const std::string & outputPlotDirectory){
 
   // Plot the ROC curve with a proper style from root file originated by TMVA                                                                                                         
-  if(cROC_==NULL) (*this).CreateCanvasandFrameROC(minPTbin,maxPTbin,puMin,puMax); 
+  if(cROC_==NULL) (*this).CreateCanvasandFrameROC(plotType,minPTbin,maxPTbin,puMin,puMax); 
       
   TH1F *h ; 
 

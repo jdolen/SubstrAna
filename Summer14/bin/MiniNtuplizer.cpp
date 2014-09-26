@@ -231,7 +231,7 @@ class JetInfo : public GenJetInfo {
 // ------------------------------------------------------------------------------------------
 TTree* load(std::string iName) { 
   TFile *lFile = TFile::Open(iName.c_str());
-  TTree *lTree = (TTree*) lFile->FindObjectAny("Events");
+  TTree *lTree = (TTree*) lFile->FindObjectAny("ntupler/Events");
   return lTree;
 }
  
@@ -1803,7 +1803,7 @@ int main (int argc, char ** argv) {
   
 
   // --- Read list of files to be analyzed and fill TChain 
-  TChain* lTree = new TChain("Events");
+  TChain* lTree = new TChain("ntupler/Events");
   FillChain(*lTree, inputFilesList); // add all the input files in a TChain
   if (lTree->GetEntries() < maxEvents || maxEvents == -1) maxEvents = lTree->GetEntries(); 
 

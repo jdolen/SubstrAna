@@ -14,6 +14,7 @@ parser.add_option(""  ,"--eosdir"     , dest="eosdir"     , type="string", defau
 parser.add_option("-c","--config"     , dest="config"     , type="string", default="minintuplizer_cfg.py",help="Ntuplizer config file. Default is: minintuplizer_cfg.py")
 parser.add_option("",  "--puppiConfig", dest="puppiConfig", type="string", default="Puppi_cff.py",help="Puppi config file. Default is: Puppi_cff.py")
 parser.add_option("-n","--njobs"      , dest="njobs"      , type="int"   , help="Number of jobs")
+parser.add_option("-a","--njobmax"    , dest="njobmax"     , type="int"   , default = 0, help="Number of jobs max")
 parser.add_option("-e","--executable" , dest="executable" , type="string", default="MiniNtuplizer",help="Name of the executable. Default is: MiniNtuplizer")
 parser.add_option("-q","--queue"      , dest="queue"      , type="string", default="1nh",help="Name of the queue on lxbatch")
 parser.add_option(""  ,"--checkJobs"  , dest="checkJobs"  , action="store_true", default=False,help="Checks job status")
@@ -34,10 +35,10 @@ def makeFilesList(indir,wdir):
     command = ('%s find -f %s | grep root > %s/list.txt' % (eos,indir,wdir))
     #print command
     os.system(command)
-    file = open('%s/list.txt'%wdir, 'r')
-    list =[line.replace('/eos/cms/','root://eoscms.cern.ch//').replace('\n','') for line in file ]
+    file = open('%s/list.txt'%wdir, 'r')     
+    for line in file:
+     list.append(line.replace('/eos/cms/','root://eoscms.cern.ch//').replace('\n',''));
     print 'Found %d files' %len(list)
-    #print list             
     return list
 
 
@@ -47,7 +48,7 @@ def writeJobs(wdir, analysis, config, puppiconfig, indir, output, eosoutdir, njo
     #---------------------------------------------
     listoffiles = []
     listoffiles = makeFilesList(indir,wdir) ## make the file list for the input directory on eos
-
+    
     #---------------------------------------------
     # --- now split the jobs
     #---------------------------------------------
@@ -55,9 +56,10 @@ def writeJobs(wdir, analysis, config, puppiconfig, indir, output, eosoutdir, njo
       ## loop on the file list
       jobid = 0 ;
       for ifile in listoffiles:
+       if jobid > options.njobmax and options.njobmax != 0: break; 
        tfile    = TFile.Open(ifile,"READ");
        if not tfile : continue 
-       ttree    = tfile.Get("Events");
+       ttree    = tfile.Get("ntupler/Events");
        if not ttree : continue 
        nentries = ttree.GetEntries();
        
@@ -68,6 +70,7 @@ def writeJobs(wdir, analysis, config, puppiconfig, indir, output, eosoutdir, njo
 
        residualEvents = nentries-options.eventsPerJob*njobs ;
        if residualEvents > 0 : njobs = njobs+1;
+
        for i in range(njobs):         
         jobdir = '%s/JOB_%d'%(wdir,jobid)
         os.system("mkdir -p "+jobdir)        
@@ -153,7 +156,6 @@ def writeJobs(wdir, analysis, config, puppiconfig, indir, output, eosoutdir, njo
       return ;   
 
 def submitJobs(wdir, njobs, queue):
-    print "for job in range(njobs): ",njobs
     for job in range(njobs):
         print 'job %d' %job
         jobdir = '%s/JOB_%d'%(wdir,job)

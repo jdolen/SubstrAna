@@ -133,7 +133,7 @@ class TMVAGlob {
   ////////////////////////////////////// Canvas methods
 
   // create canvas and frame for the ROC plot
-  void CreateCanvasandFrameROC(const double & ptMin, const double & ptMax, const double & puMin, const double & puMax);
+  void CreateCanvasandFrameROC(const int & plotType, const double & ptMin, const double & ptMax, const double & puMin, const double & puMax);
   // destroy exsisting canvas
   void DestroyCanvases(); 
   // Print ROC Curve plot
@@ -172,7 +172,7 @@ class TMVAGlob {
   TDirectory *GetCorrelationPlotsDir( TMVAGlob::TypeOfPlot type, TDirectory *dir = 0 );
 
   /// banner inside the ROC plot
-  void banner4Plot (const bool & isLabel, const float & ptMin, const float & ptMax, const float & puMin, const float & puMax);
+  void banner4Plot (const bool & isLabel, const float & ptMin, const float & ptMax, const float & puMin, const float & puMax, const int & plotType);
   /// Set the name of the method
   void SetMethodName (const std::vector<std::string> & MethodName);
   /// Set input files

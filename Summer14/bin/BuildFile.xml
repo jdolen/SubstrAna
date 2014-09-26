@@ -15,3 +15,4 @@
 <bin   file="PlotPerformanceBDT.cpp" name="PlotPerformanceBDT"> </bin>
 <bin   file="TMVAApplyWeights.cpp" name="TMVAApplyWeights"> </bin>
 <bin   file="PlotEfficiency.cpp" name="PlotEfficiency"> </bin>
+<bin   file="PlotBasicQuantities.cpp" name="PlotBasicQuantities"> </bin>
