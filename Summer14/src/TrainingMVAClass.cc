@@ -676,7 +676,7 @@ std::pair<TString,TString> TrainingMVAClass::GetPreselectionCut (const std::stri
     }
 
     else if ( preselectionCutType == "basicJetsCutCSA14" && (LeptonType == "Jets" || LeptonType == "jets") and  TreeName_ =="gen"){
-      cutString.first  = Form("pt[0] > 200 && abs(eta[0])<2.4 && (pt[0] >= %f  && pt[0] <= %f )  && (npu > %f && npu <= %f) && is_MatchedToBoson == 1",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
+      cutString.first  = Form("pt[0] > 200 && abs(eta[0])<2.4 && (pt[0] >= %f  && pt[0] <= %f )  && (npu > %f && npu <= %f)",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
       cutString.second = Form("pt[0] > 200 && abs(eta[0])<2.4 && (pt[0] >= %f  && pt[0] <= %f )  && (npu > %f && npu <= %f)",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
       return cutString;
     }  
@@ -695,7 +695,7 @@ std::pair<TString,TString> TrainingMVAClass::GetPreselectionCut (const std::stri
     }
 
     else if ( preselectionCutType == "basicJetsCutCSA14Mass" && (LeptonType == "Jets" || LeptonType == "jets") and  TreeName_ =="gen"){
-      cutString.first  = Form("pt[0] > 200 && abs(eta[0])<2.4 && msoftdropsafe_z_010_beta_00[0] > 60 && msoftdropsafe_z_010_beta_00[0] < 100 && (pt[0] >= %f  && pt[0] <= %f )  && (npu > %f && npu <= %f) && is_MatchedToBoson == 1",pTJetMin_,pTJetMax_,npuMin_,npuMax_); 
+      cutString.first  = Form("pt[0] > 200 && abs(eta[0])<2.4 && msoftdropsafe_z_010_beta_00[0] > 60 && msoftdropsafe_z_010_beta_00[0] < 100 && (pt[0] >= %f  && pt[0] <= %f )  && (npu > %f && npu <= %f)",pTJetMin_,pTJetMax_,npuMin_,npuMax_); 
       cutString.second = Form("pt[0] > 200 && abs(eta[0])<2.4 && msoftdropsafe_z_010_beta_00[0] > 60 && msoftdropsafe_z_010_beta_00[0] < 100 && (pt[0] >= %f  && pt[0] <= %f )  && (npu > %f && npu <= %f)",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
       return cutString;
     }  
@@ -706,7 +706,7 @@ std::pair<TString,TString> TrainingMVAClass::GetPreselectionCut (const std::stri
       return cutString;
     }
     else if ( preselectionCutType == "basicJetsCutCSA14TTbar" && (LeptonType == "Jets" || LeptonType == "jets") and  TreeName_ =="gen"){
-    cutString.first  = Form("pt[0] > 200 && abs(eta[0])<2.4 && (pt[0] >= %f  && pt[0] <= %f )  && (npu > %f && npu <= %f) && is_MatchedToBoson == 1  && msoftdropsafe_z_010_beta_00[0] < 120 ",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
+    cutString.first  = Form("pt[0] > 200 && abs(eta[0])<2.4 && (pt[0] >= %f  && pt[0] <= %f )  && (npu > %f && npu <= %f) && msoftdropsafe_z_010_beta_00[0] < 120 ",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
     cutString.second = Form("pt[0] > 200 && abs(eta[0])<2.4 && (pt[0] >= %f  && pt[0] <= %f )  && (npu > %f && npu <= %f) && msoftdropsafe_z_010_beta_00[0] < 120 ",pTJetMin_,pTJetMax_,npuMin_,npuMax_);
     return cutString;
     }  
