@@ -44,10 +44,11 @@ file = open('%s'%options.inputTrainingList, 'r')
 lines = file.readlines();
 
 for iLine in range(len(lines)):
- jobdir = workingdir+"/JOB_%d"%(iLine); 
  listofVariables = lines[iLine].split(';');
+ if listofVariables[0][0] == "#" : continue ; 
+ jobdir = workingdir+"/JOB_%d"%(njobs); 
  os.system("mkdir -p "+jobdir);
- os.system("cp "+options.config+" "+jobdir); 
+ os.system("cp "+options.config+" "+jobdir);
  command = "cat "+jobdir+"/"+options.config+" | sed -e s%INPUFILELIST%"+str(listofVariables[0])+"%g > "+jobdir+"/temp.txt";  
  os.system(command);
  command = "cat "+jobdir+"/temp.txt | sed -e s%LABELNAME%"+str(listofVariables[1])+"%g > "+jobdir+"/temp2.txt";  
@@ -59,19 +60,19 @@ for iLine in range(len(lines)):
  os.system(" rm "+jobdir+"/*temp*");
  
  #--- prepare the jobs scripts                                                                                                                                                      
- jobscript = open('%s/sub_%d.sh'%(jobdir,iLine),'w')
+ jobscript = open('%s/sub_%d.sh'%(jobdir,njobs),'w')
  jobscript.write('cd %s \n'%jobdir)
  jobscript.write('eval ` scramv1 runtime -sh ` \n')
  jobscript.write('cd - \n')
  jobscript.write('if ( \n')
- jobscript.write('\t touch %s/sub_%d.run \n'%(jobdir,iLine));
+ jobscript.write('\t touch %s/sub_%d.run \n'%(jobdir,njobs));
  jobscript.write('\t %s %s'%(options.executable,jobdir+"/"+options.config));
  jobscript.write(') then \n');
- jobscript.write('\t touch %s/sub_%d.done \n'%(jobdir,iLine));
+ jobscript.write('\t touch %s/sub_%d.done \n'%(jobdir,njobs));
  jobscript.write('else \n');
- jobscript.write('\t touch %s/sub_%d.fail \n'%(jobdir,iLine));
+ jobscript.write('\t touch %s/sub_%d.fail \n'%(jobdir,njobs));
  jobscript.write('fi \n');
- os.system('chmod a+x %s/sub_%d.sh'%(jobdir,iLine));
+ os.system('chmod a+x %s/sub_%d.sh'%(jobdir,njobs));
  njobs = njobs +1
  
 
